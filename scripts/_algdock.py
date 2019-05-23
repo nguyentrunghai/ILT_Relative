@@ -3,27 +3,29 @@ import os
 import numpy as np
 
 
-SIX_YANK_SYSTEMS = ["lysozyme.active.A__ABJ", "benzene.A__AAA", "lysozyme.inactive.A__AAS", "1-methylpyrrole.A__AAA", "phenol.A__AAA", "p-xylene.A__AAA"]
+SIX_YANK_SYSTEMS = ["lysozyme.active.A__ABJ", "benzene.A__AAA", "lysozyme.inactive.A__AAS",
+                    "1-methylpyrrole.A__AAA", "phenol.A__AAA", "p-xylene.A__AAA"]
 
 SIX_YANK_SYSTEMS_NAMES = {}
-SIX_YANK_SYSTEMS_NAMES["lysozyme.active.A__ABJ"]   = "n-hexylbenzene"
-SIX_YANK_SYSTEMS_NAMES["benzene.A__AAA"]           = "benzene"
+SIX_YANK_SYSTEMS_NAMES["lysozyme.active.A__ABJ"] = "n-hexylbenzene"
+SIX_YANK_SYSTEMS_NAMES["benzene.A__AAA"] = "benzene"
 SIX_YANK_SYSTEMS_NAMES["lysozyme.inactive.A__AAS"] = "($\pm$)-camphor"
-SIX_YANK_SYSTEMS_NAMES["1-methylpyrrole.A__AAA"]   = "methylpyrrole"
-SIX_YANK_SYSTEMS_NAMES["phenol.A__AAA"]            = "phenol"
-SIX_YANK_SYSTEMS_NAMES["p-xylene.A__AAA"]          = "p-xylene"
+SIX_YANK_SYSTEMS_NAMES["1-methylpyrrole.A__AAA"] = "methylpyrrole"
+SIX_YANK_SYSTEMS_NAMES["phenol.A__AAA"] = "phenol"
+SIX_YANK_SYSTEMS_NAMES["p-xylene.A__AAA"] = "p-xylene"
 
 FOUR_ACTIVE_YANK_SYSTEMS = ["lysozyme.active.A__ABJ", "benzene.A__AAA", "1-methylpyrrole.A__AAA", "p-xylene.A__AAA"]
 
-SNAPSHOT_LIST_DIR   = "/home/tnguye46/T4_Lysozyme/scripts"
+SNAPSHOT_LIST_DIR   = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/snapshot_list"
 SNAPSHOT_LIST_FILES = ["the_5th_288_snapshots_names.dat", "the_10th_288_snapshots_names.dat"]
 SNAPSHOT_LIST_FILES = [os.path.join(SNAPSHOT_LIST_DIR, file) for file in SNAPSHOT_LIST_FILES]
 
+
 def load_algdock_snapshots():
     """
-    snapshot_list_files :   list of str
-    return
-        sorted list of Bing's notation snapshots
+    :return: list of str
+            a sorted list of snapshots according to Bing's notation
+            eg. ["4", "9", ...]
     """
     snapshots = []
     for filename in SNAPSHOT_LIST_FILES:
@@ -31,12 +33,15 @@ def load_algdock_snapshots():
     snapshots.sort(key = lambda i: int(i))
     return snapshots
 
+
 def ligand_name_to_group_code(ligand_names):
     """
-    ligand_names    :   list of str
-    return 
-        group_code[ligand_full_name]["group"]   -> group
-        group_code[ligand_full_name]["code"]    -> code
+    :param ligand_names:  list of str
+                          list of names of ligands
+    :return: group_code, dict
+              group_code[ligand_full_name]["group"]   -> group
+              group_code[ligand_full_name]["code"]    -> code
+              e.g.: {'lysozyme.active.A__ABJ': {'code': 'ABJ', 'group': 'lysozyme.active.A__'}}
     """
     assert type(ligand_names) == list, "ligand_names must be a list"
     group_code = {}
@@ -45,6 +50,7 @@ def ligand_name_to_group_code(ligand_names):
         group_code[ligand]["group"] = ligand[: -3]
         group_code[ligand]["code"] = ligand[-3 :]
     return group_code
+
 
 def load_algdock_snapshots_for_each_of_six_yank_systems():
     """
