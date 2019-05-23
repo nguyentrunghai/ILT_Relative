@@ -54,6 +54,9 @@ def ligand_name_to_group_code(ligand_names):
 
 def load_algdock_snapshots_for_each_of_six_yank_systems():
     """
+    :return: snapshots_for_each_system, dict
+              snapshots_for_each_system["ligand_name"] -> list of snapshots (["4", "9"...])
+              snapshots_for_each_system["all"] -> list of snapshots
     """
     snapshots = load_algdock_snapshots()
     total_number_of_snapshots = len(snapshots)
@@ -70,8 +73,12 @@ def load_algdock_snapshots_for_each_of_six_yank_systems():
         snapshots_for_each_system[system] = snapshots[begin : end]
     return snapshots_for_each_system
 
+
 def Bing_snapshot_indices_for_algdock(nframes_per_state=10000):
     """
+    :param nframes_per_state: int
+    :return: [5000, 9000]
+             index of snaphots from each state chosen for algdock calculations
     """
     first_stride = 1000
     first_list = [i for i in range(nframes_per_state) if i%first_stride == 0]
@@ -83,6 +90,11 @@ def Bing_snapshot_indices_for_algdock(nframes_per_state=10000):
 
 def load_bpmfs(file_name, exclude_nan=False):
     """
+    :param file_name: str
+    :param exclude_nan: bool, whether to exclude NaN values
+    :return: bpmfs, dict
+             bpmfs[snapshot]  -> float
+             e.g. bpmfs["4"]  -> -2.8192
     """
     bpmfs = {}
     with open(file_name, "r") as handle:
