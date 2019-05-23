@@ -208,7 +208,7 @@ def load_receptor_pot_energies(file_name, value_col=3):
         for line in handle:
             if "#" not in line:
                 entries = line.split()
-                value    = entries[value_col]
+                value = entries[value_col]
                 energies.append(np.float(value))
     return np.array(energies)
 
