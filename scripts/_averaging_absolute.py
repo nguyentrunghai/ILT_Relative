@@ -1,4 +1,6 @@
-#
+
+from __future__ import print_function
+
 import os
 import glob
 import numpy as np
@@ -206,7 +208,7 @@ class MultiStruScores:
                     try:
                         a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
                     except FloatingPointError:
-                        print "overflow for " + self._identification + " " + snapshot + " " + FF
+                        print("overflow for", self._identification, snapshot, FF)
                     else:
                         w += self._weights[system][snapshot]
             if w != 0:
@@ -218,6 +220,10 @@ class MultiStruScores:
 
 
     def get_exp_mean_std(self):
+        """
+        using bootstrap
+        :return: std, dict, std[FF] -> float
+        """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
             snapshots = np.random.choice(self._considered_snapshots, size=len(self._considered_snapshots), replace=True)
@@ -232,9 +238,14 @@ class MultiStruScores:
                 std[FF] = np.std(fes[FF])
             else:
                 std[FF] = 0.
+
         return std
     
     def _cal_mean(self, snapshots):
+        """
+        :param snapshots: list of str
+        :return: averages, dict, averages[FF] -> float
+        """
         averages = {}
         for FF in self._FFs:
             sys_mean = 0.
@@ -250,7 +261,7 @@ class MultiStruScores:
                     a = a / w
                 sys_mean += a * self._weights["systems"][system]
 
-            sys_mean = sys_mean / np.sum( [self._weights["systems"][system] for system in self._yank_systems] )
+            sys_mean = sys_mean / np.sum([self._weights["systems"][system] for system in self._yank_systems])
             averages[FF] = sys_mean * TEMPERATURE * KB
         return averages
 
@@ -258,6 +269,10 @@ class MultiStruScores:
         return self._cal_mean(self._considered_snapshots)
 
     def get_mean_std(self):
+        """
+        using bootstrap
+        :return: std, dict, std[FF] -> float
+        """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
             snapshots = np.random.choice(self._considered_snapshots, size=len(self._considered_snapshots), replace=True)
@@ -279,7 +294,8 @@ class MultiStruScores:
         for FF in self._FFs:
             a = []
             for system in self._yank_systems:
-                a += [ self._scores[FF][snapshot] for snapshot in snapshots if snapshot in self._allowed_snapshots[FF][system] ]
+                a += [self._scores[FF][snapshot] for snapshot in snapshots
+                      if snapshot in self._allowed_snapshots[FF][system]]
 
             if len(a) > 0:
                 averages[FF] = np.array(a).min() * TEMPERATURE * KB
@@ -291,6 +307,10 @@ class MultiStruScores:
         return self._cal_min(self._considered_snapshots)
 
     def get_min_std(self):
+        """
+        using bootstrap
+        :return: std, dict, std[FF] -> float
+        """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
             snapshots = np.random.choice(self._considered_snapshots, size=len(self._considered_snapshots), replace=True)
@@ -307,16 +327,22 @@ class MultiStruScores:
                 std[FF] = 0.
         return std
 
-    def check_extreme_low(self, cutoff = -100.):
+    def check_extreme_low(self, cutoff=-100.):
+        """
+        to check if some scores are very low
+        :param cutoff:
+        :return:
+        """
         for FF in self._FFs:
             for system in self._yank_systems:
                 for snapshot in self._weights[system].keys():
                     if snapshot in self._allowed_snapshots[FF][system]:
                         if self._scores[FF][snapshot] != np.inf:
                             if self._scores[FF][snapshot] < cutoff:
-                                print "Extreme low: " + self._identification + " " + snapshot + " " + FF + "  %20.10f"%self._scores[FF][snapshot]
+                                print("Extreme low:", self._identification, snapshot,
+                                      FF, " %20.10f"%self._scores[FF][snapshot])
         return None
-#----------------------------
+
 
 
 
