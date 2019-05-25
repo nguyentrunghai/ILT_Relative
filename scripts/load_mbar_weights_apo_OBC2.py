@@ -1,4 +1,6 @@
 
+from __future__ import print_function
+
 import numpy as np
 import os
 import pickle
@@ -7,11 +9,12 @@ from _algdock import Bing_snapshot_indices_for_algdock
 
 WEIGHTS_DIR = "/home/tnguye46/T4_Lysozyme/Mbar_Weights_OBC2"
 
-SNAPSHOT_LIST_DIR = "/home/tnguye46/T4_Lysozyme/scripts"
+SNAPSHOT_LIST_DIR = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/snapshot_list"
 SNAPSHOT_LIST_FILES = ["the_5th_288_snapshots_names.dat", "the_10th_288_snapshots_names.dat"]
 SNAPSHOT_LIST_FILES = [os.path.join(SNAPSHOT_LIST_DIR, file) for file in SNAPSHOT_LIST_FILES]
 
-#$$$$$$$$$$$$$$$
+# when unpickled we get a dict, assign[snapshot] -> list of int
+# it maps each of the 576 Algdock snapshots to a list of YANK snapshots it represent
 ASSIGNMENT_FILE = "/home/tnguye46/T4_Lysozyme/Yank_snapshots/assign_snapshots_to_576_classes/assign.pkl"
 ASSIGNMENT = pickle.load( open(ASSIGNMENT_FILE, "r") )
 
@@ -35,22 +38,23 @@ def load_mbar_weights():
     nr_systems = len(YANK_SYSTEMS)
 
     nr_of_states_per_system = NR_YANK_SNAPSHOTS_PER_SYSTEM / NR_YANK_SNAPSHOTS_PER_STATE
-    print "number of states per system %d"%nr_of_states_per_system 
+    print("number of states per system %d"%nr_of_states_per_system)
     
-    nr_selected_snaphots_per_system = NR_YANK_SNAPSHOTS_PER_SYSTEM / DOCK_STRIDE
-    print 'number of selected snapshots %d' %(nr_selected_snaphots_per_system * nr_systems)
+    nr_selected_snapshots_per_system = NR_YANK_SNAPSHOTS_PER_SYSTEM / DOCK_STRIDE
+    print('number of selected snapshots %d' %(nr_selected_snapshots_per_system * nr_systems))
 
-    #selected_snaphots_per_system = range(FIRST_INDEX, NR_YANK_SNAPSHOTS_PER_SYSTEM, DOCK_STRIDE)
-    selected_snaphots_per_system = Bing_snapshot_indices_for_algdock(nframes_per_state=NR_YANK_SNAPSHOTS_PER_SYSTEM)
+    #selected_snapshots_per_system = range(FIRST_INDEX, NR_YANK_SNAPSHOTS_PER_SYSTEM, DOCK_STRIDE)
+    selected_snapshots_per_system = Bing_snapshot_indices_for_algdock(nframes_per_state=NR_YANK_SNAPSHOTS_PER_SYSTEM)
 
 
-    if len(selected_snaphots_per_system) != nr_selected_snaphots_per_system:
-        raise RuntimeError("len(selected_snaphots_per_system) != nr_selected_snaphots_per_system")
+    if len(selected_snapshots_per_system) != nr_selected_snapshots_per_system:
+        raise RuntimeError("len(selected_snapshots_per_system) != nr_selected_snapshots_per_system")
 
-    if len(snapshots) != (nr_selected_snaphots_per_system * nr_systems):
-        raise RuntimeError("nr of snapshot from the list file is %d but number estimated from stride is %d "%(len(snapshots), nr_selected_snaphots_per_system * nr_systems))
+    if len(snapshots) != (nr_selected_snapshots_per_system * nr_systems):
+        raise RuntimeError("nr of snapshot from the list file is %d but number estimated from stride is %d "%(len(snapshots),
+                                                                    nr_selected_snapshots_per_system * nr_systems))
 
-    print 'parsing MBAR weights ...'
+    print("parsing MBAR weights ...")
     #
     bl_weights = {}
     st_weights = {}
@@ -79,7 +83,7 @@ def load_mbar_weights():
         st_weights[system]  = np.array( [ weights[i : j].sum() for i, j in repeated_index_range_in_each_state ] )
         st_weights[system]  /= st_weights[system].sum()
 
-        single_weights[system] = np.array( [ weights[s] for s in selected_snaphots_per_system ] )
+        single_weights[system] = np.array( [ weights[s] for s in selected_snapshots_per_system ] )
         single_weights[system] /= single_weights[system].sum()
 
         #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -135,7 +139,7 @@ def load_mbar_weights():
     count = -1
     for system in YANK_SYSTEMS:
         snapshot_for_each_system[system] = []
-        for i in range(nr_selected_snaphots_per_system):
+        for i in range(nr_selected_snapshots_per_system):
             count += 1
             snapshot_for_each_system[system].append( snapshots[count] )
     #
