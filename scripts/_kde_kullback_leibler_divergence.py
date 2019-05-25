@@ -5,18 +5,28 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import seaborn as sns
 
+
 def _mins(pcs_file):
-    """ """
+    """
+    :param pcs_file: list of str
+    :return: mins, numpy array
+    """
     return np.loadtxt(pcs_file).min(axis=0)
 
+
 def _maxs(pcs_file):
-    """ """
+    """
+    :param pcs_file: list of str
+    :return: maxs, numpy array
+    """
     return np.loadtxt(pcs_file).max(axis=0)
 
 
 def overal_min_max(pcs_files):
     """
-    return [(pc1_min, pc1_max), (pc2_min, pc2_max), ...]
+    :param pcs_files: list str
+    :return: min_max, list of tuples
+             eg., [(pc1_min, pc1_max), (pc2_min, pc2_max), ...]
     """
     assert isinstance(pcs_files, list), "pcs_files must be a list of str"
     mins = [_mins(pcs_file) for pcs_file in pcs_files]
@@ -33,6 +43,7 @@ def overal_min_max(pcs_files):
         min_max.append( (mi - factor*d, ma + factor*d) )
 
     return min_max
+
 
 def gaussian_kde_2d(x, y, xmin, xmax, ymin, ymax, bandwidth, xbins=20, ybins=20):
     """ Build 2D kernel density estimate (KDE)."""
@@ -53,17 +64,32 @@ def gaussian_kde_2d(x, y, xmin, xmax, ymin, ymax, bandwidth, xbins=20, ybins=20)
 
     return x_grid, y_grid, density_grid
 
+
 def bin_area(x_grid, y_grid):
     """
+    :param x_grid: numpy array
+    :param y_grid: numpy array
+    :return: float
     """
     x_bin_width = x_grid[0, 1] - x_grid[0, 0]
     y_bin_width = y_grid[1, 0] - y_grid[0, 0]
     return x_bin_width * y_bin_width 
 
+
 def plot_density(density_grid, left, right, bottom, top, 
                 xlabel, ylabel, out,
                 nticks=7):
     """
+    :param density_grid:
+    :param left:
+    :param right:
+    :param bottom:
+    :param top:
+    :param xlabel:
+    :param ylabel:
+    :param out:
+    :param nticks:
+    :return:
     """
     figure_size = (3.2, 3.2*6/8)
     dpi = 300
@@ -104,6 +130,12 @@ def plot_density(density_grid, left, right, bottom, top,
 
 
 def kullback_leibler_divergence(p, q, bin_area):
+    """
+    :param p:
+    :param q:
+    :param bin_area:
+    :return:
+    """
     assert p.shape == q.shape, "p and q must have the same shape"
     assert p.ndim == 2, "p must be 2d array"
 
@@ -123,13 +155,18 @@ def kullback_leibler_divergence(p, q, bin_area):
 
     return total * bin_area
 
+
 def jensen_shannon_divergence(p, q, bin_area):
     m = 0.5 * (p + q)
     jsd = 0.5 * kullback_leibler_divergence(p, m, bin_area) + 0.5 * kullback_leibler_divergence(q, m, bin_area)
     return jsd
 
+
 def annotated_heat_map(dataframe, out):
     """
+    :param dataframe:
+    :param out:
+    :return:
     """
     figure_size=(6.4, 6.4)
     dpi=300
