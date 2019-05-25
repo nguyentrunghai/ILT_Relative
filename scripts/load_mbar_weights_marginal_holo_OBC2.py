@@ -6,8 +6,10 @@ from _algdock import SIX_YANK_SYSTEMS
 
 def load_mbar_weights(path="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Mbar_Weights_marginal_holo_OBC2"):
     """
+    :param path: str
+    :return: weights, dict, weights[ligand][snapshot] -> float
     """
-    weights = {}
+    weights = dict()
     weights["systems"] = {ligand:1 for ligand in SIX_YANK_SYSTEMS}
 
     for ligand in SIX_YANK_SYSTEMS:
