@@ -56,33 +56,47 @@ class MultiStruScores:
         self._allowed_snapshots = self._get_snapshots_in_scores_and_systems()
 
     def _load_dock6(self):
+        """
+        store dock6 scores to self._scores["dock6"]
+        self._scores["dock6"][snapshot_id] -> float
+        :return: None
+        """
         in_file = open(os.path.join(self._dock_dir, "dock6.score"), "r")
         entries = {}
         for line in in_file:
             words = line.split()
-            snap_id, value = words[0], words[1]
+            snapshot_id, value = words[0], words[1]
             
             if value.lower() != "nan":
-                entries[snap_id] = np.float(value) / TEMPERATURE / KB
+                entries[snapshot_id] = np.float(value) / TEMPERATURE / KB
 
         self._scores["dock6"] = entries
         in_file.close()
+
         return None
     
     def _load_algdock(self):
-        for FF in self._FFs:
-            if FF != "dock6":
-                in_file = open( os.path.join(self._algdock_dir, FF + ".score"), "r" )
-                entries = {}
-                for line in in_file:
-                    words = line.split()
-                    snap_id, value = words[0], words[1]
+        """
+        store algdock scores into self._scores[FF], where FF != "dock6"
+        self._scores[FF][snapshot_id] -> float
+        :return: None
+        """
+        algdock_FFs = [FF for FF in self._FFs if FF != "dock6"]
 
-                    if value.lower() != "nan":
-                        entries[snap_id] = np.float(value)
+        for FF in algdock_FFs:
+            in_file = open(os.path.join(self._algdock_dir, FF + ".score"), "r")
+            entries = {}
 
-                self._scores[FF] = entries
-                in_file.close()
+            for line in in_file:
+                words = line.split()
+                snapshot_id, value = words[0], words[1]
+
+                if value.lower() != "nan":
+                    entries[snapshot_id] = np.float(value)
+
+            self._scores[FF] = entries
+            in_file.close()
+            
         return None
 
     def _get_snapshots(self):
