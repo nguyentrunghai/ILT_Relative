@@ -1,42 +1,49 @@
 #
 import os
-import sys
 import glob
 import numpy as np
-import copy
 np.seterr(over='raise') # raise exception if overload
 
 TEMPERATURE = 300.                                                                                                                                                       
 KB = 8.3144621E-3/4.184  # kcal/mol/K
 BETA = 1. / TEMPERATURE / KB
 
-dock6_dir   = "dock6"
-algdock_dir = "AlGDock/dock"
-#algdock_dir = "AlGDock"
+DOCK6_SUB_DIR = "dock6"
+ALGDOCK_SUB_DIR = "AlGDock/dock"
 
-EXCLUDE_FFS = ["receptor_OpenMM_Gas", "receptor_OpenMM_OBC2", "Theta_1OpenMM_Gas", "Theta_1OpenMM_OBC2", "Theta_RLOpenMM_Gas", "Theta_RLOpenMM_OBC2", 
-        "Theta_1sander_Gas", "Theta_1sander_PBSA", "Theta_RLsander_Gas", "Theta_RLsander_PBSA", "receptor_sander_Gas", "receptor_sander_PBSA", 
-        "grid_MBAR", "MBAR", "OpenMM_Gas_MBAR_c2", "OpenMM_Gas_inverse_FEP", "OpenMM_OBC2_inverse_FEP", "OpenMM_OBC2_MBAR_c2"]
+EXCLUDE_FFS = ["receptor_OpenMM_Gas", "receptor_OpenMM_OBC2", "Theta_1OpenMM_Gas",
+               "Theta_1OpenMM_OBC2", "Theta_RLOpenMM_Gas", "Theta_RLOpenMM_OBC2",
+               "Theta_1sander_Gas", "Theta_1sander_PBSA", "Theta_RLsander_Gas", "Theta_RLsander_PBSA",
+               "receptor_sander_Gas", "receptor_sander_PBSA", "grid_MBAR", "MBAR", "OpenMM_Gas_MBAR_c2",
+               "OpenMM_Gas_inverse_FEP", "OpenMM_OBC2_inverse_FEP", "OpenMM_OBC2_MBAR_c2"]
+
 
 class MultiStruScores:
     """
     load and averaging scores for a ligand over multiple receptor's snapshots
     """
-    def __init__( self, score_dir, ligand_group, ligand_3l_code, weights, yank_systems, exclude_ffs=EXCLUDE_FFS, 
-                repeats=100):
+    def __init__( self, score_dir, ligand_group, ligand_3l_code,
+                  weights, yank_systems,
+                  exclude_ffs=EXCLUDE_FFS, repeats=100):
         """
-        weights[system][snapshot]
-        yank_systems:   list of str
+        :param score_dir: str
+        :param ligand_group: str
+        :param ligand_3l_code: str
+        :param weights: dict, weights[system][snapshot] -> float
+        :param yank_systems: list of str
+        :param exclude_ffs: list of str
+        :param repeats: int, number of bootstrap repeats
         """
+
         self._identification = ligand_group + ligand_3l_code
-        self._dock_dir = os.path.join( score_dir, dock6_dir, ligand_group, ligand_3l_code )
-        self._algdock_dir = os.path.join( score_dir, algdock_dir, ligand_group, ligand_3l_code )
+        self._dock_dir = os.path.join(score_dir, DOCK6_SUB_DIR, ligand_group, ligand_3l_code)
+        self._algdock_dir = os.path.join(score_dir, ALGDOCK_SUB_DIR, ligand_group, ligand_3l_code)
         
         self._FFs = ["dock6"]
-        FFs = glob.glob( os.path.join(self._algdock_dir, "*.score") )
-        FFs = [ os.path.basename(FF)[:-6] for FF in FFs ]
+        FFs = glob.glob(os.path.join(self._algdock_dir, "*.score"))
+        FFs = [os.path.basename(FF)[:-6] for FF in FFs]
         FFs = [ff for ff in FFs if ff not in exclude_ffs]
-        self._FFs.extend( FFs )
+        self._FFs.extend(FFs)
         
         self._scores = {}
         self._load_dock6()
@@ -46,10 +53,10 @@ class MultiStruScores:
         self._yank_systems = yank_systems
         self._repeats = repeats
         self._considered_snapshots = self._get_snapshots()
-        self._allowed_snashots = self._get_snapshots_in_scores_and_systems()
+        self._allowed_snapshots = self._get_snapshots_in_scores_and_systems()
 
     def _load_dock6(self):
-        in_file = open( os.path.join(self._dock_dir, "dock6.score"), "r")
+        in_file = open(os.path.join(self._dock_dir, "dock6.score"), "r")
         entries = {}
         for line in in_file:
             words = line.split()
@@ -110,7 +117,7 @@ class MultiStruScores:
                 a = 0.
                 w = 0.
                 for snapshot in snapshots:
-                    if snapshot in self._allowed_snashots[FF][system]:
+                    if snapshot in self._allowed_snapshots[FF][system]:
                         try:
                             a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
                         except FloatingPointError:
@@ -134,7 +141,7 @@ class MultiStruScores:
             a = 0.
             w = 0.
             for snapshot in snapshots:
-                if snapshot in self._allowed_snashots[FF][system]:
+                if snapshot in self._allowed_snapshots[FF][system]:
                     try:
                         a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
                     except FloatingPointError:
@@ -155,7 +162,7 @@ class MultiStruScores:
             a = 0.
             w = 0.
             for snapshot in snapshots:
-                if snapshot in self._allowed_snashots[FF][system]:
+                if snapshot in self._allowed_snapshots[FF][system]:
                     try:
                         a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
                     except FloatingPointError:
@@ -195,7 +202,7 @@ class MultiStruScores:
                 a = 0.
                 w = 0.
                 for snapshot in snapshots:
-                    if snapshot in self._allowed_snashots[FF][system]:
+                    if snapshot in self._allowed_snapshots[FF][system]:
                         if self._scores[FF][snapshot] != np.inf:
                             a += self._scores[FF][snapshot] * self._weights[system][snapshot]
                             w += self._weights[system][snapshot]
@@ -232,7 +239,7 @@ class MultiStruScores:
         for FF in self._FFs:
             a = []
             for system in self._yank_systems:
-                a += [ self._scores[FF][snapshot] for snapshot in snapshots if snapshot in self._allowed_snashots[FF][system] ]
+                a += [ self._scores[FF][snapshot] for snapshot in snapshots if snapshot in self._allowed_snapshots[FF][system] ]
 
             if len(a) > 0:
                 averages[FF] = np.array(a).min() * TEMPERATURE * KB
@@ -264,7 +271,7 @@ class MultiStruScores:
         for FF in self._FFs:
             for system in self._yank_systems:
                 for snapshot in self._weights[system].keys():
-                    if snapshot in self._allowed_snashots[FF][system]:
+                    if snapshot in self._allowed_snapshots[FF][system]:
                         if self._scores[FF][snapshot] != np.inf:
                             if self._scores[FF][snapshot] < cutoff:
                                 print "Extreme low: " + self._identification + " " + snapshot + " " + FF + "  %20.10f"%self._scores[FF][snapshot]
