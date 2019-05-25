@@ -298,7 +298,7 @@ class MultiStruScores:
     def get_min_std(self):
         """
         use bootstrap for self._cal_min()
-        :return:
+        :return: std, dict, std[FF] -> float
         """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
