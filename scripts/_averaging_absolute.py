@@ -96,10 +96,14 @@ class MultiStruScores:
 
             self._scores[FF] = entries
             in_file.close()
-            
+
         return None
 
     def _get_snapshots(self):
+        """
+        :return: list of str
+                 list of all snapshots in  self._weights
+        """
         snapshots = []
         for system in self._yank_systems:
             for snapshot in self._weights[system].keys():
@@ -107,6 +111,10 @@ class MultiStruScores:
         return snapshots
 
     def _get_snapshots_in_scores_and_systems(self):
+        """
+        :return:  snapshots, dict, snapshots[FF][system] -> list
+                  snapshots in yank_systems and have scores
+        """
         snapshots = {}
         for FF in self._FFs:
             snapshots[FF] = {}
@@ -124,6 +132,12 @@ class MultiStruScores:
         return self._FFs
     
     def _cal_exp_mean(self, snapshots):
+        """
+        :param snapshots: lis of str
+        :return: averages, dict, averages[FF] -> float
+                 -1/\beta *\ln(<e^{-\beta * BPMF}>),
+                 where <...> is average over snapshots
+        """
         averages = {}
         for FF in self._FFs:
             sys_mean = 0.
@@ -133,23 +147,29 @@ class MultiStruScores:
                 for snapshot in snapshots:
                     if snapshot in self._allowed_snapshots[FF][system]:
                         try:
-                            a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
+                            a += np.exp(-1.0 * self._scores[FF][snapshot]) * self._weights[system][snapshot]
                         except FloatingPointError:
-                            print "overflow for " + self._identification + " " + snapshot + " " + FF
+                            print("overflow for", self._identification, snapshot, FF)
                         else:
                             w += self._weights[system][snapshot]
                 if w != 0:
                     a = a / w
                 sys_mean += a * self._weights["systems"][system]
 
-            sys_mean = sys_mean / sum( [self._weights["systems"][system] for system in self._yank_systems] )
+            sys_mean = sys_mean / sum([self._weights["systems"][system] for system in self._yank_systems])
             averages[FF] = (-1./BETA) * np.log(sys_mean)
+
         return averages
 
     def get_exp_mean(self):
         return self._cal_exp_mean(self._considered_snapshots)
 
     def get_exp_mean_for_snapshots(self, FF, snapshots):
+        """
+        :param FF: str
+        :param snapshots: list of str
+        :return: sys_mean, float
+        """
         sys_mean = 0.
         for system in self._yank_systems:
             a = 0.
@@ -157,20 +177,26 @@ class MultiStruScores:
             for snapshot in snapshots:
                 if snapshot in self._allowed_snapshots[FF][system]:
                     try:
-                        a += np.exp( -1.0 * self._scores[FF][snapshot] ) * self._weights[system][snapshot]
+                        a += np.exp(-1.0 * self._scores[FF][snapshot]) * self._weights[system][snapshot]
                     except FloatingPointError:
-                        print "overflow for " + self._identification + " " + snapshot + " " + FF
+                        print("overflow for", self._identification, snapshot, FF)
                     else:
                         w += self._weights[system][snapshot]
             if w != 0:
                 a = a / w
             sys_mean += a * self._weights["systems"][system]
 
-        sys_mean = sys_mean / sum( [self._weights["systems"][system] for system in self._yank_systems] )
+        sys_mean = sys_mean / sum([self._weights["systems"][system] for system in self._yank_systems])
         sys_mean = (-1./BETA) * np.log(sys_mean)
+
         return sys_mean
 
     def get_min_exp_mean_for_snapshots(self, FF, snapshots):
+        """
+        :param FF: str
+        :param snapshots: list of str
+        :return: min[e^{-\beta BPMF}] float
+        """
         sys_means = []
         for system in self._yank_systems:
             a = 0.
