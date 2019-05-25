@@ -171,7 +171,10 @@ class MultiStruScores:
 
     def cal_exp_mean_separate_for_each_system(self, FF, snapshots):
         """
-        exponential mean for each FF, with repect to each system in self._yank_systems
+        exponential mean for each FF, with respect to each system in self._yank_systems
+        :param FF: str
+        :param snapshots: list of str
+        :return: sys_means, dict, sys_means[system] -> float
         """
         sys_means = {}
         for system in self._yank_systems:
@@ -180,9 +183,10 @@ class MultiStruScores:
             for snapshot in snapshots:
                 if snapshot in self._allowed_snapshots[FF][system]:
                     try:
-                        a += np.exp( -1.0 * (self._scores[FF][snapshot] - self._yank_interaction_energies[system][snapshot]) ) * self._weights[system][snapshot]
+                        a += np.exp(-1.0 * (self._scores[FF][snapshot] -
+                                            self._yank_interaction_energies[system][snapshot])) * self._weights[system][snapshot]
                     except FloatingPointError:
-                        #print "overflow for " + self._identification + " " + snapshot + " " + FF
+                        #print("overflow for", self._identification, snapshot, FF)
                         pass
                     else:
                         w += self._weights[system][snapshot]
@@ -194,6 +198,11 @@ class MultiStruScores:
         return sys_means
 
     def get_exp_mean_std(self):
+        """
+        use bootstrap to estimate standard error of self._cal_exp_mean
+        :return: std, dict
+                 std[FF] -> float
+        """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
             snapshots = np.random.choice(self._considered_snapshots, size=len(self._considered_snapshots), replace=True)
@@ -208,9 +217,15 @@ class MultiStruScores:
                 std[FF] = np.std(fes[FF])
             else:
                 std[FF] = 0.
+
         return std
     
     def _cal_mean(self, snapshots):
+        """
+        :param snapshots: list of str
+        :return: averages, dict
+                 averages[FF] -> float
+        """
         averages = {}
         for FF in self._FFs:
             sys_mean = 0.
@@ -220,20 +235,26 @@ class MultiStruScores:
                 for snapshot in snapshots:
                     if snapshot in self._allowed_snapshots[FF][system]:
                         if self._scores[FF][snapshot] != np.inf:
-                            a += ( self._scores[FF][snapshot] - self._yank_interaction_energies[system][snapshot] )* self._weights[system][snapshot]
+                            a += (self._scores[FF][snapshot]
+                                - self._yank_interaction_energies[system][snapshot])* self._weights[system][snapshot]
                             w += self._weights[system][snapshot]
                 if w != 0:
                     a = a / w
                 sys_mean += a * self._weights["systems"][system]
 
-            sys_mean = sys_mean / np.sum( [self._weights["systems"][system] for system in self._yank_systems] )
+            sys_mean = sys_mean / np.sum([self._weights["systems"][system] for system in self._yank_systems])
             averages[FF] = sys_mean * TEMPERATURE * KB
+
         return averages
 
     def get_mean(self):
         return self._cal_mean(self._considered_snapshots)
 
     def get_mean_std(self):
+        """
+        use bootstrap to estimate standard error for self._cal_mean()
+        :return: std, dict, std[FF] -> float
+        """
         fes = {FF:[] for FF in self._FFs}
         for repeat in range(self._repeats):
             snapshots = np.random.choice(self._considered_snapshots, size=len(self._considered_snapshots), replace=True)
