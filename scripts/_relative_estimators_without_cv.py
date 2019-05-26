@@ -1,5 +1,5 @@
 """
-implement relative binding free energy estimator (holo estimator)
+implement relative binding free energy estimator (holo estimator) without control variates
 """
 
 from __future__ import print_function
