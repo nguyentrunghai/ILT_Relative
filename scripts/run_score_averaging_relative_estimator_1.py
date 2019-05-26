@@ -18,47 +18,48 @@ from _relative_estimators_without_cv import MultiStruScores
 
 def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
     """
-    :param yank_systems:
-    :param result_dir:
-    :param weights:
-    :param yank_interaction_energies:
-    :return:
+    :param yank_systems: list of str
+    :param result_dir: str
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :return: None
     """
-    #
     if not os.path.isdir(result_dir):
         os.system("mkdir " + result_dir)
 
     out_files = {}
     for rule in combining_rules:
-        if not os.path.isdir( os.path.join(result_dir, rule) ):
-            os.system("mkdir " + os.path.join(result_dir, rule) )
+        if not os.path.isdir(os.path.join(result_dir, rule)):
+            os.system("mkdir " + os.path.join(result_dir, rule))
         out_files[rule] = {}
         for FF in FFs:
-            out_files[rule][FF] = open( os.path.join(result_dir, rule, FF + '.score'), 'w' )
+            out_files[rule][FF] = open(os.path.join(result_dir, rule, FF + ".score"), "w")
 
     for group in ligand_3l_codes.keys():
+
         for code in ligand_3l_codes[group]:
-            # TODO
             scores = MultiStruScores(args.scores_dir, group, code,  weights, yank_systems, yank_interaction_energies)
             scores.check_extreme_low()
+
             for rule in combining_rules:
-                if rule == 'Mean':
+                if rule == "Mean":
                     averages     = scores.get_mean()
                     standard_dev = scores.get_mean_std()
 
-                elif rule == 'Min':
+                elif rule == "Min":
                     averages     = scores.get_min()
                     standard_dev = scores.get_min_std()
 
-                elif rule == 'ExpMean':
+                elif rule == "ExpMean":
                     averages     = scores.get_exp_mean()
                     standard_dev = scores.get_exp_mean_std()
                 else:
-                    raise RuntimeError('unknown combining rule')
+                    raise ValueError("unknown combining rule")
 
                 id = scores.get_id()
                 for FF in averages.keys():
-                    out_files[rule][FF].write("%s   %20.10f %20.10f\n" %(id, averages[FF], standard_dev[FF]) )
+                    out_files[rule][FF].write("%s   %20.10f %20.10f\n" %(id, averages[FF], standard_dev[FF]))
 
     for rule in combining_rules:
         for FF in FFs:
@@ -67,14 +68,25 @@ def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
     return None
 
 
-def equalize_system_weights( original_weights ):
+def equalize_system_weights(original_weights):
+    """
+    make all the ref systems equally weighted
+    :param original_weights: dict
+    :return: new_weights, dict
+    """
     new_weights = copy.deepcopy( original_weights )
     for system in new_weights["systems"].keys():
         new_weights["systems"][system] = 1.0
+
     return new_weights
 
 
 def take_6_holo(original_weights):
+    """
+    only snapshots from apo of YANK states get nonzero weights
+    :param original_weights: dict
+    :return: new_weights
+    """
     new_weights = equalize_system_weights(original_weights)
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems() 
 
@@ -89,6 +101,10 @@ def take_6_holo(original_weights):
 
 
 def take_12_near_holo(original_weights):
+    """
+    :param original_weights: dict
+    :return: dict
+    """
     new_weights = equalize_system_weights(original_weights)
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
 
@@ -96,10 +112,15 @@ def take_12_near_holo(original_weights):
         for i, snapshot in enumerate( ordered_snapshots[system] ):
             if i >= 12:
                 new_weights[system][snapshot] = 0.
+
     return new_weights
 
 
 def take_24_near_holo(original_weights):
+    """
+    :param original_weights: dict
+    :return: dict
+    """
     new_weights = equalize_system_weights(original_weights)
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
 
@@ -107,6 +128,7 @@ def take_24_near_holo(original_weights):
         for i, snapshot in enumerate( ordered_snapshots[system] ):
             if i >= 24:
                 new_weights[system][snapshot] = 0.
+                
     return new_weights
 
 #---------------------
