@@ -128,46 +128,47 @@ def take_24_near_holo(original_weights):
         for i, snapshot in enumerate( ordered_snapshots[system] ):
             if i >= 24:
                 new_weights[system][snapshot] = 0.
-                
+
     return new_weights
 
-#---------------------
 
+DOCK6_SUB_DIR = "dock6"
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--scores_dir", type=str, default = "/home/tnguye46/T4_Lysozyme/Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
+parser.add_argument("--scores_dir", type=str,
+default="~/T4_Lysozyme/Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
 
-parser.add_argument("--interaction_energies_dir", type=str, default = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
+parser.add_argument("--interaction_energies_dir", type=str,
+default="~/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
 
-parser.add_argument("--which_snapshots_to_take", type=str, default="all96")    # "all96", "6holo", "12nearholo", "24nearholo" 
+# "all96", "6holo", "12nearholo", "24nearholo"
+parser.add_argument("--which_snapshots_to_take", type=str, default="all96")
 
 args = parser.parse_args()
-#
 
 assert args.which_snapshots_to_take in ["all96", "6holo", "12nearholo", "24nearholo"], "unknown which_snapshots_to_take"
-print "use " + args.which_snapshots_to_take
+print("use", args.which_snapshots_to_take)
 
-combining_rules = [ 'Mean', 'ExpMean', 'Min' ]
-#
-ligand_groups = glob.glob( os.path.join(args.scores_dir, dock6_dir, "*") )
-ligand_groups = [os.path.basename(dir) for dir in ligand_groups]
-#
+combining_rules = ["Mean", "ExpMean", "Min"]
+
+ligand_groups = glob.glob(os.path.join(args.scores_dir, DOCK6_SUB_DIR, "*"))
+ligand_groups = [os.path.basename(d) for d in ligand_groups]
+
 if os.path.basename(args.scores_dir) == "OBC2":
-    print "OBC2 weights"
+    print("OBC2 weights")
     from load_mbar_weights_holo_OBC2 import load_mbar_weights
 elif os.path.basename(args.scores_dir) == "PBSA":
-    print "PBSA weights"
+    print("PBSA weights")
     from load_mbar_weights_holo_PBSA import load_mbar_weights
 else:
-    raise RuntimeError("unknown phase "+os.path.basename(args.scores_dir))
+    raise ValueError("unknown phase "+os.path.basename(args.scores_dir))
 
-#
+
 ligand_3l_codes = {}
 for group in ligand_groups:
-    codes = glob.glob( os.path.join( args.scores_dir, dock6_dir, group, "*") )
+    codes = glob.glob(os.path.join( args.scores_dir, DOCK6_SUB_DIR, group, "*"))
     ligand_3l_codes[group] = [os.path.basename(c) for c in codes]
-
 
 
 block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys, stru_group_weights_ub_weighted = load_mbar_weights()
@@ -175,32 +176,35 @@ block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys,
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir) 
 
 yank_systems = [key for key in block_weights.keys() if key not in ["systems"] ]
-print "yank systems ", yank_systems
+print("yank systems ", yank_systems)
 
 state_weights_equal_systems = equalize_system_weights(state_weights)
 single_snap_weights_equal_systems = equalize_system_weights(single_snap_weights) 
 
-print ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0]
-#TODO
-FFs = MultiStruScores(args.scores_dir, ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0], block_weights, yank_systems, yank_interaction_energies).get_FFs()
-print FFs
+print(ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0])
+
+FFs = MultiStruScores(args.scores_dir, ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0],
+                      block_weights, yank_systems, yank_interaction_energies).get_FFs()
+print(FFs)
 
 if args.which_snapshots_to_take == "all96":
 
-    use_state_weights  = equalize_system_weights(state_weights)
+    use_state_weights = equalize_system_weights(state_weights)
     use_single_weights = equalize_system_weights(single_snap_weights)
 
 elif args.which_snapshots_to_take == "6holo":
-    use_state_weights  = take_6_holo(state_weights)
+    use_state_weights = take_6_holo(state_weights)
     use_single_weights = take_6_holo(single_snap_weights)
 
 elif args.which_snapshots_to_take == "12nearholo":
-    use_state_weights  = take_12_near_holo(state_weights)
+    use_state_weights = take_12_near_holo(state_weights)
     use_single_weights = take_12_near_holo(single_snap_weights)
 
 elif args.which_snapshots_to_take == "24nearholo":
-    use_state_weights  = take_24_near_holo(state_weights)
+    use_state_weights = take_24_near_holo(state_weights)
     use_single_weights = take_24_near_holo(single_snap_weights)
+else:
+    raise ValueError("")
 
 for y_sys in yank_systems:
     averaging([y_sys], y_sys + "__equal_sys__state_weight",  use_state_weights, yank_interaction_energies)
