@@ -1,3 +1,6 @@
+"""
+Implement estimators for absolute binding free energies - the apo estimator
+"""
 
 from __future__ import print_function
 
