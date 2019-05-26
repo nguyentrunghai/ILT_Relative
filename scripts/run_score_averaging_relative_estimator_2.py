@@ -1,4 +1,6 @@
-#
+"""
+NOT USED in the JCP 2018 publication
+"""
 import os
 import sys
 import glob
