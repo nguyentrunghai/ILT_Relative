@@ -151,6 +151,11 @@ else:
 
 for y_sys in yank_systems:
     # a yank system is a ref ligand
-    averaging([y_sys], y_sys + "__equal_sys__state_weight",  use_state_weights, yank_interaction_energies)
-    averaging([y_sys], y_sys + "__equal_sys__single_weight", use_single_weights, yank_interaction_energies)
+    averaging(args.scores_dir, ligand_3l_codes, [y_sys],
+              y_sys + "__equal_sys__state_weight",
+              use_state_weights, yank_interaction_energies, combining_rules)
 
+
+    averaging(args.scores_dir, ligand_3l_codes, [y_sys],
+              y_sys + "__equal_sys__single_weight",
+              use_single_weights, yank_interaction_energies, combining_rules)
