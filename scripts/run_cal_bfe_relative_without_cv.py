@@ -44,15 +44,15 @@ def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
 
             for rule in combining_rules:
                 if rule == "Mean":
-                    averages     = scores.get_mean()
+                    averages = scores.get_mean()
                     standard_dev = scores.get_mean_std()
 
                 elif rule == "Min":
-                    averages     = scores.get_min()
+                    averages = scores.get_min()
                     standard_dev = scores.get_min_std()
 
                 elif rule == "ExpMean":
-                    averages     = scores.get_exp_mean()
+                    averages = scores.get_exp_mean()
                     standard_dev = scores.get_exp_mean_std()
                 else:
                     raise ValueError("unknown combining rule")
@@ -91,7 +91,7 @@ def take_6_holo(original_weights):
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems() 
 
     for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate( ordered_snapshots[system] ):
+        for i, snapshot in enumerate(ordered_snapshots[system]):
             if i < 6:
                 new_weights[system][snapshot] = 1.
             else:
@@ -109,7 +109,7 @@ def take_12_near_holo(original_weights):
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
 
     for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate( ordered_snapshots[system] ):
+        for i, snapshot in enumerate(ordered_snapshots[system]):
             if i >= 12:
                 new_weights[system][snapshot] = 0.
 
@@ -125,7 +125,7 @@ def take_24_near_holo(original_weights):
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
 
     for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate( ordered_snapshots[system] ):
+        for i, snapshot in enumerate(ordered_snapshots[system]):
             if i >= 24:
                 new_weights[system][snapshot] = 0.
 
@@ -175,7 +175,7 @@ block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys,
 
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir) 
 
-yank_systems = [key for key in block_weights.keys() if key not in ["systems"] ]
+yank_systems = [key for key in block_weights.keys() if key not in ["systems"]]
 print("yank systems ", yank_systems)
 
 state_weights_equal_systems = equalize_system_weights(state_weights)
