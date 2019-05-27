@@ -77,7 +77,7 @@ if __name__ == "__main__":
     ref_ligand = "1-methylpyrrole.A__AAA"
     FF = "OpenMM_OBC2_MBAR"
     sample_size = 96
-    repeats = 100
+    repeats = 1000
 
     block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys, stru_group_weights_ub_weighted = load_mbar_weights()
     yank_interaction_energies = load_interaction_energies(path=interaction_energies_dir)
@@ -86,3 +86,7 @@ if __name__ == "__main__":
                                                                              all_ref_ligands, single_snap_weights,
                                                                              yank_interaction_energies, FF, sample_size,
                                                                              repeats)
+
+    with open("test.dat", "w") as handle:
+        for rel_fe, self_rel_fe in zip(rel_fes, self_rel_fes):
+            handle.write("%20.10f %20.10f\n" % (rel_fe, self_rel_fe))
