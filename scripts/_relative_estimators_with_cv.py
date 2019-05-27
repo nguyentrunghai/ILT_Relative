@@ -30,7 +30,7 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
             cov, float, covariance
             var, float, variance
     """
-    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: "+ ref_ligand
+    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
 
     snapshots_for_ref_ligand = weights[ref_ligand].keys()
     assert sample_size <= len(snapshots_for_ref_ligand), "sample_size is larger than number of snapshots"
@@ -58,5 +58,30 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
             rel_fes.append(rel_fe)
             self_rel_fes.append(self_rel_fe)
 
-    return np.cov(rel_fes, self_rel_fes)[0, -1], np.var(self_rel_fes)
+    covariance = np.cov(rel_fes, self_rel_fes)[0, -1]
+    variance = np.var(self_rel_fes)
 
+    return rel_fes, self_rel_fes, covariance, variance
+
+
+if __name__ == "__main__":
+    from _yank import YANK_LIGANDS as all_ref_ligands
+    from load_mbar_weights_holo_OBC2 import load_mbar_weights
+    from _process_yank_outputs import load_interaction_energies
+
+    score_dir = "/home/tnguye46/T4_Lysozyme/Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2"
+    interaction_energies_dir = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots"
+    target_ligand = "lysozyme.inactive.A__ABA"
+    ref_ligand = "1-methylpyrrole.A__AAA"
+    FF = "OpenMM_OBC2_MBAR"
+    sample_size = 96
+    repeats = 100
+
+    block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys, stru_group_weights_ub_weighted = load_mbar_weights()
+    yank_interaction_energies = load_interaction_energies(path=interaction_energies_dir)
+
+    rel_fes, self_rel_fes, covariance, variance = bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand,
+                                                                             all_ref_ligands, single_snap_weights,
+                                                                             yank_interaction_energies, FF, sample_size,
+                                                                             repeats)
+    
