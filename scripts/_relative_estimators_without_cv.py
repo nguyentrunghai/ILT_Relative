@@ -200,6 +200,34 @@ class MultiStruScores:
 
         return std
 
+    def cal_exp_mean_separate_for_each_system(self, FF, snapshots):
+        """
+        exponential mean for each FF, with respect to each system in self._yank_systems
+        :param FF: str
+        :param snapshots: list of str
+        :return: sys_means, dict, sys_means[system] -> float
+        """
+        sys_means = {}
+        for system in self._yank_systems:
+            a = 0.
+            w = 0.
+            for snapshot in snapshots:
+                if snapshot in self._allowed_snapshots[FF][system]:
+                    try:
+                        a += np.exp(-1.0 * (self._scores[FF][snapshot] -
+                                            self._yank_interaction_energies[system][snapshot])) * self._weights[system][snapshot]
+                    except FloatingPointError:
+                        #print("overflow for", self._identification, snapshot, FF)
+                        pass
+                    else:
+                        w += self._weights[system][snapshot]
+            if w != 0:
+                a = a / w
+            a = (-1./BETA) * np.log(a)
+            sys_means[system] = a
+
+        return sys_means
+
     def cal_exp_mean_min_across_systems(self, snapshots):
         """
         the same as _cal_exp_mean() except that the min value across YANK systems is taken
