@@ -7,22 +7,29 @@ import os
 import argparse
 import glob
 import numpy as np
-import copy
-np.seterr(over='raise') # raise exception if overload
 
 from _process_yank_outputs import load_interaction_energies
-from _algdock import load_algdock_snapshots_for_each_of_six_yank_systems
 
 from _relative_estimators_without_cv import MultiStruScores
 
+from _weight_processing import equalize_system_weights, take_6_holo, take_12_near_holo, take_24_near_holo
 
-def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
+np.seterr(over='raise')     # raise exception if overload
+
+
+def averaging(scores_dir, ligand_3l_codes, yank_systems, result_dir,
+              weights, yank_interaction_energies,
+              combining_rules):
     """
+    :param scores_dir: str
+    :param ligand_3l_codes: dict, ligand_3l_codes[group] -> list of three-letter strings
     :param yank_systems: list of str
     :param result_dir: str
     :param weights: dict,
                     weights[ref_ligand_name][snapshot] -> float
                     weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param combining_rules: list of str
     :return: None
     """
     if not os.path.isdir(result_dir):
@@ -39,7 +46,7 @@ def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
     for group in ligand_3l_codes.keys():
 
         for code in ligand_3l_codes[group]:
-            scores = MultiStruScores(args.scores_dir, group, code,  weights, yank_systems, yank_interaction_energies)
+            scores = MultiStruScores(scores_dir, group, code,  weights, yank_systems, yank_interaction_energies)
             scores.check_extreme_low()
 
             for rule in combining_rules:
@@ -66,70 +73,6 @@ def averaging(yank_systems, result_dir, weights, yank_interaction_energies):
             out_files[rule][FF].close()
 
     return None
-
-
-def equalize_system_weights(original_weights):
-    """
-    make all the ref systems equally weighted
-    :param original_weights: dict
-    :return: new_weights, dict
-    """
-    new_weights = copy.deepcopy( original_weights )
-    for system in new_weights["systems"].keys():
-        new_weights["systems"][system] = 1.0
-
-    return new_weights
-
-
-def take_6_holo(original_weights):
-    """
-    only snapshots from apo of YANK states get nonzero weights
-    :param original_weights: dict
-    :return: new_weights
-    """
-    new_weights = equalize_system_weights(original_weights)
-    ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems() 
-
-    for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate(ordered_snapshots[system]):
-            if i < 6:
-                new_weights[system][snapshot] = 1.
-            else:
-                new_weights[system][snapshot] = 0.
-            
-    return new_weights
-
-
-def take_12_near_holo(original_weights):
-    """
-    :param original_weights: dict
-    :return: dict
-    """
-    new_weights = equalize_system_weights(original_weights)
-    ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
-
-    for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate(ordered_snapshots[system]):
-            if i >= 12:
-                new_weights[system][snapshot] = 0.
-
-    return new_weights
-
-
-def take_24_near_holo(original_weights):
-    """
-    :param original_weights: dict
-    :return: dict
-    """
-    new_weights = equalize_system_weights(original_weights)
-    ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
-
-    for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate(ordered_snapshots[system]):
-            if i >= 24:
-                new_weights[system][snapshot] = 0.
-
-    return new_weights
 
 
 DOCK6_SUB_DIR = "dock6"
@@ -207,6 +150,7 @@ else:
     raise ValueError("")
 
 for y_sys in yank_systems:
+    # a yank system is a ref ligand
     averaging([y_sys], y_sys + "__equal_sys__state_weight",  use_state_weights, yank_interaction_energies)
     averaging([y_sys], y_sys + "__equal_sys__single_weight", use_single_weights, yank_interaction_energies)
 
