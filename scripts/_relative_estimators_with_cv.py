@@ -66,6 +66,82 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
     return rel_fes, self_rel_fes, covariance, variance
 
 
+def relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand, all_ref_ligands,
+            weights, yank_interaction_energies,
+            FF, bootstrap_repeats):
+    """
+    calculate Cov(relative_bfe, self_relative_bfe) and Var(self_relative_bfe)
+    using bootstrap
+
+    :param snapshots: list of str
+    :param score_dir: str
+    :param target_ligand: str
+    :param ref_ligand: str
+    :param all_ref_ligands: list of str, all possible ref ligand
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param FF: str, phase
+    :param bootstrap_repeats: int
+    :return: (result, error, correlation)
+            result, float, relative binding free energy
+            error, float, standard error
+            correlation, array of shape (2, 2), correlation matrix between the naive estimate and the control variable
+    """
+    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
+    assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
+
+    n_snapshots = len(snapshots)
+
+    target_ligand_group = target_ligand[:-3]
+    target_ligand_3l_code = target_ligand[-3:]
+
+    ref_ligand_group = ref_ligand[: -3]
+    ref_ligand_3l_code = ref_ligand[-3:]
+
+    rel_fes = []
+    self_rel_fes = []
+    for _ in range(bootstrap_repeats):
+        random_snapshots = np.random.choice(snapshots, size=n_snapshots, replace=True)
+
+        rel_fe = MultiStruScores(score_dir, target_ligand_group, target_ligand_3l_code,
+                                 weights, [ref_ligand], yank_interaction_energies
+                                 ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+        rel_fe = rel_fe.values()[0]
+
+        self_rel_fe = MultiStruScores(score_dir, ref_ligand_group, ref_ligand_3l_code,
+                                      weights, [ref_ligand], yank_interaction_energies
+                                      ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+        self_rel_fe = self_rel_fe.values()[0]
+
+        if (rel_fe not in [np.nan, np.inf, -np.inf]) and (self_rel_fe not in [np.nan, np.inf, -np.inf]):
+            rel_fes.append(rel_fe)
+            self_rel_fes.append(self_rel_fe)
+
+    rel_fes = np.array(rel_fes)
+    self_rel_fes = np.array(self_rel_fes)
+
+    covariance = np.cov(rel_fes, self_rel_fes)[0, -1]
+    variance = np.var(self_rel_fes)
+
+    rel_fe = MultiStruScores(score_dir, target_ligand_group, target_ligand_3l_code,
+                             weights, [ref_ligand], yank_interaction_energies
+                             ).cal_exp_mean_separate_for_each_system(FF, snapshots)
+    rel_fe = rel_fe.values()[0]
+
+    self_rel_fe = MultiStruScores(score_dir, ref_ligand_group, ref_ligand_3l_code,
+                                  weights, [ref_ligand], yank_interaction_energies
+                                  ).cal_exp_mean_separate_for_each_system(FF, snapshots)
+    self_rel_fe = self_rel_fe.values()[0]
+
+    result = rel_fe - (covariance / variance) * self_rel_fe
+    error = (rel_fes - (covariance / variance) * self_rel_fes).std()
+    correlation = np.corrcoef(rel_fes, self_rel_fes)
+
+    return result, error, correlation
+
+
 if __name__ == "__main__":
     from _yank import YANK_LIGANDS as all_ref_ligands
     from load_mbar_weights_holo_OBC2 import load_mbar_weights
@@ -82,11 +158,18 @@ if __name__ == "__main__":
     block_weights, state_weights, single_snap_weights, stru_group_weights_equal_sys, stru_group_weights_ub_weighted = load_mbar_weights()
     yank_interaction_energies = load_interaction_energies(path=interaction_energies_dir)
 
-    rel_fes, self_rel_fes, covariance, variance = bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand,
-                                                                             all_ref_ligands, single_snap_weights,
-                                                                             yank_interaction_energies, FF, sample_size,
-                                                                             repeats)
+    #rel_fes, self_rel_fes, covariance, variance = bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand,
+    #                                                                         all_ref_ligands, single_snap_weights,
+    #                                                                         yank_interaction_energies, FF, sample_size,
+    #                                                                         repeats)
 
-    with open("test.dat", "w") as handle:
-        for rel_fe, self_rel_fe in zip(rel_fes, self_rel_fes):
-            handle.write("%20.10f %20.10f\n" % (rel_fe, self_rel_fe))
+    #with open("test.dat", "w") as handle:
+    #    for rel_fe, self_rel_fe in zip(rel_fes, self_rel_fes):
+    #        handle.write("%20.10f %20.10f\n" % (rel_fe, self_rel_fe))
+
+    snapshots = single_snap_weights[ref_ligand].keys()
+
+    rbfe, error, corr = relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand,
+                                               all_ref_ligands, single_snap_weights,
+                                               yank_interaction_energies, FF,
+                                               repeats)
