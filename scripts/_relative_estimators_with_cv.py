@@ -49,10 +49,12 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
         rel_fe = MultiStruScores(score_dir, target_ligand_group, target_ligand_3l_code,
                                  weights, [ref_ligand], yank_interaction_energies
                                  ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+        rel_fe = rel_fe.values()[0]
 
         self_rel_fe = MultiStruScores(score_dir, ref_ligand_group, ref_ligand_3l_code,
                                       weights, [ref_ligand], yank_interaction_energies
                                       ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+        self_rel_fe = self_rel_fe.values()[0]
 
         if (rel_fe not in [np.nan, np.inf, -np.inf]) and (self_rel_fe not in [np.nan, np.inf, -np.inf]):
             rel_fes.append(rel_fe)
@@ -84,4 +86,3 @@ if __name__ == "__main__":
                                                                              all_ref_ligands, single_snap_weights,
                                                                              yank_interaction_energies, FF, sample_size,
                                                                              repeats)
-    
