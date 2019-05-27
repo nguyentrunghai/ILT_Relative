@@ -14,13 +14,16 @@ from _absolute_estimators import MultiStruScores
 from _algdock import load_algdock_snapshots_for_each_of_six_yank_systems
 
 
-def averaging(yank_systems, result_dir, weights):
+def averaging(scores_dir, ligand_3l_codes, yank_systems, result_dir, weights, combining_rules):
     """
+    :param scores_dir: str
+    :param ligand_3l_codes: dict, ligand_3l_codes[group] -> list of three-letter strings
     :param yank_systems: list of str
     :param result_dir: str
     :param weights: dict,
                     weights[ref_ligand_name][snapshot] -> float
                     weights["systems"][ref_ligand_name] -> float
+    :param combining_rules: list of str
     :return: None
     """
     #
@@ -37,7 +40,7 @@ def averaging(yank_systems, result_dir, weights):
 
     for group in ligand_3l_codes.keys():
         for code in ligand_3l_codes[group]:
-            scores = MultiStruScores(args.scores_dir, group, code,  weights, yank_systems)
+            scores = MultiStruScores(scores_dir, group, code,  weights, yank_systems)
             scores.check_extreme_low()
             for rule in combining_rules:
                 if rule == "Mean":
@@ -105,7 +108,7 @@ def take_12_near_apo(original_weights):
     ordered_snapshots = load_algdock_snapshots_for_each_of_six_yank_systems()
 
     for system in new_weights["systems"].keys():
-        for i, snapshot in enumerate( ordered_snapshots[system] ):
+        for i, snapshot in enumerate(ordered_snapshots[system]):
             if i < len(ordered_snapshots[system]) - 12:
                 new_weights[system][snapshot] = 0.
     return new_weights
@@ -187,6 +190,6 @@ elif args.which_snapshots_to_take == "24nearapo":
 else:
     raise ValueError("Unknown which_snapshots_to_take")
 
-averaging(yank_systems, "all_snap__equal_sys__state_weight", use_state_weights)
-
+averaging(args.scores_dir, ligand_3l_codes, yank_systems,
+          "all_snap__equal_sys__state_weight", use_state_weights, combining_rules)
 
