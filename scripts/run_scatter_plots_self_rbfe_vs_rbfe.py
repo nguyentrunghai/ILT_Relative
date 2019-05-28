@@ -1,9 +1,8 @@
 """
 run scatter plots between self relative binding free energies and relative binding free energies
+TODO set figure titles
 """
-
-import sys
-sys.path.append("/home/tnguye46/FFT_T4/scripts")
+from __future__ import print_function
 
 import os
 import glob
