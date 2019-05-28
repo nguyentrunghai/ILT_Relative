@@ -66,7 +66,7 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
     return rel_fes, self_rel_fes, covariance, variance
 
 
-def relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand, all_ref_ligands,
+def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand, all_ref_ligands,
             weights, yank_interaction_energies,
             FF, bootstrap_repeats):
     """
@@ -84,12 +84,13 @@ def relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand, all_
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
     :param bootstrap_repeats: int
-    :return: (result, error, correlation, covariance, variance)
+    :return: (result, error, rel_fes, self_rel_fes)
             result, float, relative binding free energy
             error, float, standard error
-            correlation, float, correlation coefficient between the naive estimate and the control variable
-            covariance, float, covariance between the naive estimate and the control variable
-            variance, float, variance of the control variable
+            rel_fes, numpy array of shape (bootstrap_repeats,),
+                        "naive" estimate of relative binding free energies for different bootstrap samples
+            self_rel_fes, numpy array of shape (bootstrap_repeats,)
+                         estimate of self relative binding free energies for different bootstrap samples
     """
     assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
     assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
@@ -139,9 +140,8 @@ def relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand, all_
 
     result = rel_fe - (covariance / variance) * self_rel_fe
     error = (rel_fes - (covariance / variance) * self_rel_fes).std()
-    correlation = np.corrcoef(rel_fes, self_rel_fes)[0, -1]
 
-    return result, error, correlation, covariance, variance
+    return result, error, rel_fes, self_rel_fes
 
 
 if __name__ == "__main__":
