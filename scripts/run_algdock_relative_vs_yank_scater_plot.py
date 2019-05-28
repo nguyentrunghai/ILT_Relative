@@ -1,4 +1,6 @@
 
+from __future__ import print_function
+
 import argparse
 import glob
 import os
@@ -13,29 +15,29 @@ from _yank_algdock_fft_scores import load_scores, matching_scores, write_pairs
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--yank_results",              type=str, default = "/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
-parser.add_argument( "--algdock_results_dir",       type=str, default = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/OBC2")
-parser.add_argument( "--averaging_rule",            type=str, default = "ExpMean")
-parser.add_argument( "--algdock_score_file",        type=str, default = "OpenMM_OBC2_MBAR.score")
+parser.add_argument( "--yank_results", type=str, default = "/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
+parser.add_argument( "--algdock_results_dir", type=str, default = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/OBC2")
+parser.add_argument( "--averaging_rule", type=str, default = "ExpMean")
+parser.add_argument( "--algdock_score_file", type=str, default = "OpenMM_OBC2_MBAR.score")
 
-parser.add_argument( "--exclude_ligands_from_scatter_plots",        type=str, default = "" )
+parser.add_argument( "--exclude_ligands_from_scatter_plots", type=str, default = "" )
 
-parser.add_argument( "--subtract_self_rbfe",        action="store_true", default=False)
-parser.add_argument( "--compare_absolute",        action="store_true", default=False)
+parser.add_argument( "--subtract_self_rbfe", action="store_true", default=False)
+parser.add_argument( "--compare_absolute",  action="store_true", default=False)
 
-parser.add_argument( "--out_figure",         type=str, default = "algdock_vs_yank.pdf")
-parser.add_argument( "--out_text",           type=str, default = "algdock_vs_yank.dat")
+parser.add_argument( "--out_figure", type=str, default = "algdock_vs_yank.pdf")
+parser.add_argument( "--out_text", type=str, default = "algdock_vs_yank.dat")
 
-parser.add_argument( "--xlabel",         type=str, default = "YANK free energy (kcal/mol)")
-parser.add_argument( "--ylabel",         type=str, default = "AlGDock free energy (kcal/mol)")
-parser.add_argument( "--show_xy_axes",         type=bool, default = True)
+parser.add_argument( "--xlabel", type=str, default = "YANK free energy (kcal/mol)")
+parser.add_argument( "--ylabel", type=str, default = "AlGDock free energy (kcal/mol)")
+parser.add_argument( "--show_xy_axes", type=bool, default = True)
 
 args = parser.parse_args()
 
 exclude_ligands_from_scatter_plots = args.exclude_ligands_from_scatter_plots.split()
-print "exclude_ligands_from_scatter_plots ", exclude_ligands_from_scatter_plots
-print "subtract_self_rbfe ", args.subtract_self_rbfe
-print "compare_absolute ", args.compare_absolute
+print("exclude_ligands_from_scatter_plots ", exclude_ligands_from_scatter_plots)
+print("subtract_self_rbfe ", args.subtract_self_rbfe)
+print("compare_absolute ", args.compare_absolute)
 
 yank_scores, yank_stds = load_scores(args.yank_results, 0, 1, 2, [])
 
@@ -50,7 +52,7 @@ for scheme_ligand in weighting_schemes_ref_ligands:
             weighting_schemes.append(scheme)
 
 weighting_schemes = list(set(weighting_schemes))
-print weighting_schemes
+print(weighting_schemes)
 
 all_algdock_scores = {}
 all_algdock_stds   = {}
@@ -69,7 +71,7 @@ for scheme in weighting_schemes:
         out_raw_data_file  = os.path.join(out_dir, "raw_data.dat") 
 
         algdock_score_file = os.path.join(args.algdock_results_dir, out_dir, args.averaging_rule, args.algdock_score_file)
-        print algdock_score_file
+        print(algdock_score_file)
         algdock_scores, algdock_stds = load_scores(algdock_score_file, 0, 1, 2, [])
 
         if args.subtract_self_rbfe:
@@ -203,5 +205,5 @@ for scheme in weighting_schemes:
                     )
 
 
-print "Done"
+print("Done")
 
