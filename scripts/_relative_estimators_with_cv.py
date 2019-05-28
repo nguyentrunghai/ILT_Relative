@@ -66,7 +66,7 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
     return rel_fes, self_rel_fes, covariance, variance
 
 
-def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand, all_ref_ligands,
+def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand,
             weights, yank_interaction_energies,
             FF, bootstrap_repeats):
     """
@@ -77,7 +77,6 @@ def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand, all_re
     :param score_dir: str
     :param target_ligand: str
     :param ref_ligand: str
-    :param all_ref_ligands: list of str, all possible ref ligand
     :param weights: dict,
                     weights[ref_ligand_name][snapshot] -> float
                     weights["systems"][ref_ligand_name] -> float
@@ -92,6 +91,7 @@ def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand, all_re
             self_rel_fes, numpy array of shape (bootstrap_repeats,)
                          estimate of self relative binding free energies for different bootstrap samples
     """
+    all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
     assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
     assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
 
@@ -145,7 +145,7 @@ def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand, all_re
 
 
 if __name__ == "__main__":
-    from _yank import YANK_LIGANDS as all_ref_ligands
+
     from load_mbar_weights_holo_OBC2 import load_mbar_weights
     from _process_yank_outputs import load_interaction_energies
 
@@ -171,7 +171,11 @@ if __name__ == "__main__":
 
     snapshots = single_snap_weights[ref_ligand].keys()
 
-    rbfe, error, corr = relative_bfe_within_cv(snapshots, score_dir, target_ligand, ref_ligand,
-                                               all_ref_ligands, single_snap_weights,
+    rbfe, error, rel_fes, self_rel_fes = relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand,
+                                               single_snap_weights,
                                                yank_interaction_energies, FF,
                                                repeats)
+
+relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand,
+            weights, yank_interaction_energies,
+            FF, bootstrap_repeats)
