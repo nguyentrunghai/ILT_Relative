@@ -14,10 +14,10 @@ from _relative_estimators_with_cv import relative_bfe_with_cv
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--scores_dir", type=str,
-                    default="Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
+                    default="/home/tnguye46/T4_Lysozyme/Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
 
 parser.add_argument("--interaction_energies_dir", type=str,
-                    default="Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
+                    default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
 
 parser.add_argument("--FF", type=str, default="OpenMM_OBC2_MBAR")
 

@@ -175,7 +175,3 @@ if __name__ == "__main__":
                                                single_snap_weights,
                                                yank_interaction_energies, FF,
                                                repeats)
-
-relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand,
-            weights, yank_interaction_energies,
-            FF, bootstrap_repeats)
