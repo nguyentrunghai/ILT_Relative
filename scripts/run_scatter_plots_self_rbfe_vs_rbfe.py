@@ -46,6 +46,6 @@ for data_file in data_files:
                  markersize=4,
                  markercolors=None,
                  same_xy_scale=False,
-                 text_pos=[0.1, 0.7]
-                 )
+                 text_pos=[0.1, 0.7],
+                 title=os.path.basename(data_file))
 
