@@ -571,16 +571,19 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         if snapshot not in target_scores:
             raise ValueError(snapshot + " is not in target_scores")
 
-        h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
-            weights[ref_ligand][snapshot]
-        g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
-            weights[ref_ligand][snapshot]
-
-        if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
-            hs.append(h)
-            gs.append(g)
-            nr_snapshots += 1
-            total_weight += weights[ref_ligand][snapshot]
+        try:
+            h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
+                weights[ref_ligand][snapshot]
+            g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
+                weights[ref_ligand][snapshot]
+        except FloatingPointError:
+            pass
+        else:
+            if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
+                hs.append(h)
+                gs.append(g)
+                nr_snapshots += 1
+                total_weight += weights[ref_ligand][snapshot]
 
     hs = np.array(hs) * nr_snapshots / total_weight
     gs = np.array(gs) * nr_snapshots / total_weight
