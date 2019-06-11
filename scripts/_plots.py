@@ -124,6 +124,7 @@ def scatter_plot(x, y, xlabel, ylabel, out,
                 aspect="auto",
 
                 same_xy_scale=True,
+                integer_limits=True,
                 show_regression_line=False,
                 show_diagonal_line=False,
 
@@ -176,10 +177,11 @@ def scatter_plot(x, y, xlabel, ylabel, out,
         upper_x = np.max([upper_x, upper_y])
         upper_y = upper_x
 
-    lower_x = np.floor(lower_x)
-    upper_x = np.ceil(upper_x)
-    lower_y = np.floor(lower_y)
-    upper_y = np.ceil(upper_y)
+    if integer_limits:
+        lower_x = np.floor(lower_x)
+        upper_x = np.ceil(upper_x)
+        lower_y = np.floor(lower_y)
+        upper_y = np.ceil(upper_y)
 
     if xlimits is not None:
         lower_x, upper_x = xlimits
