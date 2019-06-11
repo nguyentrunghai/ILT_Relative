@@ -23,9 +23,9 @@ EXCLUDE_FFS = ["receptor_OpenMM_Gas", "receptor_OpenMM_OBC2", "Theta_1OpenMM_Gas
                "OpenMM_OBC2_inverse_FEP", "OpenMM_OBC2_MBAR_c2"]
 
 
-class MultiStruScores:
+class RelBFEWithoutCV:
     """
-    load and averaging scores for a ligand over multiple receptor's snapshots
+    estimate relative binding free energies without control variates
     """
 
     def __init__(self, score_dir, ligand_group, ligand_3l_code, weights, yank_systems,
