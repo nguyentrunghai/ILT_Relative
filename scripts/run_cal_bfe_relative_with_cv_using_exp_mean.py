@@ -54,7 +54,6 @@ for ref_ligand in ref_ligands:
     snapshots = single_snap_weights[ref_ligand].keys()
 
     for target_ligand in YANK_LIGANDS:
-        print("Processing target ligand", target_ligand)
         hs, gs, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir, target_ligand, ref_ligand,
                                             single_snap_weights, yank_interaction_energies, args.FF, verbose=True)
 
