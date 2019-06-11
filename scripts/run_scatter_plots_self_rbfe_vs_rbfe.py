@@ -32,7 +32,7 @@ for data_file in data_files:
     x = data[:, 0]
     y = data[:, 1]
 
-    out_file = os.path.basename(data_file) + ".jpg"
+    out_file = os.path.basename(data_file) + ".pdf"
 
     title = os.path.basename(data_file)
     title = " vs ".join(title.split("_vs_"))
