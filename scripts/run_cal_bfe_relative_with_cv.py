@@ -10,7 +10,7 @@ import argparse
 from _yank import YANK_LIGANDS
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
-from _relative_estimators_with_cv import relative_bfe_with_cv
+from _relative_estimators import relative_bfe_with_cv_using_bootstrap
 
 parser = argparse.ArgumentParser()
 
@@ -54,10 +54,11 @@ for ref_ligand in ref_ligands:
     for target_ligand in YANK_LIGANDS:
         print("Processing target ligand", target_ligand)
 
-        rbfe, error, rel_fes, self_rel_fes = relative_bfe_with_cv(snapshots, args.scores_dir, target_ligand, ref_ligand,
-                                                                  single_snap_weights,
-                                                                  yank_interaction_energies, args.FF,
-                                                                  args.bootstrap_repeats)
+        rbfe, error, rel_fes, self_rel_fes = relative_bfe_with_cv_using_bootstrap(snapshots, args.scores_dir,
+                                                                                  target_ligand, ref_ligand,
+                                                                                  single_snap_weights,
+                                                                                  yank_interaction_energies, args.FF,
+                                                                                  args.bootstrap_repeats)
 
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rbfe, error))
 
