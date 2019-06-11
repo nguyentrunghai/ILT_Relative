@@ -60,7 +60,7 @@ for ref_ligand in ref_ligands:
 
         bootstrap_ests = []
         for _ in range(args.bootstrap_repeats):
-            random_snapshots = np.random.choice(snapshots, size=len(n_snapshots), replace=True)
+            random_snapshots = np.random.choice(snapshots, size=len(snapshots), replace=True)
             _, _, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir, target_ligand,
                                                             ref_ligand, single_snap_weights, yank_interaction_energies,
                                                             args.FF, verbose=False)
