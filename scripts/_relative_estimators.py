@@ -519,24 +519,30 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
 def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
             weights, yank_interaction_energies, FF, verbose=False):
     """
-    :param snapshots:
-    :param score_dir:
-    :param target_ligand:
-    :param ref_ligand:
-    :param weights:
-    :param yank_interaction_energies:
-    :param FF:
-    :return:
+    :param snapshots: list of str
+    :param score_dir: str
+    :param target_ligand: str
+    :param ref_ligand: str
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param FF: str, phase
+
+    :return: (hs, gs, rel_bfe)
+            hs: 1d array, values of random variable whose mean is to be estimated
+            gs: 1d array, values of random variable whose mean is known (= 1) and used as a control variate
+            rel_bfe: float, relative binding free energy
     """
     all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
     assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
     assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
 
-    target_ligand_group = target_ligand[:-3]
-    target_ligand_3l_code = target_ligand[-3:]
-
     ref_ligand_group = ref_ligand[: -3]
     ref_ligand_3l_code = ref_ligand[-3:]
+
+    target_ligand_group = target_ligand[:-3]
+    target_ligand_3l_code = target_ligand[-3:]
 
     ref_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, ref_ligand_group, ref_ligand_3l_code, FF + ".score")
     target_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, target_ligand_group, target_ligand_3l_code,
@@ -595,4 +601,4 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("--------------------------------")
         print("")
 
-    return covariance, variance, rel_bfe
+    return hs, gs, rel_bfe
