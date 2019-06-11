@@ -436,7 +436,7 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
     return rel_fes, self_rel_fes, covariance, variance
 
 
-def relative_bfe_with_cv(snapshots, score_dir, target_ligand, ref_ligand,
+def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, ref_ligand,
             weights, yank_interaction_energies,
             FF, bootstrap_repeats):
     """
