@@ -7,10 +7,12 @@ from __future__ import print_function
 import os
 import argparse
 
+import numpy as np
+
 from _yank import YANK_LIGANDS
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
-from _relative_estimators import relative_bfe_with_cv_using_bootstrap
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean
 
 parser = argparse.ArgumentParser()
 
@@ -53,22 +55,28 @@ for ref_ligand in ref_ligands:
 
     for target_ligand in YANK_LIGANDS:
         print("Processing target ligand", target_ligand)
+        hs, gs, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir, target_ligand, ref_ligand,
+                                            single_snap_weights, yank_interaction_energies, args.FF, verbose=True)
 
-        rbfe, error, rel_fes, self_rel_fes = relative_bfe_with_cv_using_bootstrap(snapshots, args.scores_dir,
-                                                                                  target_ligand, ref_ligand,
-                                                                                  single_snap_weights,
-                                                                                  yank_interaction_energies, args.FF,
-                                                                                  args.bootstrap_repeats)
-    
+        bootstrap_ests = []
+        for _ in range(args.bootstrap_repeats):
+            random_snapshots = np.random.choice(snapshots, size=len(n_snapshots), replace=True)
+            _, _, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir, target_ligand,
+                                                            ref_ligand, single_snap_weights, yank_interaction_energies,
+                                                            args.FF, verbose=False)
+            if (not np.isnan(bfe)) and (not np.isinf(bfe)):
+                bootstrap_ests.append(bfe)
 
-        out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rbfe, error))
+        error = np.std(bootstrap_ests)
+
+        out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
         rel_bfe_vs_self = os.path.join(result_dir, args.combining_rule, ref_ligand + "_vs_" + target_ligand)
 
         with open(rel_bfe_vs_self, "w") as handle:
-            handle.write("# self bfe        bfe\n")
-            for self_rel_fe, rel_fe in zip(self_rel_fes, rel_fes):
-                handle.write("%20.10f %20.10f\n" %(self_rel_fe, rel_fe))
+            handle.write("# h          g\n")
+            for h, g in zip(hs, gs):
+                handle.write("%20.10f %20.10f\n" % (h, g))
 
     out_file_handle.close()
 
