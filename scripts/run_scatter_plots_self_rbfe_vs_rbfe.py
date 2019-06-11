@@ -34,6 +34,8 @@ for data_file in data_files:
 
     out_file = os.path.basename(data_file) + ".pdf"
 
+    title = os.path.basename(data_file)
+    title = " vs ".join(title.split("_vs_"))
     scatter_plot(x, y, args.xlabel, args.ylabel, out_file,
                  show_xy_axes=True,
                  xerr=None, yerr=None,
@@ -47,5 +49,5 @@ for data_file in data_files:
                  markercolors=None,
                  same_xy_scale=False,
                  text_pos=[0.1, 0.7],
-                 title=os.path.basename(data_file))
+                 title=title)
 
