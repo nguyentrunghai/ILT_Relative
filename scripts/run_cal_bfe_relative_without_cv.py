@@ -10,7 +10,7 @@ import numpy as np
 
 from _process_yank_outputs import load_interaction_energies
 
-from _relative_estimators_without_cv import MultiStruScores
+from _relative_estimators import RelBFEWithoutCV
 
 from _weight_processing import equalize_system_weights, take_6_holo, take_12_near_holo, take_24_near_holo
 
@@ -46,7 +46,7 @@ def averaging(scores_dir, ligand_3l_codes, yank_systems, result_dir,
     for group in ligand_3l_codes.keys():
 
         for code in ligand_3l_codes[group]:
-            scores = MultiStruScores(scores_dir, group, code,  weights, yank_systems, yank_interaction_energies)
+            scores = RelBFEWithoutCV(scores_dir, group, code,  weights, yank_systems, yank_interaction_energies)
             scores.check_extreme_low()
 
             for rule in combining_rules:
@@ -126,7 +126,7 @@ single_snap_weights_equal_systems = equalize_system_weights(single_snap_weights)
 
 print(ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0])
 
-FFs = MultiStruScores(args.scores_dir, ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0],
+FFs = RelBFEWithoutCV(args.scores_dir, ligand_groups[0], ligand_3l_codes[ligand_groups[0]][0],
                       block_weights, yank_systems, yank_interaction_energies).get_FFs()
 print(FFs)
 
