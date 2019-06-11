@@ -75,7 +75,7 @@ for ref_ligand in ref_ligands:
         with open(rel_bfe_vs_self, "w") as handle:
             handle.write("# h          g\n")
             for h, g in zip(hs, gs):
-                handle.write("%20.10f %20.10f\n" % (h, g))
+                handle.write("%20.10e %20.10e\n" % (h, g))
 
     out_file_handle.close()
 
