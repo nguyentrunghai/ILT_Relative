@@ -225,7 +225,7 @@ class RelBFEWithoutCV:
                         w += self._weights[system][snapshot]
             if w != 0:
                 a = a / w
-            a = (-1./BETA) * np.log(a)
+            a = (-1. / BETA) * np.log(a)
             sys_means[system] = a
 
         return sys_means
@@ -594,7 +594,7 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("C:", c)
 
     exp_mean = np.mean(hs + c * (1 - gs))
-    rel_bfe = (-1./BETA) * np.log(exp_mean)
+    rel_bfe = (-1. / BETA) * np.log(exp_mean)
 
     if verbose:
         print("Relative BFE = %10.5f" % rel_bfe)
