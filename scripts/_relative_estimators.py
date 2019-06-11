@@ -9,6 +9,8 @@ import glob
 import numpy as np
 np.seterr(over='raise')     # raise exception if overload
 
+from _algdock import load_bpmfs
+
 TEMPERATURE = 300.                                                                                                                                                       
 KB = 8.3144621E-3/4.184  # kcal/mol/K
 BETA = 1. / TEMPERATURE / KB
@@ -512,3 +514,85 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     error = (rel_fes - (covariance / variance) * self_rel_fes).std()
 
     return result, error, rel_fes, self_rel_fes
+
+
+def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
+            weights, yank_interaction_energies, FF, verbose=False):
+    """
+    :param snapshots:
+    :param score_dir:
+    :param target_ligand:
+    :param ref_ligand:
+    :param weights:
+    :param yank_interaction_energies:
+    :param FF:
+    :return:
+    """
+    all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
+    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
+    assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
+
+    target_ligand_group = target_ligand[:-3]
+    target_ligand_3l_code = target_ligand[-3:]
+
+    ref_ligand_group = ref_ligand[: -3]
+    ref_ligand_3l_code = ref_ligand[-3:]
+
+    ref_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, ref_ligand_group, ref_ligand_3l_code, FF + ".score")
+    target_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, target_ligand_group, target_ligand_3l_code,
+                                     FF + ".score")
+
+    if verbose:
+        print("--------------------------------")
+        print("ref_ligand:", ref_ligand)
+        print("target_ligand:", target_ligand)
+        print("ref_score_path:", ref_score_path)
+        print("target_score_path:", target_score_path)
+
+    ref_scores = load_bpmfs(ref_score_path, exclude_nan=False)
+    target_scores = load_bpmfs(target_score_path, exclude_nan=False)
+
+    hs = []    # values of random variable whose mean is to be estimated
+    gs = []    # values of random variable whose mean is known and used as a control variate
+    nr_snapshots = 0
+    total_weight = 0.
+
+    for snapshot in snapshots:
+
+        if snapshot not in ref_scores:
+            raise ValueError(snapshot + " is not in ref_scores")
+
+        if snapshot not in target_scores:
+            raise ValueError(snapshot + " is not in target_scores")
+
+        h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
+            weights[ref_ligand][snapshot]
+        g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
+            weights[ref_ligand][snapshot]
+
+        if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
+            hs.append(h)
+            gs.append(g)
+            nr_snapshots += 1
+            total_weight += weights[ref_ligand][snapshot]
+
+    hs = np.array(hs) * nr_snapshots / total_weight
+    gs = np.array(gs) * nr_snapshots / total_weight
+
+    covariance = np.cov(hs, gs)[0, -1]
+    variance = np.var(gs)
+    c = covariance / variance
+    if verbose:
+        print("covariance:", covariance)
+        print("variance:", variance)
+        print("C:", c)
+
+    exp_mean = np.mean(hs + c * (1 - gs))
+    rel_bfe = (-1./BETA) * np.log(exp_mean)
+
+    if verbose:
+        print("Relative BFE = %10.5f" % rel_bfe)
+        print("--------------------------------")
+        print("")
+
+    return covariance, variance, rel_bfe
