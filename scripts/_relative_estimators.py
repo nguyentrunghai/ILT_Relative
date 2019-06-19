@@ -674,7 +674,6 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("variance:", variance)
         print("C:", c)
 
-    # weighted average
     ys = hs + c * (1 - gs)
     exp_mean = np.mean(ys)
     rel_bfe = (-1. / BETA) * np.log(exp_mean)
