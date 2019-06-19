@@ -24,11 +24,16 @@ parser.add_argument("--FF", type=str, default="OpenMM_OBC2_MBAR")
 
 parser.add_argument("--bootstrap_repeats", type=int, default=1000)
 
+# how_bootstrap is either "uniform" or "holo_weighted"
+parser.add_argument("--how_bootstrap", type=str, default="none")
+
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
 args = parser.parse_args()
+
+assert args.how_bootstrap in ["uniform", "holo_weighted"], "Unrecognized how_bootstrap: " + args.how_bootstrap
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
@@ -58,7 +63,8 @@ for ref_ligand in ref_ligands:
                                                                                   target_ligand, ref_ligand,
                                                                                   single_snap_weights,
                                                                                   yank_interaction_energies, args.FF,
-                                                                                  args.bootstrap_repeats)
+                                                                                  args.bootstrap_repeats,
+                                                                                  args.how_bootstrap)
 
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rbfe, error))
 
