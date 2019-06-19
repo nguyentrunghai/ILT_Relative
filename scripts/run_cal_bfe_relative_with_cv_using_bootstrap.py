@@ -71,7 +71,7 @@ for ref_ligand in ref_ligands:
         rel_bfe_vs_self = os.path.join(result_dir, args.combining_rule, ref_ligand + "_VERSUS_" + target_ligand)
 
         with open(rel_bfe_vs_self, "w") as handle:
-            handle.write("# self bfe        bfe\n")
+            handle.write("# bootstrap self_bfe        bootstrap bfe\n")
             for self_rel_fe, rel_fe in zip(self_rel_fes, rel_fes):
                 handle.write("%20.10f %20.10f\n" %(self_rel_fe, rel_fe))
 
