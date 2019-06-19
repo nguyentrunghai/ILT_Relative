@@ -684,4 +684,4 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("--------------------------------")
         print("")
 
-    return hs, gs, rel_bfe
+    return hs, gs, c, correlation, rel_bfe
