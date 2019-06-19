@@ -663,12 +663,9 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
     hs = np.array(hs) * used_weights * n_snapshots
     gs = np.array(gs) * used_weights * n_snapshots
 
-    uniform_weights = np.ones(n_snapshots, dtype=float) / n_snapshots
-
-    # weighted covariance, variance and correlations
-    covariance = _weighted_cov(hs, gs, uniform_weights)
-    variance = _weighted_var(gs, uniform_weights)
-    correlation = _weighted_corrcoef(hs, gs, uniform_weights)
+    covariance = np.cov(hs, gs)[0, -1]
+    variance = np.var(gs)
+    correlation = np.corrcoef(hs, gs)[0, -1]
 
     c = covariance / variance
     if verbose:
@@ -678,7 +675,8 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("C:", c)
 
     # weighted average
-    exp_mean = np.average(hs + c * (1 - gs), weights=uniform_weights)
+    ys = hs + c * (1 - gs)
+    exp_mean = np.mean(ys)
     rel_bfe = (-1. / BETA) * np.log(exp_mean)
 
     if verbose:
