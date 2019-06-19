@@ -633,8 +633,7 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
 
     hs = []    # values of random variable whose mean is to be estimated
     gs = []    # values of random variable whose mean is known and used as a control variate
-    nr_snapshots = 0
-    total_weight = 0.
+    used_weights = []
 
     for snapshot in snapshots:
 
@@ -645,25 +644,29 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
             raise ValueError(snapshot + " is not in target_scores")
 
         try:
-            h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
-                weights[ref_ligand][snapshot]
-            g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) * \
-                weights[ref_ligand][snapshot]
+            h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot]))
+
+            g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot]))
+
         except FloatingPointError:
             pass
         else:
             if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
                 hs.append(h)
                 gs.append(g)
-                nr_snapshots += 1
-                total_weight += weights[ref_ligand][snapshot]
+                used_weights.append(weights[ref_ligand][snapshot])
 
-    hs = np.array(hs) * nr_snapshots / total_weight
-    gs = np.array(gs) * nr_snapshots / total_weight
+    hs = np.array(hs)
+    gs = np.array(gs)
 
-    covariance = np.cov(hs, gs)[0, -1]
-    variance = np.var(gs)
-    correlation = np.corrcoef(hs, gs)[0, -1]
+    used_weights = np.array(used_weights)
+    used_weights /= used_weights.sum()
+
+    # weighted covariance, variance and correlations
+    covariance = _weighted_cov(hs, gs, used_weights)
+    variance = _weighted_var(gs, used_weights)
+    correlation = _weighted_corrcoef(hs, gs, used_weights)
+
     c = covariance / variance
     if verbose:
         print("correlation:", correlation)
@@ -671,7 +674,8 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("variance:", variance)
         print("C:", c)
 
-    exp_mean = np.mean(hs + c * (1 - gs))
+    # weighted average
+    exp_mean = np.average(hs + c * (1 - gs), used_weights)
     rel_bfe = (-1. / BETA) * np.log(exp_mean)
 
     if verbose:
