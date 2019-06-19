@@ -1,4 +1,6 @@
 
+import numpy as np
+
 YANK_LIGANDS = {}
 
 YANK_LIGANDS["1-methylpyrrole.A__AAA"]      = "methylpyrrole"
@@ -28,3 +30,21 @@ YANK_LIGANDS["phenol.A__AAA"]               = "phenol"
 
 YANK_LIGANDS["p-xylene.A__AAA"]             = "p-xylene"
 
+
+def load_scores(file, id_col, score_col, std_col, exclude_ligands):
+    scores = {}
+    standard_devs = {}
+
+    with open(file, "r") as handle:
+        for line in handle:
+            if not line.strip().startswith("#"):
+                entries = line.split()
+                id = entries[id_col]
+                val = entries[score_col]
+                std = entries[std_col]
+
+                if id not in exclude_ligands:
+                    if val.lower() not in ["inf", "nan"]:
+                        scores[id] = np.float(val)
+                        standard_devs[id] = np.float(std)
+    return scores, standard_devs
