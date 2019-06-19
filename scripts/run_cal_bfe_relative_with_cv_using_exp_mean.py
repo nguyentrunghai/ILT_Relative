@@ -95,12 +95,9 @@ for ref_ligand in ref_ligands:
 
         g_corr_h_out_file = os.path.join(result_dir, args.combining_rule, ref_ligand + "_G_CORR_H_" + target_ligand)
         with open(g_corr_h_out_file, "w") as handle:
-            handle.write("# C          correlation\n")
-            handle.write("%20.10e %20.10e\n" % (c, correlation))
-
-            handle.write("# bootstrap C and correlation\n")
-            for _c, _corr in zip(bootstrap_cs, bootstrap_corrs):
-                handle.write("%20.10e %20.10e\n" % (_c, _corr))
+            handle.write("# C        C_error      correlation    corr_error\n")
+            handle.write("%20.10e %20.10e %20.10e %20.10e\n" % (c, np.std(bootstrap_cs),
+                                                                correlation, np.std(bootstrap_corrs)))
 
     out_file_handle.close()
 
