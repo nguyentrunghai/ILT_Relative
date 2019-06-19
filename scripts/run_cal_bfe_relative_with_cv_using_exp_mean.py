@@ -70,7 +70,7 @@ for ref_ligand in ref_ligands:
 
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
-        rel_bfe_vs_self = os.path.join(result_dir, args.combining_rule, ref_ligand + "_vs_" + target_ligand)
+        rel_bfe_vs_self = os.path.join(result_dir, args.combining_rule, ref_ligand + "_VERSUS_" + target_ligand)
 
         with open(rel_bfe_vs_self, "w") as handle:
             handle.write("# h          g\n")
