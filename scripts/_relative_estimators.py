@@ -518,6 +518,19 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     return result, error, rel_fes, self_rel_fes
 
 
+def _extract_weights(weights, ref_ligand, snapshots):
+    """
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param ref_ligand: str
+    :param snapshots: list of str
+    :return: extr_w, 1d array of shape (len(snapshots), )
+    """
+    extr_w = [weights[ref_ligand][snapshot] for snapshot in snapshots]
+    return np.array(extr_w)
+
+
 def _make_holo_weights_uniform(weights, ref_ligand):
     """
     :param weights: dict,
