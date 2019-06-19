@@ -572,6 +572,23 @@ def _make_holo_weights_uniform(weights, ref_ligand):
     return unif_weights
 
 
+def _weighted_cov(x, y, weights):
+    return np.cov(x, y, aweights=weights)[0, -1]
+
+
+def _weighted_var(x, weights):
+    return _weighted_cov(x, x, weights)
+
+
+def _weighted_corrcoef(x, y, weights):
+    cov = _weighted_cov(x, y, weights)
+    var_x = _weighted_var(x, weights)
+    var_y = _weighted_var(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
+
+
 def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
             weights, yank_interaction_energies, FF, verbose=False):
     """
