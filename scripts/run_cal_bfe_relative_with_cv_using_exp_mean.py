@@ -40,6 +40,11 @@ print("ref_ligands", ref_ligands)
 
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir)
 
+if args.cap_negative:
+    print("Cap Negative values, so there should be no NaN for relative BFEs")
+else:
+    print("No Cap Negative values, so there may be some NaN for relative BFEs")
+
 for ref_ligand in ref_ligands:
     print("Processing reference ligand", ref_ligand)
 
