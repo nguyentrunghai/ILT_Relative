@@ -30,6 +30,8 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
+parser.add_argument("--cap_negative", action="store_true", default=False)
+
 args = parser.parse_args()
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
@@ -57,8 +59,9 @@ for ref_ligand in ref_ligands:
         hs, gs, c, correlation, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir,
                                                                               target_ligand, ref_ligand,
                                                                               single_snap_weights,
-                                                                              yank_interaction_energies,
-                                                                              args.FF, verbose=True)
+                                                                              yank_interaction_energies, args.FF,
+                                                                              cap_negative=args.cap_negative,
+                                                                              verbose=True)
 
         bootstrap_bfes = []
         bootstrap_cs = []
@@ -69,6 +72,7 @@ for ref_ligand in ref_ligands:
                                                                          target_ligand, ref_ligand,
                                                                          single_snap_weights,
                                                                          yank_interaction_energies, args.FF,
+                                                                         cap_negative=args.cap_negative,
                                                                          verbose=False)
             if (not np.isnan(bfe)) and (not np.isinf(bfe)):
                 bootstrap_bfes.append(bfe)
