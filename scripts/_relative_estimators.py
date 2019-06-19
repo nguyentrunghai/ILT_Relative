@@ -442,7 +442,7 @@ def bootstrap_estimate_cov_var(score_dir, target_ligand, ref_ligand, all_ref_lig
 
 def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, ref_ligand,
             weights, yank_interaction_energies,
-            FF, bootstrap_repeats):
+            FF, bootstrap_repeats, how_bootstrap):
     """
     calculate Cov(relative_bfe, self_relative_bfe) and Var(self_relative_bfe)
     using bootstrap
@@ -457,6 +457,7 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
     :param bootstrap_repeats: int
+    :param how_bootstrap: str, either "uniform" or "holo_weighted"
     :return: (result, error, rel_fes, self_rel_fes)
             result, float, relative binding free energy
             error, float, standard error
@@ -468,6 +469,7 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
     assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
     assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
+    assert how_bootstrap in ["uniform", "holo_weighted"], "Unrecognized how_bootstrap: " + how_bootstrap
 
     n_snapshots = len(snapshots)
 
@@ -477,19 +479,39 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     ref_ligand_group = ref_ligand[: -3]
     ref_ligand_3l_code = ref_ligand[-3:]
 
+    unif_weights = _make_holo_weights_uniform(weights, ref_ligand)
+    extr_weights = _extract_weights(weights, ref_ligand, snapshots)
+
     rel_fes = []
     self_rel_fes = []
     for _ in range(bootstrap_repeats):
-        random_snapshots = np.random.choice(snapshots, size=n_snapshots, replace=True)
 
-        rel_fe = RelBFEWithoutCV(score_dir, target_ligand_group, target_ligand_3l_code,
-                                 weights, [ref_ligand], yank_interaction_energies
-                                 ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+        if how_bootstrap == "uniform":
+            random_snapshots = np.random.choice(snapshots, size=n_snapshots, replace=True)
+
+            rel_fe = RelBFEWithoutCV(score_dir, target_ligand_group, target_ligand_3l_code,
+                                     weights, [ref_ligand], yank_interaction_energies
+                                     ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+
+            self_rel_fe = RelBFEWithoutCV(score_dir, ref_ligand_group, ref_ligand_3l_code,
+                                          weights, [ref_ligand], yank_interaction_energies
+                                          ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+
+        elif how_bootstrap == "holo_weighted":
+            random_snapshots = np.random.choice(snapshots, size=n_snapshots, p=extr_weights, replace=True)
+
+            rel_fe = RelBFEWithoutCV(score_dir, target_ligand_group, target_ligand_3l_code,
+                                     unif_weights, [ref_ligand], yank_interaction_energies
+                                     ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+
+            self_rel_fe = RelBFEWithoutCV(score_dir, ref_ligand_group, ref_ligand_3l_code,
+                                          unif_weights, [ref_ligand], yank_interaction_energies
+                                          ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
+
+        else:
+            raise ValueError("Unrecognized how_bootstrap: " + how_bootstrap)
+
         rel_fe = rel_fe.values()[0]
-
-        self_rel_fe = RelBFEWithoutCV(score_dir, ref_ligand_group, ref_ligand_3l_code,
-                                      weights, [ref_ligand], yank_interaction_energies
-                                      ).cal_exp_mean_separate_for_each_system(FF, random_snapshots)
         self_rel_fe = self_rel_fe.values()[0]
 
         if (rel_fe not in [np.nan, np.inf, -np.inf]) and (self_rel_fe not in [np.nan, np.inf, -np.inf]):
@@ -528,7 +550,8 @@ def _extract_weights(weights, ref_ligand, snapshots):
     :return: extr_w, 1d array of shape (len(snapshots), )
     """
     extr_w = [weights[ref_ligand][snapshot] for snapshot in snapshots]
-    return np.array(extr_w)
+    extr_w = np.array(extr_w) / np.sum(extr_w)
+    return extr_w
 
 
 def _make_holo_weights_uniform(weights, ref_ligand):
