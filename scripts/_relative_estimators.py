@@ -6,6 +6,8 @@ from __future__ import print_function
 
 import os
 import glob
+import copy
+
 import numpy as np
 np.seterr(over='raise')     # raise exception if overload
 
@@ -514,6 +516,24 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
     error = (rel_fes - (covariance / variance) * self_rel_fes).std()
 
     return result, error, rel_fes, self_rel_fes
+
+
+def _make_holo_weights_uniform(weights, ref_ligand):
+    """
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param ref_ligand: str
+    :return: unif_weights, dic
+                    weights[ref_ligand][snapshot] -> 1/n (float)
+                    weights["systems"][ref_ligand_name] -> float
+    """
+    unif_weights = copy.deepcopy(weights)
+
+    n_snapshots = len(unif_weights[ref_ligand])
+    for snapshot in unif_weights[ref_ligand]:
+        unif_weights[ref_ligand][snapshot] = 1. / n_snapshots
+    return unif_weights
 
 
 def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
