@@ -590,7 +590,9 @@ def _weighted_corrcoef(x, y, weights):
 
 
 def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
-            weights, yank_interaction_energies, FF, verbose=False):
+                                        weights, yank_interaction_energies, FF,
+                                        cap_negative=False,
+                                        verbose=False):
     """
     :param snapshots: list of str
     :param score_dir: str
@@ -601,6 +603,8 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param cap_negative: bool
+    :param verbose: bool
 
     :return: (hs, gs, rel_bfe)
             hs: 1d array, values of random variable whose mean is to be estimated
@@ -675,6 +679,9 @@ def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref
         print("C:", c)
 
     ys = hs + c * (1 - gs)
+    if cap_negative:
+        ys = np.where(ys < 0, 0., ys)
+
     exp_mean = np.mean(ys)
     rel_bfe = (-1. / BETA) * np.log(exp_mean)
 
