@@ -54,28 +54,44 @@ for ref_ligand in ref_ligands:
     snapshots = single_snap_weights[ref_ligand].keys()
 
     for target_ligand in YANK_LIGANDS:
-        hs, gs, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir, target_ligand, ref_ligand,
-                                            single_snap_weights, yank_interaction_energies, args.FF, verbose=True)
+        hs, gs, c, correlation, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir,
+                                                                              target_ligand, ref_ligand,
+                                                                              single_snap_weights,
+                                                                              yank_interaction_energies,
+                                                                              args.FF, verbose=True)
 
-        bootstrap_ests = []
+        bootstrap_bfes = []
+        bootstrap_cs = []
+        bootstrap_corrs = []
         for _ in range(args.bootstrap_repeats):
             random_snapshots = np.random.choice(snapshots, size=len(snapshots), replace=True)
-            _, _, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir, target_ligand,
-                                                            ref_ligand, single_snap_weights, yank_interaction_energies,
-                                                            args.FF, verbose=False)
+            _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
+                                                                         target_ligand, ref_ligand,
+                                                                         single_snap_weights,
+                                                                         yank_interaction_energies, args.FF,
+                                                                         verbose=False)
             if (not np.isnan(bfe)) and (not np.isinf(bfe)):
-                bootstrap_ests.append(bfe)
+                bootstrap_bfes.append(bfe)
+                bootstrap_cs.append(b_c)
+                bootstrap_corrs.append(b_corr)
 
-        error = np.std(bootstrap_ests)
-
+        error = np.std(bootstrap_bfes)
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
-        rel_bfe_vs_self = os.path.join(result_dir, args.combining_rule, ref_ligand + "_VERSUS_" + target_ligand)
+        g_vs_h_out_file = os.path.join(result_dir, args.combining_rule, ref_ligand + "_G_VERSUS_H_" + target_ligand)
+        with open(g_vs_h_out_file, "w") as handle:
+            handle.write("# g          h\n")
+            for g, h in zip(gs, hs):
+                handle.write("%20.10e %20.10e\n" % (g, h))
 
-        with open(rel_bfe_vs_self, "w") as handle:
-            handle.write("# h          g\n")
-            for h, g in zip(hs, gs):
-                handle.write("%20.10e %20.10e\n" % (h, g))
+        g_corr_h_out_file = os.path.join(result_dir, args.combining_rule, ref_ligand + "_G_CORR_H_" + target_ligand)
+        with open(g_corr_h_out_file, "w") as handle:
+            handle.write("# C          correlation\n")
+            handle.write("%20.10e %20.10e\n" % (c, correlation))
+
+            handle.write("# bootstrap C and correlation\n")
+            for _c, _corr in zip(bootstrap_cs, bootstrap_corrs):
+                handle.write("%20.10e %20.10e\n" % (_c, _corr))
 
     out_file_handle.close()
 
