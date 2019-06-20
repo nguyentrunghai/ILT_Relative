@@ -95,7 +95,7 @@ fig.tight_layout()
 fig.savefig("bfe_dev_vs_C.pdf")
 
 # remove big outliers
-idx = xs.argsort(xs)
+idx = xs.argsort()
 xs_1 = xs[idx][:-10]
 ys_1 = ys[idx][:-10]
 
