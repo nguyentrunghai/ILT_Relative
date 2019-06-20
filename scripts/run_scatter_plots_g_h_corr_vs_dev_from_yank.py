@@ -1,8 +1,12 @@
 """
 """
 
+from __future__ import print_function
+
 import os
 import argparse
+
+import numpy as np
 
 from _yank import load_scores
 from _algdock import SIX_YANK_SYSTEMS
@@ -41,6 +45,26 @@ for ref_ligand in ref_ligands:
     bfe_devs[ref_ligand] = bfes
     bfe_errors[ref_ligand] = errors
 
+# load C and g-h correlation coefficients
+cs = {}
+c_errors = {}
+corr_coeffs = {}
+corr_errors = {}
 
+for ref_ligand in ref_ligands:
+    cs[ref_ligand] = {}
+    c_errors[ref_ligand] = {}
+    corr_coeffs[ref_ligand] = {}
+    corr_errors[ref_ligand] = {}
 
+    for target_ligand in target_ligands:
+        infile = os.path.join(args.rel_bfe_dir, ref_ligand + args.result_dir_suffix,
+                              args.combining_rule, ref_ligand + "_G_CORR_H_" + target_ligand)
+        print("Loading", infile)
+        c, c_err, corr, corr_err = np.loadtxt(infile)
+
+        cs[ref_ligand][target_ligand] = c,
+        c_errors[ref_ligand][target_ligand] = c_err
+        corr_coeffs[ref_ligand][target_ligand] = corr
+        corr_errors[ref_ligand][target_ligand] = corr_err
 
