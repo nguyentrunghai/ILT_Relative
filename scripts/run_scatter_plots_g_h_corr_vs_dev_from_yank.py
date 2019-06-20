@@ -78,6 +78,7 @@ ys = [bfe_devs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for targ
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
+ax.ticklabel_format(axis="x", style="sci")
 fig.tight_layout()
 fig.savefig("bfe_dev_vs_C.pdf")
 
