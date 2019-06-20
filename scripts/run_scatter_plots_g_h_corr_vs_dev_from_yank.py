@@ -136,3 +136,17 @@ ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
 fig.savefig("bfe_dev_vs_corr.pdf")
+
+#---------------------------------------------------
+# plot bfe_devs vs corr_error
+xs = [corr_errors[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+xs = np.array(xs)
+
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys)
+
+ax.set_xlabel("Error in Corr($g, h$)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+
+fig.tight_layout()
+fig.savefig("bfe_dev_vs_corr_error.pdf")
