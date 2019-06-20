@@ -7,6 +7,9 @@ import os
 import argparse
 
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 from _yank import load_scores
 from _algdock import SIX_YANK_SYSTEMS
@@ -63,8 +66,18 @@ for ref_ligand in ref_ligands:
         print("Loading", infile)
         c, c_err, corr, corr_err = np.loadtxt(infile)
 
-        cs[ref_ligand][target_ligand] = c,
+        cs[ref_ligand][target_ligand] = c
         c_errors[ref_ligand][target_ligand] = c_err
         corr_coeffs[ref_ligand][target_ligand] = corr
         corr_errors[ref_ligand][target_ligand] = corr_err
+
+
+# plot bfe_devs vs cs
+xs = [cs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+ys = [bfe_devs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys)
+fig.tight_layout()
+fig.savefig("bfe_dev_vs_C.pdf")
 
