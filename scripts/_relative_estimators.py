@@ -589,10 +589,10 @@ def _weighted_corrcoef(x, y, weights):
     return corrcoef
 
 
-def relative_bfe_with_cv_using_exp_mean(snapshots, score_dir, target_ligand, ref_ligand,
-                                        weights, yank_interaction_energies, FF,
-                                        cap_negative=False,
-                                        verbose=False):
+def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
+                                                  weights, yank_interaction_energies, FF,
+                                                  cap_negative=False,
+                                                  verbose=False):
     """
     :param snapshots: list of str
     :param score_dir: str
