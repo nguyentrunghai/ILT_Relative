@@ -38,7 +38,12 @@ parser.add_argument("--cap_negative", action="store_true", default=False)
 
 args = parser.parse_args()
 
-assert args.method in ["2a", "2b"], "unrecognized method"
+if args.method == "2a":
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2a
+elif args.method == "2b":
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2b
+else:
+    raise ValueError("unrecognized method " + args.method)
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
