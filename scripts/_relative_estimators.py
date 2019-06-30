@@ -692,3 +692,107 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("")
 
     return hs, gs, c, correlation, rel_bfe
+
+
+def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
+                                                  weights, yank_interaction_energies, FF,
+                                                  cap_negative=False,
+                                                  verbose=False):
+    """
+    :param snapshots: list of str
+    :param score_dir: str
+    :param target_ligand: str
+    :param ref_ligand: str
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param FF: str, phase
+    :param cap_negative: bool
+    :param verbose: bool
+
+    :return: (hs, gs, rel_bfe)
+            hs: 1d array, values of random variable whose mean is to be estimated
+            gs: 1d array, values of random variable whose mean is known (= 1) and used as a control variate
+            rel_bfe: float, relative binding free energy
+    """
+    all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
+    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
+    assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
+
+    ref_ligand_group = ref_ligand[: -3]
+    ref_ligand_3l_code = ref_ligand[-3:]
+
+    target_ligand_group = target_ligand[:-3]
+    target_ligand_3l_code = target_ligand[-3:]
+
+    ref_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, ref_ligand_group, ref_ligand_3l_code, FF + ".score")
+    target_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, target_ligand_group, target_ligand_3l_code,
+                                     FF + ".score")
+
+    if verbose:
+        print("--------------------------------")
+        print("ref_ligand:", ref_ligand)
+        print("target_ligand:", target_ligand)
+        print("ref_score_path:", ref_score_path)
+        print("target_score_path:", target_score_path)
+
+    ref_scores = load_bpmfs(ref_score_path, exclude_nan=False)
+    target_scores = load_bpmfs(target_score_path, exclude_nan=False)
+
+    hs = []    # values of random variable whose mean is to be estimated
+    gs = []    # values of random variable whose mean is known and used as a control variate
+    used_weights = []
+
+    for snapshot in snapshots:
+
+        if snapshot not in ref_scores:
+            raise ValueError(snapshot + " is not in ref_scores")
+
+        if snapshot not in target_scores:
+            raise ValueError(snapshot + " is not in target_scores")
+
+        try:
+            h = np.exp(-1. * (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot]))
+
+            g = np.exp(-1. * (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot]))
+
+        except FloatingPointError:
+            pass
+        else:
+            if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
+                hs.append(h)
+                gs.append(g)
+                used_weights.append(weights[ref_ligand][snapshot])
+
+    used_weights = np.array(used_weights)
+    used_weights /= used_weights.sum()
+
+    hs = np.array(hs)
+    gs = np.array(gs)
+
+    covariance = _weighted_cov(hs, gs, used_weights)
+    variance = _weighted_var(gs, used_weights)
+    correlation = _weighted_corrcoef(hs, gs, used_weights)
+
+    c = covariance / variance
+    if verbose:
+        print("correlation:", correlation)
+        print("covariance:", covariance)
+        print("variance:", variance)
+        print("C:", c)
+
+    ys = hs + c * (1 - gs)
+    if cap_negative:
+        ys = np.where(ys < 0, 0., ys)
+
+    exp_mean = np.average(ys, weights=used_weights)
+    rel_bfe = (-1. / BETA) * np.log(exp_mean)
+
+    if verbose:
+        print("exp_mean =", exp_mean)
+        print("Relative BFE = %10.5f" % rel_bfe)
+        print("--------------------------------")
+        print("")
+
+    return hs, gs, c, correlation, rel_bfe
