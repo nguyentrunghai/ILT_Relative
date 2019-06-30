@@ -12,7 +12,8 @@ import numpy as np
 from _yank import YANK_LIGANDS
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
-from _relative_estimators import relative_bfe_with_cv_using_exp_mean
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2a
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2b
 
 parser = argparse.ArgumentParser()
 
@@ -30,9 +31,14 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
+# method is either 2a or 2b
+parser.add_argument("--method", type=str, default="None")
+
 parser.add_argument("--cap_negative", action="store_true", default=False)
 
 args = parser.parse_args()
+
+assert args.method in ["2a", "2b"], "unrecognized method"
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
