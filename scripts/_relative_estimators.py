@@ -573,7 +573,10 @@ def _make_holo_weights_uniform(weights, ref_ligand):
 
 
 def _weighted_cov(x, y, weights):
-    return np.cov(x, y, aweights=weights)[0, -1]
+    x_bar = np.average(x, weights=weights)
+    y_bar = np.average(y, weights=weights)
+    z = (x -x_bar) * (y - y_bar)
+    return np.average(z, weights=weights)
 
 
 def _weighted_var(x, weights):
