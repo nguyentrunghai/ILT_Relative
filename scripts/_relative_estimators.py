@@ -678,6 +678,13 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
 
 
 def _weighted_cov(x, y, weights):
+    """
+    TODO use np.cov(x, y, aweights=weights)[0, -1]
+    :param x:
+    :param y:
+    :param weights:
+    :return:
+    """
     x_bar = np.average(x, weights=weights)
     y_bar = np.average(y, weights=weights)
     z = (x - x_bar) * (y - y_bar)
