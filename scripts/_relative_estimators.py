@@ -572,26 +572,6 @@ def _make_holo_weights_uniform(weights, ref_ligand):
     return unif_weights
 
 
-def _weighted_cov(x, y, weights):
-    x_bar = np.average(x, weights=weights)
-    y_bar = np.average(y, weights=weights)
-    z = (x - x_bar) * (y - y_bar)
-    return np.average(z, weights=weights)
-
-
-def _weighted_var(x, weights):
-    return _weighted_cov(x, x, weights)
-
-
-def _weighted_corrcoef(x, y, weights):
-    cov = _weighted_cov(x, y, weights)
-    var_x = _weighted_var(x, weights)
-    var_y = _weighted_var(y, weights)
-
-    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
-    return corrcoef
-
-
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
                                                   cap_negative=False,
@@ -695,6 +675,26 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("")
 
     return hs, gs, c, correlation, rel_bfe
+
+
+def _weighted_cov(x, y, weights):
+    x_bar = np.average(x, weights=weights)
+    y_bar = np.average(y, weights=weights)
+    z = (x - x_bar) * (y - y_bar)
+    return np.average(z, weights=weights)
+
+
+def _weighted_var(x, weights):
+    return _weighted_cov(x, x, weights)
+
+
+def _weighted_corrcoef(x, y, weights):
+    cov = _weighted_cov(x, y, weights)
+    var_x = _weighted_var(x, weights)
+    var_y = _weighted_var(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
 
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
