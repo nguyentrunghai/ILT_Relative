@@ -14,6 +14,7 @@ from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2a
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2b
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3
 
 parser = argparse.ArgumentParser()
 
@@ -39,9 +40,14 @@ parser.add_argument("--cap_negative", action="store_true", default=False)
 args = parser.parse_args()
 
 if args.method == "2a":
+    print("Method 2a")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2a
 elif args.method == "2b":
+    print("Method 2b")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2b
+elif args.method == "3":
+    print("Method 3")
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_3
 else:
     raise ValueError("unrecognized method " + args.method)
 
