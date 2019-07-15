@@ -687,9 +687,9 @@ def _weighted_cov(x, y, weights):
     """
     x_cen = x - np.average(x, weights=weights)
     y_cen = y - np.average(y, weights=weights)
-    z = x_cen * weights
-    z = z * y_cen
-    return np.sum(z) / np.sum(weights)
+
+    z = x_cen * y_cen
+    return np.average(z, weights=weights)
 
 
 def _weighted_var(x, weights):
