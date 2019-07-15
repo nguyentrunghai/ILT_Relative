@@ -999,12 +999,13 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     hs = np.array(hs)
     gs = np.array(gs)
 
-    h_bar = np.mean(hs)
-    g_bar = np.mean(gs)
-    covariance = np.cov(hs, gs)[0, -1]
-    variance_h = np.var(hs)
-    variance_g = np.var(gs)
-    correlation = np.corrcoef(hs, gs)[0, -1]
+    h_bar = np.average(hs, weights=used_weights)
+    g_bar = np.average(gs, weights=used_weights)
+
+    covariance = _weighted_cov(hs, gs, used_weights)
+    variance_h = _weighted_var(hs, used_weights)
+    variance_g = _weighted_var(gs, used_weights)
+    correlation = _weighted_corrcoef(hs, gs, used_weights)
 
     c_nominator = h_bar * covariance + (1 - g_bar) * variance_h
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
@@ -1022,7 +1023,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     if cap_negative:
         ys = np.where(ys < 0, 0., ys)
 
-    exp_mean = np.mean(ys)
+    exp_mean = np.average(ys, weights=used_weights)
     rel_bfe = (-1. / BETA) * np.log(exp_mean)
 
     if verbose:
