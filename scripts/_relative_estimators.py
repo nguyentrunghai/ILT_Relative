@@ -995,10 +995,9 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 
     used_weights = np.array(used_weights)
     used_weights /= used_weights.sum()
-    n_snapshots = len(used_weights)
 
-    hs = np.array(hs) * used_weights * n_snapshots
-    gs = np.array(gs) * used_weights * n_snapshots
+    hs = np.array(hs)
+    gs = np.array(gs)
 
     h_bar = np.mean(hs)
     g_bar = np.mean(gs)
