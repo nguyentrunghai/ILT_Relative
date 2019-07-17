@@ -804,7 +804,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
         print("covariance:", covariance)
         print("variance:", variance)
         print("C:", c)
-        print("exp_mean =", m_bar)
+        print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
         print("--------------------------------")
         print("")
