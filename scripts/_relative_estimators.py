@@ -691,11 +691,12 @@ def _weighted_cov(x, y, weights):
     :param weights:
     :return:
     """
-    x_cen = x - np.average(x, weights=weights)
-    y_cen = y - np.average(y, weights=weights)
+    #x_cen = x - np.average(x, weights=weights)
+    #y_cen = y - np.average(y, weights=weights)
 
-    z = x_cen * y_cen
-    return np.average(z, weights=weights)
+    #z = x_cen * y_cen
+    #return np.average(z, weights=weights)
+    return np.cov(x, y, aweights=weights)[0, -1]
 
 
 def _weighted_var(x, weights):
