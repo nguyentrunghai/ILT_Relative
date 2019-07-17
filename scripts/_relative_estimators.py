@@ -1019,7 +1019,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     m_bar = np.average(ms, weights=used_weights)
 
     # flip sign of c if m_bar or mean of ys < 0
-    if m_bar < 0:
+    if flip_sign_C and (m_bar < 0):
         ms = hs - c * (1 - gs)
         m_bar = np.average(ms, weights=used_weights)
 
