@@ -574,6 +574,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  set_c_to_zero=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -586,6 +587,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param set_c_to_zero:, bool
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
@@ -655,6 +657,8 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     correlation = np.corrcoef(hs, gs)[0, -1]
 
     c = covariance / variance
+    if set_c_to_zero:
+        c = 1.
 
     ms = hs + c * (1 - gs)
     m_bar = np.mean(ms)
