@@ -574,7 +574,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
-                                                  cap_negative=False,
+                                                  flip_sign_c=False,
                                                   verbose=False):
     """
     :param snapshots: list of str
@@ -586,7 +586,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
-    :param cap_negative: bool
+    :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
     :return: (hs, gs, rel_bfe)
@@ -661,16 +661,18 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("variance:", variance)
         print("C:", c)
 
-    ys = hs + c * (1 - gs)
-    # TODO: try -C if m_bar or mean of ys < 0
-    if cap_negative:
-        ys = np.where(ys < 0, 0., ys)
+    ms = hs + c * (1 - gs)
+    m_bar = np.mean(ms)
 
-    exp_mean = np.mean(ys)
-    rel_bfe = (-1. / BETA) * np.log(exp_mean)
+    # flip sign of c if m_bar < 0
+    if flip_sign_c and (m_bar < 0):
+        ms = hs - c * (1 - gs)
+        m_bar = np.mean(ms)
+
+    rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
-        print("exp_mean =", exp_mean)
+        print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
         print("--------------------------------")
         print("")
