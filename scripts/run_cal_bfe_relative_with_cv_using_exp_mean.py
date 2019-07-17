@@ -41,6 +41,7 @@ parser.add_argument("--flip_sign_c", action="store_true", default=False)
 
 args = parser.parse_args()
 
+
 def _filter_big_values(arr):
     """
     Filter out big values so that np.sd does not give overflow error
