@@ -683,7 +683,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     return hs, gs, c, correlation, rel_bfe
 
 
-def _weighted_cov_np(x, y, weights):
+def _weighted_cov(x, y, weights):
     """
     :param x:
     :param y:
@@ -693,7 +693,7 @@ def _weighted_cov_np(x, y, weights):
     return np.cov(x, y, aweights=weights)[0, -1]
 
 
-def _weighted_cov(x, y, weights):
+def _weighted_cov_test(x, y, weights):
     """
     TODO use np.cov(x, y, aweights=weights)[0, -1]
     :param x:
