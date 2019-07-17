@@ -683,6 +683,16 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     return hs, gs, c, correlation, rel_bfe
 
 
+def _weighted_cov_np(x, y, weights):
+    """
+    :param x:
+    :param y:
+    :param weights:
+    :return:
+    """
+    return np.cov(x, y, aweights=weights)[0, -1]
+
+
 def _weighted_cov(x, y, weights):
     """
     TODO use np.cov(x, y, aweights=weights)[0, -1]
@@ -691,12 +701,29 @@ def _weighted_cov(x, y, weights):
     :param weights:
     :return:
     """
-    #x_cen = x - np.average(x, weights=weights)
-    #y_cen = y - np.average(y, weights=weights)
+    x_cen = x - np.average(x, weights=weights)
+    y_cen = y - np.average(y, weights=weights)
 
-    #z = x_cen * y_cen
-    #return np.average(z, weights=weights)
-    return np.cov(x, y, aweights=weights)[0, -1]
+    xs, ys, ws = [], [], []
+
+    for x_v, y_v, w in zip(x_cen, y_cen, weights):
+        try:
+            x_v * y_v
+        except FloatingPointError:
+            pass
+        else:
+            xs.append(x_v)
+            ys.append(y_v)
+            ws.append(w)
+    xs = np.array(xs)
+    ys = np.array(ys)
+    ws = np.array(ws)
+
+    x_cen = xs - np.average(xs, weights=ws)
+    y_cen = ys - np.average(ys, weights=ws)
+    zs = x_cen * y_cen
+
+    return np.average(zs, weights=ws)
 
 
 def _weighted_var(x, weights):
