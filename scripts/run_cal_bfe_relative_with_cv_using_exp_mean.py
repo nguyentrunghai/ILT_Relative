@@ -14,7 +14,8 @@ from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2a
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2b
-from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3a
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3b
 
 parser = argparse.ArgumentParser()
 
@@ -32,22 +33,30 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
-# method is either 2a or 2b
+# method is either 2a, 2b, 3a, 3b
 parser.add_argument("--method", type=str, default="None")
 
-parser.add_argument("--cap_negative", action="store_true", default=False)
+parser.add_argument("--set_c_to_one", action="store_true", default=False)
+parser.add_argument("--flip_sign_c", action="store_true", default=False)
 
 args = parser.parse_args()
 
 if args.method == "2a":
     print("Method 2a")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2a
+
 elif args.method == "2b":
     print("Method 2b")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2b
-elif args.method == "3":
-    print("Method 3")
-    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_3
+
+elif args.method == "3a":
+    print("Method 3a")
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_3a
+
+elif args.method == "3b":
+    print("Method 3b")
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_3b
+
 else:
     raise ValueError("unrecognized method " + args.method)
 
@@ -82,7 +91,8 @@ for ref_ligand in ref_ligands:
                                                                               target_ligand, ref_ligand,
                                                                               single_snap_weights,
                                                                               yank_interaction_energies, args.FF,
-                                                                              cap_negative=args.cap_negative,
+                                                                              set_c_to_one=args.set_c_to_one,
+                                                                              flip_sign_c=args.flip_sign_c,
                                                                               verbose=True)
 
         bootstrap_bfes = []
@@ -94,7 +104,8 @@ for ref_ligand in ref_ligands:
                                                                          target_ligand, ref_ligand,
                                                                          single_snap_weights,
                                                                          yank_interaction_energies, args.FF,
-                                                                         cap_negative=args.cap_negative,
+                                                                         set_c_to_one=args.set_c_to_one,
+                                                                         flip_sign_c=args.flip_sign_c,
                                                                          verbose=False)
             if (not np.isnan(bfe)) and (not np.isinf(bfe)):
                 bootstrap_bfes.append(bfe)
