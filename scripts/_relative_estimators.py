@@ -574,7 +574,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
-                                                  set_c_to_zero=False,
+                                                  set_c_to_one=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -587,7 +587,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
-    :param set_c_to_zero:, bool
+    :param set_c_to_one:, bool
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
@@ -657,7 +657,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     correlation = np.corrcoef(hs, gs)[0, -1]
 
     c = covariance / variance
-    if set_c_to_zero:
+    if set_c_to_one:
         c = 1.
 
     ms = hs + c * (1 - gs)
@@ -713,7 +713,7 @@ def _weighted_corrcoef(x, y, weights):
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
-                                                  set_c_to_zero=False,
+                                                  set_c_to_one=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -726,7 +726,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
-    :param set_c_to_zero: bool
+    :param set_c_to_one: bool
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
@@ -795,7 +795,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
     correlation = _weighted_corrcoef(hs, gs, used_weights)
 
     c = covariance / variance
-    if set_c_to_zero:
+    if set_c_to_one:
         c = 1.
 
     ms = hs + c * (1 - gs)
@@ -823,6 +823,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
 
 def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  set_c_to_one=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -835,6 +836,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param set_c_to_one: bool
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
@@ -910,6 +912,8 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
 
     c = c_nominator / c_denominator
+    if set_c_to_one:
+        c = 1.
 
     ms = hs + c * (1 - gs)
     m_bar = np.mean(ms)
