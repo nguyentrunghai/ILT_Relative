@@ -655,11 +655,6 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     correlation = np.corrcoef(hs, gs)[0, -1]
 
     c = covariance / variance
-    if verbose:
-        print("correlation:", correlation)
-        print("covariance:", covariance)
-        print("variance:", variance)
-        print("C:", c)
 
     ms = hs + c * (1 - gs)
     m_bar = np.mean(ms)
@@ -672,6 +667,10 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
+        print("correlation:", correlation)
+        print("covariance:", covariance)
+        print("variance:", variance)
+        print("C:", c)
         print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
         print("--------------------------------")
