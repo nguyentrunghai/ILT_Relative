@@ -137,7 +137,7 @@ for ref_ligand in ref_ligands:
         bootstrap_bfes = _filter_big_values(bootstrap_bfes)
         bootstrap_cs = _filter_big_values(bootstrap_cs)
         bootstrap_corrs = _filter_big_values(bootstrap_corrs)
-        
+
         error = np.std(bootstrap_bfes)
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
