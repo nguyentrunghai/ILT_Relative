@@ -41,6 +41,25 @@ parser.add_argument("--flip_sign_c", action="store_true", default=False)
 
 args = parser.parse_args()
 
+def _filter_big_values(arr):
+    """
+    Filter out big values so that np.sd does not give overflow error
+    :param arr: 1d array or list
+    :return: 1d array
+    """
+    arr = np.array(arr)
+    arr_cen = arr - arr.mean()
+    arr_out = []
+    for v in arr_cen:
+        try:
+            v*v
+        except FloatingPointError:
+            print("Overflow if squared: %0.5e" % v)
+        else:
+            arr_out.append(v)
+    return np.array(arr_out)
+
+
 if args.method == "2a":
     print("Method 2a")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2a
@@ -115,6 +134,10 @@ for ref_ligand in ref_ligands:
                 bootstrap_cs.append(b_c)
                 bootstrap_corrs.append(b_corr)
 
+        bootstrap_bfes = _filter_big_values(bootstrap_bfes)
+        bootstrap_cs = _filter_big_values(bootstrap_cs)
+        bootstrap_corrs = _filter_big_values(bootstrap_corrs)
+        
         error = np.std(bootstrap_bfes)
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
