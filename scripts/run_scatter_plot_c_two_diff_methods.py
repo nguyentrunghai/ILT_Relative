@@ -63,9 +63,9 @@ for label_x in method_labels:
 
         #fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
         plt.figure(figsize=(3.2, 2.4))
-        ax = sns.jointplot(xs, ys, kind="scatter")
-        ax.set_xlabel(label_x)
-        ax.set_ylabel(label_y)
+        sns.jointplot(xs, ys, kind="scatter")
+        plt.xlabel(label_x)
+        plt.ylabel(label_y)
         plt.tight_layout()
 
         out = label_x + "_vs_" + label_y + ".pdf"
