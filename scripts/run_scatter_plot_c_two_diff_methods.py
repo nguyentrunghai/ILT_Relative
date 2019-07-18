@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 
 def _is_outlier(arr, test_value):
-    iqr = np.quantile(arr, 0.75) - np.quantile(arr, 0.25)
+    iqr = np.percentile(arr, 75.) - np.quantile(arr, 25.)
     score = np.abs(test_value - np.median(arr))
     return score > 5.*iqr
 
