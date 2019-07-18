@@ -14,9 +14,9 @@ from _algdock import SIX_YANK_SYSTEMS
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_dirs", type=str,
-                    default="../Relative_FE_Est_with_CV_method_2a/not_flip_sign_c")
+                    default="../Relative_FE_Est_with_CV_method_2a/not_flip_sign_c ../Relative_FE_Est_with_CV_method_2b/not_flip_sign_c")
 parser.add_argument("--method_labels", type=str,
-                    default="method_2a")
+                    default="method_2a method_2b")
 args = parser.parse_args()
 
 data_dirs = args.data_dirs.split()
