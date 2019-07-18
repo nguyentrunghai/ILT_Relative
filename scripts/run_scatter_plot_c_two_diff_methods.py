@@ -51,25 +51,26 @@ for label, data_dir in zip(method_labels, data_dirs):
 
 for label_x in method_labels:
     for label_y in method_labels:
-        xs = []
-        ys = []
+        if label_y != label_x:
+            xs = []
+            ys = []
 
-        for ref_ligand in ref_ligands:
-            for target_ligand in target_ligands:
-                xs.append(cs[label_x][ref_ligand][target_ligand])
-                ys.append(cs[label_y][ref_ligand][target_ligand])
+            for ref_ligand in ref_ligands:
+                for target_ligand in target_ligands:
+                    xs.append(cs[label_x][ref_ligand][target_ligand])
+                    ys.append(cs[label_y][ref_ligand][target_ligand])
 
-        xs = np.array(xs)
-        ys = np.array(ys)
+            xs = np.array(xs)
+            ys = np.array(ys)
 
-        data = pd.DataFrame({label_x: xs, label_y: ys})
-        #fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
-        plt.figure(figsize=(3.2, 2.4))
-        sns.jointplot(x=label_x, y=label_y, data=data, kind="scatter")
-        plt.xlabel(label_x)
-        plt.ylabel(label_y)
-        plt.tight_layout()
+            data = pd.DataFrame({label_x: xs, label_y: ys})
+            #fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
+            plt.figure(figsize=(3.2, 2.4))
+            sns.jointplot(x=label_x, y=label_y, data=data, kind="scatter")
+            plt.xlabel(label_x)
+            plt.ylabel(label_y)
+            plt.tight_layout()
 
-        out = label_x + "_vs_" + label_y + ".pdf"
-        dpi = 300
-        plt.savefig(out, dpi=dpi)
+            out = label_x + "_vs_" + label_y + ".pdf"
+            dpi = 300
+            plt.savefig(out, dpi=dpi)
