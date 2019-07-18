@@ -21,13 +21,15 @@ parser.add_argument("--data_dirs", type=str,
                     default="../Relative_FE_Est_with_CV_method_2a/not_flip_sign_c ../Relative_FE_Est_with_CV_method_2b/not_flip_sign_c")
 parser.add_argument("--method_labels", type=str,
                     default="method_2a method_2b")
+parser.add_argument("--threshold_4_outliers", type=float, default=5)
 args = parser.parse_args()
 
 
-def _is_outlier(arr, test_value):
+def _is_outlier(arr, test_value, threshold):
+    assert threshold > 0, "threshold must be positive"
     iqr = np.percentile(arr, 75.) - np.percentile(arr, 25.)
     score = np.abs(test_value - np.median(arr))
-    return score > 5.*iqr
+    return score > threshold*iqr
 
 
 data_dirs = args.data_dirs.split()
@@ -70,8 +72,8 @@ for label_x in method_labels:
             xs_new = []
             ys_new = []
             for x, y in zip(xs, ys):
-                if not _is_outlier(xs, x):
-                    if not _is_outlier(ys, y):
+                if not _is_outlier(xs, x, args.threshold_4_outliers):
+                    if not _is_outlier(ys, y, args.threshold_4_outliers):
                         xs_new.append(x)
                         ys_new.append(y)
 
