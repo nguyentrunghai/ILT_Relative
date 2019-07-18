@@ -29,11 +29,16 @@ SUB_DIR_SUFFIX = "__equal_sys__single_weight"
 
 cs = {}
 for label, data_dir in zip(method_labels, data_dirs):
-    cs[label] = []
+    cs[label] = {}
 
     for ref_ligand in ref_ligands:
+        cs[label][ref_ligand] = {}
+
         data_files = glob.glob(os.path.join(data_dir, ref_ligand + SUB_DIR_SUFFIX, "ExpMean",
                                             ref_ligand + "_G_CORR_H_*"))
         data_files = [data_file for data_file in data_files if data_file.split("_G_CORR_H_")[-1] != ref_ligand]
-        print(data_files)
-        cs[label].extend([np.loadtxt(data_file)[0, 0] for data_file in data_files])
+
+        for data_file in data_files:
+            target_ligand = data_file.split("_G_CORR_H_")[-1]
+            print("Loading " + data_file)
+            cs[label][ref_ligand][target_ligand] = np.loadtxt(data_file)[0, 0]
