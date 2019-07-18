@@ -36,7 +36,7 @@ for label, data_dir in zip(method_labels, data_dirs):
 
         data_files = glob.glob(os.path.join(data_dir, ref_ligand + SUB_DIR_SUFFIX, "ExpMean",
                                             ref_ligand + "_G_CORR_H_*"))
-        data_files = [data_file for data_file in data_files if data_file.split("_G_CORR_H_")[-1] != ref_ligand]
+        data_files = [data_file for data_file in data_files if data_file.split("_G_CORR_H_")[-1] not in ref_ligands]
 
         for data_file in data_files:
             target_ligand = data_file.split("_G_CORR_H_")[-1]
