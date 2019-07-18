@@ -41,4 +41,4 @@ for label, data_dir in zip(method_labels, data_dirs):
         for data_file in data_files:
             target_ligand = data_file.split("_G_CORR_H_")[-1]
             print("Loading " + data_file)
-            cs[label][ref_ligand][target_ligand] = np.loadtxt(data_file)[0, 0]
+            cs[label][ref_ligand][target_ligand] = np.loadtxt(data_file)[0]
