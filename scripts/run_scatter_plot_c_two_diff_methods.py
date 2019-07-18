@@ -9,6 +9,9 @@ import glob
 import os
 
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 from _algdock import SIX_YANK_SYSTEMS
 
@@ -42,3 +45,19 @@ for label, data_dir in zip(method_labels, data_dirs):
             target_ligand = data_file.split("_G_CORR_H_")[-1]
             print("Loading " + data_file)
             cs[label][ref_ligand][target_ligand] = np.loadtxt(data_file)[0]
+
+        target_ligands = cs[label][ref_ligand].keys()
+
+for label_x in method_labels:
+    for label_y in method_labels:
+        xs = []
+        ys = []
+
+        for ref_ligand in ref_ligands:
+            for target_ligand in target_ligands:
+                xs.append(cs[label_x][ref_ligand][target_ligand])
+                ys.append(cs[label_y][ref_ligand][target_ligand])
+
+        xs = np.array(xs)
+        ys = np.array(ys)
+        
