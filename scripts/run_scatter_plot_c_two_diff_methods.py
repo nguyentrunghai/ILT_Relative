@@ -9,6 +9,7 @@ import glob
 import os
 
 import numpy as np
+import scipy
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -22,6 +23,13 @@ parser.add_argument("--data_dirs", type=str,
 parser.add_argument("--method_labels", type=str,
                     default="method_2a method_2b")
 args = parser.parse_args()
+
+
+def _is_outlier(arr, test_value):
+    iqr = scipy.stats.iqr(arr)
+    score = np.abs(test_value - np.median(arr))
+    return score > 5.*iqr
+
 
 data_dirs = args.data_dirs.split()
 print("data_dirs", data_dirs)
@@ -60,10 +68,18 @@ for label_x in method_labels:
                     xs.append(cs[label_x][ref_ligand][target_ligand])
                     ys.append(cs[label_y][ref_ligand][target_ligand])
 
-            xs = np.array(xs)
-            ys = np.array(ys)
+            xs_new = []
+            ys_new = []
+            for x, y in zip(xs, ys):
+                if not _is_outlier(xs, x):
+                    if not _is_outlier(ys, y):
+                        xs_new.append(x)
+                        ys_new.append(y)
 
-            data = pd.DataFrame({label_x: xs, label_y: ys})
+            xs_new = np.array(xs_new)
+            ys_new = np.array(ys_new)
+
+            data = pd.DataFrame({label_x: xs_new, label_y: ys_new})
             #fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
             plt.figure(figsize=(3.2, 2.4))
             sns.jointplot(x=label_x, y=label_y, data=data, kind="scatter")
