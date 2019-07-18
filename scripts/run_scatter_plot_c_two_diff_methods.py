@@ -60,4 +60,13 @@ for label_x in method_labels:
 
         xs = np.array(xs)
         ys = np.array(ys)
-        
+
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
+        sns.jointplot(xs, ys, kind="scatter", ax=ax)
+        ax.set_xlabel(label_x)
+        ax.set_ylabel(label_y)
+        fig.tight_layout()
+
+        out = label_x + "_vs_" + label_y + ".pdf"
+        dpi = 300
+        fig.savefig(out, dpi=dpi)
