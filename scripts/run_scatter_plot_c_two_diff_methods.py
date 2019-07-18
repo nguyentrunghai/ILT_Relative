@@ -8,6 +8,8 @@ import argparse
 import glob
 import os
 
+import numpy as np
+
 from _algdock import SIX_YANK_SYSTEMS
 
 parser = argparse.ArgumentParser()
@@ -18,16 +20,20 @@ parser.add_argument("--method_labels", type=str,
 args = parser.parse_args()
 
 data_dirs = args.data_dirs.split()
+print("data_dirs", data_dirs)
 method_labels = args.method_labels.split()
+print("method_labels")
 
 ref_ligands = SIX_YANK_SYSTEMS
 SUB_DIR_SUFFIX = "__equal_sys__single_weight"
 
 cs = {}
 for label, data_dir in zip(method_labels, data_dirs):
-    cs[label] = {}
+    cs[label] = []
 
     for ref_ligand in ref_ligands:
-        data_files = glob.glob(os.path.join(data_dir, ref_ligand+SUB_DIR_SUFFIX, "ExpMean", ref_ligand+"_G_CORR_H_*"))
-        data_files = [f for f in data_files if f.split("_G_CORR_H_")[-1] != ref_ligand]
+        data_files = glob.glob(os.path.join(data_dir, ref_ligand + SUB_DIR_SUFFIX, "ExpMean",
+                                            ref_ligand + "_G_CORR_H_*"))
+        data_files = [data_file for data_file in data_files if data_file.split("_G_CORR_H_")[-1] != ref_ligand]
         print(data_files)
+        cs[label].extend([np.loadtxt(data_file)[0, 0] for data_file in data_files])
