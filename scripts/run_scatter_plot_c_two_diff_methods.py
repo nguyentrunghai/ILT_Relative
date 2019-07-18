@@ -9,6 +9,7 @@ import glob
 import os
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
@@ -61,9 +62,10 @@ for label_x in method_labels:
         xs = np.array(xs)
         ys = np.array(ys)
 
+        data = pd.DataFrame({label_x: xs, label_y: ys})
         #fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(3.2, 2.4))
         plt.figure(figsize=(3.2, 2.4))
-        sns.jointplot(xs, ys, kind="scatter")
+        sns.jointplot(x=label_x, y=label_y, data=data, kind="scatter")
         plt.xlabel(label_x)
         plt.ylabel(label_y)
         plt.tight_layout()
