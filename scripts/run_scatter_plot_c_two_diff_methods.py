@@ -9,7 +9,6 @@ import glob
 import os
 
 import numpy as np
-import scipy
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -26,7 +25,7 @@ args = parser.parse_args()
 
 
 def _is_outlier(arr, test_value):
-    iqr = scipy.stats.iqr(arr)
+    iqr = np.quantile(arr, 0.75) - np.quantile(arr, 0.25)
     score = np.abs(test_value - np.median(arr))
     return score > 5.*iqr
 
