@@ -42,7 +42,8 @@ print("compare_absolute ", args.compare_absolute)
 
 yank_scores, yank_stds = load_scores(args.yank_results, 0, 1, 2, [])
 
-weighting_schemes_ref_ligands = glob.glob( os.path.join(args.algdock_results_dir, "*", args.averaging_rule, args.algdock_score_file))
+weighting_schemes_ref_ligands = glob.glob(os.path.join(args.algdock_results_dir, "*",
+                                                       args.averaging_rule, args.algdock_score_file))
 weighting_schemes_ref_ligands = [file_name.split("/")[-3] for file_name in weighting_schemes_ref_ligands]
 
 weighting_schemes = []
@@ -71,12 +72,14 @@ for scheme in weighting_schemes:
         out_text_file = os.path.join(out_dir, args.out_text)
         out_raw_data_file = os.path.join(out_dir, "raw_data.dat")
 
-        algdock_score_file = os.path.join(args.algdock_results_dir, out_dir, args.averaging_rule, args.algdock_score_file)
+        algdock_score_file = os.path.join(args.algdock_results_dir, out_dir,
+                                          args.averaging_rule, args.algdock_score_file)
         print(algdock_score_file)
         algdock_scores, algdock_stds = load_scores(algdock_score_file, 0, 1, 2, [])
 
         if args.subtract_self_rbfe:
-            algdock_scores = {ligand: (algdock_scores[ligand] - algdock_scores[ref_ligand]) for ligand in algdock_scores}
+            algdock_scores = {ligand: (algdock_scores[ligand] - algdock_scores[ref_ligand])
+                              for ligand in algdock_scores}
 
         if args.compare_absolute:
             algdock_scores = {ligand: (algdock_scores[ligand] + yank_scores[ref_ligand]) for ligand in algdock_scores}
@@ -86,14 +89,16 @@ for scheme in weighting_schemes:
         all_algdock_stds[scheme][ref_ligand] = algdock_stds
 
 
-        considered_algdock_scores = {ligand: algdock_scores[ligand] for ligand in algdock_scores if ligand not in [ref_ligand] + exclude_ligands_from_scatter_plots}
+        considered_algdock_scores = {ligand: algdock_scores[ligand] for ligand in algdock_scores
+                                     if ligand not in [ref_ligand] + exclude_ligands_from_scatter_plots}
 
         if args.compare_absolute:
             considered_yank_scores = yank_scores
         else:
             considered_yank_scores = {ligand: (yank_scores[ligand] - yank_scores[ref_ligand]) for ligand in yank_scores}
 
-        x, y, xerr, yerr, ligands = matching_scores(considered_yank_scores, considered_algdock_scores, yank_stds, algdock_stds)
+        x, y, xerr, yerr, ligands = matching_scores(considered_yank_scores, considered_algdock_scores,
+                                                    yank_stds, algdock_stds)
         write_pairs(considered_yank_scores, considered_algdock_scores, yank_stds, algdock_stds, out_raw_data_file, [])
         # use one std for errorbar
         xerr /= 2.
@@ -121,7 +126,8 @@ for scheme in weighting_schemes:
                         text_pos=[0.1, 0.7])
 
 
-all_ligands = [all_algdock_scores[scheme][ref_ligand].keys() for scheme in weighting_schemes for ref_ligand in SIX_YANK_SYSTEMS]
+all_ligands = [all_algdock_scores[scheme][ref_ligand].keys()
+               for scheme in weighting_schemes for ref_ligand in SIX_YANK_SYSTEMS]
 common_ligands = set(all_ligands[0])
 unioned_ligands = set(all_ligands[0])
 
@@ -137,8 +143,10 @@ for scheme in weighting_schemes:
     min_algdock_scores[scheme] = {}
     min_algdock_stds[scheme] = {}
     for ligand in common_ligands:
-        min_algdock_scores[scheme][ligand] = np.min([all_algdock_scores[scheme][ref_ligand][ligand] for ref_ligand in SIX_YANK_SYSTEMS])
-        min_algdock_stds[scheme][ligand] = np.mean([all_algdock_stds[scheme][ref_ligand][ligand] for ref_ligand in SIX_YANK_SYSTEMS])
+        min_algdock_scores[scheme][ligand] = np.min([all_algdock_scores[scheme][ref_ligand][ligand]
+                                                     for ref_ligand in SIX_YANK_SYSTEMS])
+        min_algdock_stds[scheme][ligand] = np.mean([all_algdock_stds[scheme][ref_ligand][ligand]
+                                                    for ref_ligand in SIX_YANK_SYSTEMS])
 
 # take all 24 ligands
 
@@ -174,10 +182,13 @@ for scheme in weighting_schemes:
     else:
         considered_yank_scores = {ligand: (yank_scores[ligand] - yank_scores[ref_ligand]) for ligand in yank_scores}
 
-    considered_yank_scores = {ligand: considered_yank_scores[ligand] for ligand in considered_yank_scores if ligand not in exclude_ligands_from_scatter_plots}
+    considered_yank_scores = {ligand: considered_yank_scores[ligand] for ligand in considered_yank_scores
+                              if ligand not in exclude_ligands_from_scatter_plots}
 
-    x, y, xerr, yerr, ligands = matching_scores(considered_yank_scores, min_algdock_scores[scheme], yank_stds, min_algdock_stds[scheme])
-    write_pairs(considered_yank_scores, min_algdock_scores[scheme], yank_stds, min_algdock_stds[scheme], out_raw_data_file, [])
+    x, y, xerr, yerr, ligands = matching_scores(considered_yank_scores, min_algdock_scores[scheme],
+                                                yank_stds, min_algdock_stds[scheme])
+    write_pairs(considered_yank_scores, min_algdock_scores[scheme], yank_stds,
+                min_algdock_stds[scheme], out_raw_data_file, [])
     # use one std for errorbar
     xerr /= 2.
     yerr /= 2.
@@ -201,8 +212,7 @@ for scheme in weighting_schemes:
                     markersize=5,
                     markercolors=markercolors,
                     same_xy_scale=False,
-                    text_pos=[0.1, 0.7] 
-                    )
+                    text_pos=[0.1, 0.7])
 
 
 print("Done")
