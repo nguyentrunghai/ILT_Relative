@@ -78,8 +78,9 @@ for scheme in weighting_schemes:
         algdock_scores, algdock_stds = load_scores(algdock_score_file, 0, 1, 2, [])
 
         if args.subtract_self_rbfe:
-            algdock_scores = {ligand: (algdock_scores[ligand] - algdock_scores[ref_ligand])
-                              for ligand in algdock_scores}
+            if not np.isnan(algdock_scores[ref_ligand]):
+                algdock_scores = {ligand: (algdock_scores[ligand] - algdock_scores[ref_ligand])
+                                  for ligand in algdock_scores}
 
         if args.compare_absolute:
             algdock_scores = {ligand: (algdock_scores[ligand] + yank_scores[ref_ligand]) for ligand in algdock_scores}
