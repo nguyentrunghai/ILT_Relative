@@ -15,22 +15,23 @@ from _yank_algdock_fft_scores import load_scores, matching_scores, write_pairs
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--yank_results", type=str, default = "/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
-parser.add_argument( "--algdock_results_dir", type=str, default = "/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/OBC2")
-parser.add_argument( "--averaging_rule", type=str, default = "ExpMean")
-parser.add_argument( "--algdock_score_file", type=str, default = "OpenMM_OBC2_MBAR.score")
+parser.add_argument("--yank_results", type=str, default="/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
+parser.add_argument("--algdock_results_dir", type=str,
+                    default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/OBC2")
+parser.add_argument("--averaging_rule", type=str, default="ExpMean")
+parser.add_argument("--algdock_score_file", type=str, default="OpenMM_OBC2_MBAR.score")
 
-parser.add_argument( "--exclude_ligands_from_scatter_plots", type=str, default = "" )
+parser.add_argument("--exclude_ligands_from_scatter_plots", type=str, default="")
 
-parser.add_argument( "--subtract_self_rbfe", action="store_true", default=False)
-parser.add_argument( "--compare_absolute",  action="store_true", default=False)
+parser.add_argument("--subtract_self_rbfe", action="store_true", default=False)
+parser.add_argument("--compare_absolute",  action="store_true", default=False)
 
-parser.add_argument( "--out_figure", type=str, default = "algdock_vs_yank.pdf")
-parser.add_argument( "--out_text", type=str, default = "algdock_vs_yank.dat")
+parser.add_argument("--out_figure", type=str, default="algdock_vs_yank.pdf")
+parser.add_argument("--out_text", type=str, default="algdock_vs_yank.dat")
 
-parser.add_argument( "--xlabel", type=str, default = "YANK free energy (kcal/mol)")
-parser.add_argument( "--ylabel", type=str, default = "AlGDock free energy (kcal/mol)")
-parser.add_argument( "--show_xy_axes", type=bool, default = True)
+parser.add_argument("--xlabel", type=str, default="YANK free energy (kcal/mol)")
+parser.add_argument("--ylabel", type=str, default="AlGDock free energy (kcal/mol)")
+parser.add_argument("--show_xy_axes", type=bool, default=True)
 
 args = parser.parse_args()
 
