@@ -484,10 +484,14 @@ def relative_bfe_with_cv_using_bootstrap(snapshots, score_dir, target_ligand, re
 
     rel_fes = []
     self_rel_fes = []
+    bootstrap_weights = []
     for _ in range(bootstrap_repeats):
 
         if how_bootstrap == "uniform":
             random_snapshots = np.random.choice(snapshots, size=n_snapshots, replace=True)
+            #random_idx = np.random.choice(n_snapshots, size=n_snapshots, replace=True)
+            #random_snapshots = snapshots[random_idx]
+            #bootstrap_weights.append(extr_weights[random_idx].prod())
 
             rel_fe = RelBFEWithoutCV(score_dir, target_ligand_group, target_ligand_3l_code,
                                      weights, [ref_ligand], yank_interaction_energies
@@ -693,9 +697,21 @@ def _weighted_cov(x, y, weights):
     return np.cov(x, y, aweights=weights)[0, -1]
 
 
-def _weighted_cov_test(x, y, weights):
+def _weighted_var(x, weights):
+    return _weighted_cov(x, x, weights)
+
+
+def _weighted_corrcoef(x, y, weights):
+    cov = _weighted_cov(x, y, weights)
+    var_x = _weighted_var(x, weights)
+    var_y = _weighted_var(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
+
+
+def _weighted_cov_manual_notused(x, y, weights):
     """
-    TODO use np.cov(x, y, aweights=weights)[0, -1]
     :param x:
     :param y:
     :param weights:
@@ -726,17 +742,27 @@ def _weighted_cov_test(x, y, weights):
     return np.average(zs, weights=ws)
 
 
-def _weighted_var(x, weights):
-    return _weighted_cov(x, x, weights)
+def _weighted_cov_manual(x, y, weights):
+    """
+    :param x:
+    :param y:
+    :param weights:
+    :return:
+    """
+    x_cen = x - np.average(x, weights=weights)
+    y_cen = y - np.average(y, weights=weights)
+    xy_max = np.max([x_cen.max(), y_cen.max()])
+
+    weights = np.array(weights) / xy_max
+    zs = weights * x_cen
+    zs = zs * y_cen
+
+    cov = np.sum(zs) / np.sum(weights)
+    return cov
 
 
-def _weighted_corrcoef(x, y, weights):
-    cov = _weighted_cov(x, y, weights)
-    var_x = _weighted_var(x, weights)
-    var_y = _weighted_var(y, weights)
-
-    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
-    return corrcoef
+def _weighted_var_manual(x, weights):
+    return _weighted_cov_manual(x, x, weights)
 
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
