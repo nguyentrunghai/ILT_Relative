@@ -1084,10 +1084,10 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     h_bar = np.average(hs, weights=used_weights)
     g_bar = np.average(gs, weights=used_weights)
 
-    covariance = _weighted_cov_manual(hs, gs, used_weights)
-    variance_h = _weighted_var_manual(hs, used_weights)
-    variance_g = _weighted_var_manual(gs, used_weights)
-    correlation = _weighted_corrcoef_manual(hs, gs, used_weights)
+    covariance = _weighted_cov(hs, gs, used_weights)
+    variance_h = _weighted_var(hs, used_weights)
+    variance_g = _weighted_var(gs, used_weights)
+    correlation = _weighted_corrcoef(hs, gs, used_weights)
 
     c_nominator = h_bar * covariance + (1 - g_bar) * variance_h
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
