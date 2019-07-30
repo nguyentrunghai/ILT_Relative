@@ -765,6 +765,15 @@ def _weighted_var_manual(x, weights):
     return _weighted_cov_manual(x, x, weights)
 
 
+def _weighted_corrcoef_manual(x, y, weights):
+    cov = _weighted_cov_manual(x, y, weights)
+    var_x = _weighted_var_manual(x, weights)
+    var_y = _weighted_var_manual(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
+
+
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
                                                   set_c_to_one=False,
