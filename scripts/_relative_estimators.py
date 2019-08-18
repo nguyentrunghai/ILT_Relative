@@ -681,7 +681,11 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     return hs, gs, c, correlation, rel_bfe
 
 
-def _weighted_cov(x, y, weights):
+def _weighted_mean_np(x, weights):
+    return np.average(x, weights=weights)
+
+
+def _weighted_cov_np(x, y, weights):
     """
     :param x:
     :param y:
@@ -691,17 +695,24 @@ def _weighted_cov(x, y, weights):
     return np.cov(x, y, aweights=weights)[0, -1]
 
 
-def _weighted_var(x, weights):
-    return _weighted_cov(x, x, weights)
+def _weighted_var_np(x, weights):
+    return _weighted_cov_np(x, x, weights)
 
 
-def _weighted_corrcoef(x, y, weights):
-    cov = _weighted_cov(x, y, weights)
-    var_x = _weighted_var(x, weights)
-    var_y = _weighted_var(y, weights)
+def _weighted_corrcoef_np(x, y, weights):
+    cov = _weighted_cov_np(x, y, weights)
+    var_x = _weighted_var_np(x, weights)
+    var_y = _weighted_var_np(y, weights)
 
     corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
     return corrcoef
+
+
+def _weighted_mean_manual(x, weights):
+    x_max = np.max(x)
+    weights = np.array(weights) / x_max
+    m = np.sum(x * weights) / np.sum(weights)
+    return m
 
 
 def _weighted_cov_manual(x, y, weights):
