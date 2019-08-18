@@ -745,9 +745,11 @@ def _weighted_cov_manual(x, y, weights):
     """
     x_cen = np.asarray(x) - _weighted_mean_manual(x, weights)
     y_cen = np.asarray(y) - _weighted_mean_manual(y, weights)
+    xy_max = np.max([x_cen.max(), y_cen.max()])
 
-    weights = np.array(weights) / x_cen.max() / y_cen.max()
-    zs = weights * x_cen * y_cen
+    weights = np.array(weights) / xy_max
+    zs = weights * x_cen
+    zs *= y_cen
     cov = np.sum(zs) / np.sum(weights)
     return cov
 
