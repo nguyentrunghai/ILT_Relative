@@ -677,8 +677,6 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("C:", c)
         print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
-        print("--------------------------------")
-        print("")
 
     self_rel_bfe = 0.
     if subtract_self:
