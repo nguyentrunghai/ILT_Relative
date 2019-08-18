@@ -682,7 +682,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
     if subtract_self:
         ms_self = gs + c * (1 - gs)
         m_self_bar = np.mean(ms_self)
-        # flip sign of c if m_bar < 0
+        # flip sign of c if m_self_bar < 0
         if flip_sign_c and (m_self_bar < 0):
             ms_self = gs - c * (1 - gs)
             m_self_bar = np.mean(ms_self)
