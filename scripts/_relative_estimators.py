@@ -692,6 +692,12 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
 
     rel_bfe -= self_rel_bfe
 
+    if verbose:
+        print("Self Relative BFE = %10.5f" % self_rel_bfe)
+        print("Relative BFE (after subtracting self rbfe) = %10.5f" % rel_bfe)
+        print("--------------------------------")
+        print("")
+
     return hs, gs, c, correlation, rel_bfe
 
 
