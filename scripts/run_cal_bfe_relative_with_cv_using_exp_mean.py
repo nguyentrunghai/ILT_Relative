@@ -91,8 +91,8 @@ if args.flip_sign_c:
 else:
     print("Don't flip sign of C")
 
-if args.set_c_to_one:
-    print("Set c to One")
+if args.subtract_self:
+    print("Subtract from self relative BFE")
 
 for ref_ligand in ref_ligands:
     print("Processing reference ligand", ref_ligand)
