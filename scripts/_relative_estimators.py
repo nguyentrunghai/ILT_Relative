@@ -578,6 +578,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  subtract_self=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -590,6 +591,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param subtract_self: bool, if True subtract result from self relative bfe
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
 
@@ -677,6 +679,18 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("Relative BFE = %10.5f" % rel_bfe)
         print("--------------------------------")
         print("")
+
+    self_rel_bfe = 0.
+    if subtract_self:
+        ms_self = gs + c * (1 - gs)
+        m_self_bar = np.mean(ms_self)
+        # flip sign of c if m_bar < 0
+        if flip_sign_c and (m_self_bar < 0):
+            ms_self = gs - c * (1 - gs)
+            m_self_bar = np.mean(ms_self)
+        self_rel_bfe = (-1. / BETA) * np.log(m_self_bar)
+
+    rel_bfe -= self_rel_bfe
 
     return hs, gs, c, correlation, rel_bfe
 
