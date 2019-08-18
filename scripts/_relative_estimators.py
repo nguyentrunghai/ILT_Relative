@@ -704,38 +704,6 @@ def _weighted_corrcoef(x, y, weights):
     return corrcoef
 
 
-def _weighted_cov_manual_notused(x, y, weights):
-    """
-    :param x:
-    :param y:
-    :param weights:
-    :return:
-    """
-    x_cen = x - np.average(x, weights=weights)
-    y_cen = y - np.average(y, weights=weights)
-
-    xs, ys, ws = [], [], []
-
-    for x_v, y_v, w in zip(x_cen, y_cen, weights):
-        try:
-            x_v * y_v
-        except FloatingPointError:
-            pass
-        else:
-            xs.append(x_v)
-            ys.append(y_v)
-            ws.append(w)
-    xs = np.array(xs)
-    ys = np.array(ys)
-    ws = np.array(ws)
-
-    x_cen = xs - np.average(xs, weights=ws)
-    y_cen = ys - np.average(ys, weights=ws)
-    zs = x_cen * y_cen
-
-    return np.average(zs, weights=ws)
-
-
 def _weighted_cov_manual(x, y, weights):
     """
     :param x:
