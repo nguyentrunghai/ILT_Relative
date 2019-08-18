@@ -709,6 +709,7 @@ def _weighted_corrcoef_np(x, y, weights):
 
 
 def _weighted_mean_manual(x, weights):
+    """to avoid overflow if x is large"""
     x = np.array(x)
     x_max = np.max(x)
     weights = np.array(weights) / x_max
