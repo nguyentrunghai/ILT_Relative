@@ -986,7 +986,6 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
 
 def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
-                                                  set_c_to_one=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -999,7 +998,6 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
-    :param set_c_to_one: bool
     :param flip_sign_c: bool, if m_bar < 0, flip sign of C
     :param verbose: bool
 
@@ -1075,17 +1073,13 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
 
     c = c_nominator / c_denominator
-    if set_c_to_one:
-        c = 1.
 
     ms = hs + c * (1 - gs)
     m_bar = np.average(ms, weights=used_weights)
-
     # flip sign of c if m_bar < 0
     if flip_sign_c and (m_bar < 0):
         ms = hs - c * (1 - gs)
         m_bar = np.average(ms, weights=used_weights)
-
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
