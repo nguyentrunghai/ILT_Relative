@@ -768,15 +768,15 @@ def _weighted_corrcoef_manual(x, y, weights):
 
 
 # select which statistic functions to use
-#_weighted_mean = _weighted_mean_np
-#_weighted_cov = _weighted_cov_np
-#_weighted_var = _weighted_var_np
-#_weighted_corrcoef = _weighted_corrcoef_np
+_weighted_mean = _weighted_mean_np
+_weighted_cov = _weighted_cov_np
+_weighted_var = _weighted_var_np
+_weighted_corrcoef = _weighted_corrcoef_np
 
-_weighted_mean = _weighted_mean_manual
-_weighted_cov = _weighted_cov_manual
-_weighted_var = _weighted_var_manual
-_weighted_corrcoef = _weighted_corrcoef_manual
+#_weighted_mean = _weighted_mean_manual
+#_weighted_cov = _weighted_cov_manual
+#_weighted_var = _weighted_var_manual
+#_weighted_corrcoef = _weighted_corrcoef_manual
 
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
