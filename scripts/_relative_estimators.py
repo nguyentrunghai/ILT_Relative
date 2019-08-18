@@ -709,6 +709,7 @@ def _weighted_corrcoef_np(x, y, weights):
 
 
 def _weighted_mean_manual(x, weights):
+    x = np.array(x)
     x_max = np.max(x)
     weights = np.array(weights) / x_max
     m = np.sum(x * weights) / np.sum(weights)
@@ -722,8 +723,8 @@ def _weighted_cov_manual(x, y, weights):
     :param weights:
     :return:
     """
-    x_cen = x - np.average(x, weights=weights)
-    y_cen = y - np.average(y, weights=weights)
+    x_cen = x - _weighted_mean_manual(x, weights)
+    y_cen = y - _weighted_mean_manual(y, weights)
     xy_max = np.max([x_cen.max(), y_cen.max()])
 
     weights = np.array(weights) / xy_max
