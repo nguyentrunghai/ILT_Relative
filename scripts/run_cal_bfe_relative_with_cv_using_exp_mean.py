@@ -123,13 +123,17 @@ for ref_ligand in ref_ligands:
         bootstrap_corrs = []
         for _ in range(args.bootstrap_repeats):
             random_snapshots = np.random.choice(snapshots, size=len(snapshots), replace=True)
-            _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
+            try:
+                _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
                                                                          target_ligand, ref_ligand,
                                                                          single_snap_weights,
                                                                          yank_interaction_energies, args.FF,
                                                                          subtract_self=args.subtract_self,
                                                                          flip_sign_c=args.flip_sign_c,
                                                                          verbose=False)
+            except FloatingPointError:
+                bfe = np.nan
+                
             if (not np.isnan(bfe)) and (not np.isinf(bfe)):
                 bootstrap_bfes.append(bfe)
                 bootstrap_cs.append(b_c)
