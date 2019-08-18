@@ -1031,6 +1031,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
 
 def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  subtract_self=True,
                                                   flip_sign_c=False,
                                                   verbose=False):
     """
@@ -1043,6 +1044,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param subtract_self: bool, if true, subtract result from self relative bfe
     :param flip_sign_c: bool, if m_bar < 0, flip sign of C
     :param verbose: bool
 
@@ -1135,6 +1137,22 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
         print("C:", c)
         print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
+
+    self_rel_bfe = 0.
+    if subtract_self:
+        ms_self = gs + c * (1 - gs)
+        m_self_bar = _weighted_mean(ms_self, weights=used_weights)
+        # flip sign of c if m_self_bar < 0
+        if flip_sign_c and (m_self_bar < 0):
+            ms_self = gs - c * (1 - gs)
+            m_self_bar = _weighted_mean(ms_self, weights=used_weights)
+        self_rel_bfe = (-1. / BETA) * np.log(m_self_bar)
+
+    rel_bfe -= self_rel_bfe
+
+    if verbose:
+        print("Self Relative BFE = %10.5f" % self_rel_bfe)
+        print("Relative BFE (after subtracting self rbfe) = %10.5f" % rel_bfe)
         print("--------------------------------")
         print("")
 
