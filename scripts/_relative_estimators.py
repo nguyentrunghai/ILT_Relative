@@ -836,18 +836,18 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
     hs = np.array(hs)
     gs = np.array(gs)
 
-    covariance = _weighted_cov_manual(hs, gs, used_weights)
-    variance = _weighted_var_manual(gs, used_weights)
-    correlation = _weighted_corrcoef_manual(hs, gs, used_weights)
+    covariance = _weighted_cov(hs, gs, used_weights)
+    variance = _weighted_var(gs, used_weights)
+    correlation = _weighted_corrcoef(hs, gs, used_weights)
 
     c = covariance / variance
 
     ms = hs + c * (1 - gs)
-    m_bar = np.average(ms, weights=used_weights)
+    m_bar = _weighted_mean(ms, weights=used_weights)
     # flip sign of c if m_bar < 0
     if flip_sign_c and (m_bar < 0):
         ms = hs - c * (1 - gs)
-        m_bar = np.average(ms, weights=used_weights)
+        m_bar = _weighted_mean(ms, weights=used_weights)
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
@@ -1052,8 +1052,8 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     hs = np.array(hs)
     gs = np.array(gs)
 
-    h_bar = np.average(hs, weights=used_weights)
-    g_bar = np.average(gs, weights=used_weights)
+    h_bar = _weighted_mean(hs, weights=used_weights)
+    g_bar = _weighted_mean(gs, weights=used_weights)
 
     covariance = _weighted_cov(hs, gs, used_weights)
     variance_h = _weighted_var(hs, used_weights)
@@ -1066,11 +1066,11 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     c = c_nominator / c_denominator
 
     ms = hs + c * (1 - gs)
-    m_bar = np.average(ms, weights=used_weights)
+    m_bar = _weighted_mean(ms, weights=used_weights)
     # flip sign of c if m_bar < 0
     if flip_sign_c and (m_bar < 0):
         ms = hs - c * (1 - gs)
-        m_bar = np.average(ms, weights=used_weights)
+        m_bar = _weighted_mean(ms, weights=used_weights)
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
