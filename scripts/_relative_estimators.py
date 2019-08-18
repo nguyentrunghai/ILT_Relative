@@ -1123,6 +1123,13 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 
     c = c_nominator / c_denominator
 
+    if verbose:
+        print("correlation:", correlation)
+        print("covariance:", covariance)
+        print("variance_h:", variance_h)
+        print("variance_g:", variance_g)
+        print("C:", c)
+
     ms = hs + c * (1 - gs)
     m_bar = _weighted_mean(ms, weights=used_weights)
     # flip sign of c if m_bar < 0
@@ -1132,11 +1139,6 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
-        print("correlation:", correlation)
-        print("covariance:", covariance)
-        print("variance_h:", variance_h)
-        print("variance_g:", variance_g)
-        print("C:", c)
         print("m_bar =", m_bar)
         print("Relative BFE = %10.5f" % rel_bfe)
 
