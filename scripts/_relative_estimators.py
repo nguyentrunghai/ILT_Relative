@@ -655,6 +655,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
 
     hs = np.array(hs) * used_weights * n_snapshots
     gs = np.array(gs) * used_weights * n_snapshots
+    # TODO Remove Outliers
 
     covariance = np.cov(hs, gs)[0, -1]
     variance = np.var(gs)
@@ -857,6 +858,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
 
     hs = np.array(hs)
     gs = np.array(gs)
+    # TODO Remove Outliers
 
     covariance = _weighted_cov(hs, gs, used_weights)
     variance = _weighted_var(gs, used_weights)
@@ -980,6 +982,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
 
     hs = np.array(hs) * used_weights * n_snapshots
     gs = np.array(gs) * used_weights * n_snapshots
+    # TODO Remove Outliers
 
     h_bar = np.mean(hs)
     g_bar = np.mean(gs)
@@ -1109,6 +1112,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 
     hs = np.array(hs)
     gs = np.array(gs)
+    # TODO Remove Outliers
 
     h_bar = _weighted_mean(hs, weights=used_weights)
     g_bar = _weighted_mean(gs, weights=used_weights)
