@@ -605,6 +605,7 @@ def _remove_outliers(x, y):
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  remove_outliers_g_h=False,
                                                   subtract_self=False,
                                                   flip_sign_c=False,
                                                   verbose=False):
@@ -618,6 +619,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param remove_outliers_g_h: bool, if True, remove outliers in both hs and gs
     :param subtract_self: bool, if True subtract result from self relative bfe
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
     :param verbose: bool
@@ -682,7 +684,19 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
 
     hs = np.array(hs) * used_weights * n_snapshots
     gs = np.array(gs) * used_weights * n_snapshots
-    # TODO Remove Outliers
+
+    if remove_outliers_g_h:
+        if verbose:
+            print("Before removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+
+        hs, gs = _remove_outliers(hs, gs)
+
+        if verbose:
+            print("After removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
     covariance = np.cov(hs, gs)[0, -1]
     variance = np.var(gs)
