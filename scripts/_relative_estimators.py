@@ -611,6 +611,7 @@ def _remove_outliers(x, y, weights):
     not_outliers = ~all_outliers
     return x[not_outliers], y[not_outliers], weights[not_outliers]
 
+
 def _weighted_mean_np(x, weights):
     return np.average(x, weights=weights)
 
