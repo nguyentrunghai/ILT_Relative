@@ -1062,19 +1062,22 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
+        _hs, _gs, _used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
-            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
-            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+            print("hs (min, max, len):", _hs.min(), _hs.max(), len(_hs))
+            print("gs (min, max, len):", _gs.min(), _gs.max(), len(_gs))
 
-    h_bar = np.mean(hs)
-    g_bar = np.mean(gs)
-    covariance = np.cov(hs, gs)[0, -1]
-    variance_h = np.var(hs)
-    variance_g = np.var(gs)
-    correlation = np.corrcoef(hs, gs)[0, -1]
+    else:
+        _hs, _gs, _used_weights = hs, gs, used_weights
+
+    h_bar = np.mean(_hs)
+    g_bar = np.mean(_gs)
+    covariance = np.cov(_hs, _gs)[0, -1]
+    variance_h = np.var(_hs)
+    variance_g = np.var(_gs)
+    correlation = np.corrcoef(_hs, _gs)[0, -1]
 
     c_nominator = h_bar * covariance + (1 - g_bar) * variance_h
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
