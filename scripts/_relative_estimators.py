@@ -586,7 +586,10 @@ def _outliers(x, how_far_from_iq=1.5):
     assert x.ndim ==1, "x must be 1d"
     q1, q3 = np.percentile(x, [25, 75])
     iqr = q3 - q1
-    outliers = (x < (q1 - how_far_from_iq*iqr)) | (x > (q3 + how_far_from_iq*iqr))
+    lower = q1 - how_far_from_iq*iqr
+    upper = q3 + how_far_from_iq*iqr
+
+    outliers = (x < lower) | (x > upper)
     return outliers
 
 
