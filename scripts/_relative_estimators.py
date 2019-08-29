@@ -1209,20 +1209,23 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
+        _hs, _gs, _used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
-            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
-            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+            print("hs (min, max, len):", _hs.min(), _hs.max(), len(_hs))
+            print("gs (min, max, len):", _gs.min(), _gs.max(), len(_gs))
 
-    h_bar = _weighted_mean(hs, weights=used_weights)
-    g_bar = _weighted_mean(gs, weights=used_weights)
+    else:
+        _hs, _gs, _used_weights = hs, gs, used_weights
 
-    covariance = _weighted_cov(hs, gs, used_weights)
-    variance_h = _weighted_var(hs, used_weights)
-    variance_g = _weighted_var(gs, used_weights)
-    correlation = _weighted_corrcoef(hs, gs, used_weights)
+    h_bar = _weighted_mean(_hs, weights=_used_weights)
+    g_bar = _weighted_mean(_gs, weights=_used_weights)
+
+    covariance = _weighted_cov(_hs, _gs, _used_weights)
+    variance_h = _weighted_var(_hs, _used_weights)
+    variance_g = _weighted_var(_gs, _used_weights)
+    correlation = _weighted_corrcoef(_hs, _gs, _used_weights)
 
     c_nominator = h_bar * covariance + (1 - g_bar) * variance_h
     c_denominator = h_bar * variance_g + (1 - g_bar) * covariance
