@@ -921,16 +921,19 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
+        _hs, _gs, _used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
-            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
-            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+            print("hs (min, max, len):", _hs.min(), _hs.max(), len(_hs))
+            print("gs (min, max, len):", _gs.min(), _gs.max(), len(_gs))
 
-    covariance = _weighted_cov(hs, gs, used_weights)
-    variance = _weighted_var(gs, used_weights)
-    correlation = _weighted_corrcoef(hs, gs, used_weights)
+    else:
+        _hs, _gs, _used_weights = hs, gs, used_weights
+
+    covariance = _weighted_cov(_hs, _gs, _used_weights)
+    variance = _weighted_var(_gs, _used_weights)
+    correlation = _weighted_corrcoef(_hs, _gs, _used_weights)
 
     c = covariance / variance
 
