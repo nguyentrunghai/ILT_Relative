@@ -780,7 +780,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs = _remove_outliers(hs, gs)
+        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
@@ -917,7 +917,7 @@ def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs = _remove_outliers(hs, gs)
+        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
@@ -1055,7 +1055,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs = _remove_outliers(hs, gs)
+        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
@@ -1199,7 +1199,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
             print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
-        hs, gs = _remove_outliers(hs, gs)
+        hs, gs, used_weights = _remove_outliers(hs, gs, used_weights)
 
         if verbose:
             print("After removing outliers")
