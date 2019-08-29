@@ -576,14 +576,19 @@ def _make_holo_weights_uniform(weights, ref_ligand):
     return unif_weights
 
 
-def _outliers(x, how_far_from_iq=1.5):
+def _outliers(x, log_scale=True, how_far_from_iq=1.5):
     """
     :param x: 1d array
+    :param log_scale: bool
     :param how_far_from_iq: float
     :return outliers: 1d bool array
     """
     x = np.asarray(x)
-    assert x.ndim ==1, "x must be 1d"
+    assert x.ndim == 1, "x must be 1d"
+
+    if log_scale:
+        x = np.log(x)
+
     q1, q3 = np.percentile(x, [25, 75])
     iqr = q3 - q1
     lower = q1 - how_far_from_iq*iqr
