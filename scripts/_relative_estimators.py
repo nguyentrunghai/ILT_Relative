@@ -602,6 +602,85 @@ def _remove_outliers(x, y):
     not_outliers = ~all_outliers
     return x[not_outliers], y[not_outliers]
 
+def _weighted_mean_np(x, weights):
+    return np.average(x, weights=weights)
+
+
+def _weighted_cov_np(x, y, weights):
+    """
+    :param x:
+    :param y:
+    :param weights:
+    :return:
+    """
+    return np.cov(x, y, aweights=weights)[0, -1]
+
+
+def _weighted_var_np(x, weights):
+    return _weighted_cov_np(x, x, weights)
+
+
+def _weighted_corrcoef_np(x, y, weights):
+    cov = _weighted_cov_np(x, y, weights)
+    var_x = _weighted_var_np(x, weights)
+    var_y = _weighted_var_np(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
+
+
+def _weighted_mean_manual(x, weights):
+    """to avoid overflow if x is large"""
+    x = np.asarray(x)
+    x_max = np.max(x)
+    weights = np.array(weights) / x_max
+    m = np.sum(x * weights) / np.sum(weights)
+    return m
+
+
+def _weighted_cov_manual(x, y, weights):
+    """
+    to a void overflow if x and y are large
+    :param x:
+    :param y:
+    :param weights:
+    :return:
+    """
+    x_cen = np.asarray(x) - _weighted_mean_manual(x, weights)
+    y_cen = np.asarray(y) - _weighted_mean_manual(y, weights)
+    xy_max = np.max([x_cen.max(), y_cen.max()])
+
+    weights = np.array(weights) / xy_max
+    zs = weights * x_cen
+    zs *= y_cen
+    cov = np.sum(zs) / np.sum(weights)
+    return cov
+
+
+def _weighted_var_manual(x, weights):
+    return _weighted_cov_manual(x, x, weights)
+
+
+def _weighted_corrcoef_manual(x, y, weights):
+    cov = _weighted_cov_manual(x, y, weights)
+    var_x = _weighted_var_manual(x, weights)
+    var_y = _weighted_var_manual(y, weights)
+
+    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
+    return corrcoef
+
+
+# select which statistic functions to use
+_weighted_mean = _weighted_mean_np
+_weighted_cov = _weighted_cov_np
+_weighted_var = _weighted_var_np
+_weighted_corrcoef = _weighted_corrcoef_np
+
+#_weighted_mean = _weighted_mean_manual
+#_weighted_cov = _weighted_cov_manual
+#_weighted_var = _weighted_var_manual
+#_weighted_corrcoef = _weighted_corrcoef_manual
+
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
@@ -739,86 +818,6 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
         print("")
 
     return hs, gs, c, correlation, rel_bfe
-
-
-def _weighted_mean_np(x, weights):
-    return np.average(x, weights=weights)
-
-
-def _weighted_cov_np(x, y, weights):
-    """
-    :param x:
-    :param y:
-    :param weights:
-    :return:
-    """
-    return np.cov(x, y, aweights=weights)[0, -1]
-
-
-def _weighted_var_np(x, weights):
-    return _weighted_cov_np(x, x, weights)
-
-
-def _weighted_corrcoef_np(x, y, weights):
-    cov = _weighted_cov_np(x, y, weights)
-    var_x = _weighted_var_np(x, weights)
-    var_y = _weighted_var_np(y, weights)
-
-    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
-    return corrcoef
-
-
-def _weighted_mean_manual(x, weights):
-    """to avoid overflow if x is large"""
-    x = np.asarray(x)
-    x_max = np.max(x)
-    weights = np.array(weights) / x_max
-    m = np.sum(x * weights) / np.sum(weights)
-    return m
-
-
-def _weighted_cov_manual(x, y, weights):
-    """
-    to a void overflow if x and y are large
-    :param x:
-    :param y:
-    :param weights:
-    :return:
-    """
-    x_cen = np.asarray(x) - _weighted_mean_manual(x, weights)
-    y_cen = np.asarray(y) - _weighted_mean_manual(y, weights)
-    xy_max = np.max([x_cen.max(), y_cen.max()])
-
-    weights = np.array(weights) / xy_max
-    zs = weights * x_cen
-    zs *= y_cen
-    cov = np.sum(zs) / np.sum(weights)
-    return cov
-
-
-def _weighted_var_manual(x, weights):
-    return _weighted_cov_manual(x, x, weights)
-
-
-def _weighted_corrcoef_manual(x, y, weights):
-    cov = _weighted_cov_manual(x, y, weights)
-    var_x = _weighted_var_manual(x, weights)
-    var_y = _weighted_var_manual(y, weights)
-
-    corrcoef = cov / np.sqrt(var_x) / np.sqrt(var_y)
-    return corrcoef
-
-
-# select which statistic functions to use
-_weighted_mean = _weighted_mean_np
-_weighted_cov = _weighted_cov_np
-_weighted_var = _weighted_var_np
-_weighted_corrcoef = _weighted_corrcoef_np
-
-#_weighted_mean = _weighted_mean_manual
-#_weighted_cov = _weighted_cov_manual
-#_weighted_var = _weighted_var_manual
-#_weighted_corrcoef = _weighted_corrcoef_manual
 
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
