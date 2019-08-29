@@ -582,10 +582,11 @@ def _outliers(x, how_far_from_iq=1.5):
     :param how_far_from_iq: float
     :return outliers: 1d bool array
     """
+    x = np.asarray(x)
     assert x.ndim ==1, "x must be 1d"
     q1, q3 = np.percentile(x, [25, 75])
     iqr = q3 - q1
-    outliers = ((q1 - how_far_from_iq*iqr) < x) | (x > (q3 + how_far_from_iq*iqr))
+    outliers = (x < (q1 - how_far_from_iq*iqr)) | (x > (q3 + how_far_from_iq*iqr))
     return outliers
 
 
@@ -595,7 +596,11 @@ def _remove_outliers(x, y):
     :param y: 1d array
     :return (new_x, new_y): 1d arrays, x, y after remove outliers in both
     """
+    x = np.asarray(x)
+    y = np.asarray(y)
+
     assert x.shape == y.shape, "x, y must have the same shape"
+
     outliers_x = _outliers(x)
     outliers_y = _outliers(y)
     all_outliers = outliers_x | outliers_y
