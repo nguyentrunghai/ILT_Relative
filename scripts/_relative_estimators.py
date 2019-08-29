@@ -593,22 +593,23 @@ def _outliers(x, how_far_from_iq=1.5):
     return outliers
 
 
-def _remove_outliers(x, y):
+def _remove_outliers(x, y, weights):
     """
     :param x: 1d array
     :param y: 1d array
+    :param weights: 1d array
     :return (new_x, new_y): 1d arrays, x, y after remove outliers in both
     """
     x = np.asarray(x)
     y = np.asarray(y)
 
-    assert x.shape == y.shape, "x, y must have the same shape"
+    assert x.shape == y.shape == weights.shape, "x, y must have the same shape"
 
     outliers_x = _outliers(x)
     outliers_y = _outliers(y)
     all_outliers = outliers_x | outliers_y
     not_outliers = ~all_outliers
-    return x[not_outliers], y[not_outliers]
+    return x[not_outliers], y[not_outliers], weights[not_outliers]
 
 def _weighted_mean_np(x, weights):
     return np.average(x, weights=weights)
@@ -639,6 +640,7 @@ def _weighted_corrcoef_np(x, y, weights):
 
 def _weighted_mean_manual(x, weights):
     """to avoid overflow if x is large"""
+    assert len(x) == len(weights), "x and weights must have the same len"
     x = np.asarray(x)
     x_max = np.max(x)
     weights = np.array(weights) / x_max
