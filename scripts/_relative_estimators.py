@@ -785,8 +785,8 @@ def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_l
 
         if verbose:
             print("After removing outliers")
-            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
-            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+            print("hs (min, max, len):", _hs.min(), _hs.max(), len(_hs))
+            print("gs (min, max, len):", _gs.min(), _gs.max(), len(_gs))
 
     else:
         _hs, _gs, _used_weights = hs, gs, used_weights
