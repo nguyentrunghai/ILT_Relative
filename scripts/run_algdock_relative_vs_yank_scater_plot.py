@@ -33,12 +33,18 @@ parser.add_argument("--xlabel", type=str, default="YANK free energy (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="AlGDock free energy (kcal/mol)")
 parser.add_argument("--show_xy_axes", type=bool, default=True)
 
+parser.add_argument("--ligands_to_scale_error", type=str, default="")
+parser.add_argument("--error_scale_factor", type=float, default=1.)
+
 args = parser.parse_args()
 
 exclude_ligands_from_scatter_plots = args.exclude_ligands_from_scatter_plots.split()
 print("exclude_ligands_from_scatter_plots ", exclude_ligands_from_scatter_plots)
 print("subtract_self_rbfe ", args.subtract_self_rbfe)
 print("compare_absolute ", args.compare_absolute)
+
+ligands_to_scale_error = args.ligands_to_scale_error.split()
+
 
 yank_scores, yank_stds = load_scores(args.yank_results, 0, 1, 2, [])
 
@@ -104,6 +110,9 @@ for scheme in weighting_schemes:
         # use one std for errorbar
         xerr /= 2.
         yerr /= 2.
+
+        if ref_ligand in ligands_to_scale_error:
+            yerr *= args.error_scale_factor
 
         #markercolors = ["b" if ".inactive." in ligand or ligand == "phenol.A__AAA" else "r" for ligand in ligands]
         markers = ["D" if ".inactive." in ligand or ligand == "phenol.A__AAA" else "." for ligand in ligands]
