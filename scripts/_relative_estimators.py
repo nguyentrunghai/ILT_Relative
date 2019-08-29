@@ -576,7 +576,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
     return unif_weights
 
 
-def _outliers(x, log_scale=True, how_far_from_iq=1.5):
+def _outliers(x, log_scale=False, how_far_from_iq=1.5):
     """
     :param x: 1d array
     :param log_scale: bool
