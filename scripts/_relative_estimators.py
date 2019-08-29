@@ -1104,6 +1104,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3a(snapshots, score_dir, target_l
 
 def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
+                                                  remove_outliers_g_h=False,
                                                   subtract_self=True,
                                                   flip_sign_c=False,
                                                   verbose=False):
@@ -1117,6 +1118,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
+    :param remove_outliers_g_h: bool, if True, remove outliers in both hs and gs
     :param subtract_self: bool, if true, subtract result from self relative bfe
     :param flip_sign_c: bool, if m_bar < 0, flip sign of C
     :param verbose: bool
@@ -1180,7 +1182,19 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 
     hs = np.array(hs)
     gs = np.array(gs)
-    # TODO Remove Outliers
+
+    if remove_outliers_g_h:
+        if verbose:
+            print("Before removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+
+        hs, gs = _remove_outliers(hs, gs)
+
+        if verbose:
+            print("After removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
     h_bar = _weighted_mean(hs, weights=used_weights)
     g_bar = _weighted_mean(gs, weights=used_weights)
