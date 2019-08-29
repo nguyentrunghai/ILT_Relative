@@ -36,6 +36,7 @@ parser.add_argument("--combining_rule", type=str, default="ExpMean")
 # method is either 2a, 2b, 3a, 3b
 parser.add_argument("--method", type=str, default="None")
 
+parser.add_argument("--remove_outliers_g_h", action="store_true", default=False)
 parser.add_argument("--subtract_self", action="store_true", default=False)
 parser.add_argument("--flip_sign_c", action="store_true", default=False)
 
@@ -114,6 +115,7 @@ for ref_ligand in ref_ligands:
                                                                               target_ligand, ref_ligand,
                                                                               single_snap_weights,
                                                                               yank_interaction_energies, args.FF,
+                                                                              remove_outliers_g_h=args.remove_outliers_g_h,
                                                                               subtract_self=args.subtract_self,
                                                                               flip_sign_c=args.flip_sign_c,
                                                                               verbose=True)
@@ -127,6 +129,7 @@ for ref_ligand in ref_ligands:
                                                                          target_ligand, ref_ligand,
                                                                          single_snap_weights,
                                                                          yank_interaction_energies, args.FF,
+                                                                         remove_outliers_g_h=args.remove_outliers_g_h,
                                                                          subtract_self=args.subtract_self,
                                                                          flip_sign_c=args.flip_sign_c,
                                                                          verbose=False)
