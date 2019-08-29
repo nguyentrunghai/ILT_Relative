@@ -1219,8 +1219,8 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     else:
         _hs, _gs, _used_weights = hs, gs, used_weights
 
-    h_bar = _weighted_mean(_hs, weights=_used_weights)
-    g_bar = _weighted_mean(_gs, weights=_used_weights)
+    h_bar = _weighted_mean(_hs, _used_weights)
+    g_bar = _weighted_mean(_gs, _used_weights)
 
     covariance = _weighted_cov(_hs, _gs, _used_weights)
     variance_h = _weighted_var(_hs, _used_weights)
@@ -1240,11 +1240,11 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
         print("C:", c)
 
     ms = hs + c * (1 - gs)
-    m_bar = _weighted_mean(ms, weights=used_weights)
+    m_bar = _weighted_mean(ms, used_weights)
     # flip sign of c if m_bar < 0
     if flip_sign_c and (m_bar < 0):
         ms = hs - c * (1 - gs)
-        m_bar = _weighted_mean(ms, weights=used_weights)
+        m_bar = _weighted_mean(ms, used_weights)
     rel_bfe = (-1. / BETA) * np.log(m_bar)
 
     if verbose:
@@ -1254,11 +1254,11 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
     self_rel_bfe = 0.
     if subtract_self:
         ms_self = gs + c * (1 - gs)
-        m_self_bar = _weighted_mean(ms_self, weights=used_weights)
+        m_self_bar = _weighted_mean(ms_self, used_weights)
         # flip sign of c if m_self_bar < 0
         if flip_sign_c and (m_self_bar < 0):
             ms_self = gs - c * (1 - gs)
-            m_self_bar = _weighted_mean(ms_self, weights=used_weights)
+            m_self_bar = _weighted_mean(ms_self, used_weights)
         self_rel_bfe = (-1. / BETA) * np.log(m_self_bar)
 
     rel_bfe -= self_rel_bfe
