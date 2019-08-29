@@ -589,6 +589,20 @@ def _outliers(x, how_far_from_iq=1.5):
     return outliers
 
 
+def _remove_outliers(x, y):
+    """
+    :param x: 1d array
+    :param y: 1d array
+    :return (new_x, new_y): 1d arrays, x, y after remove outliers in both
+    """
+    assert x.shape == y.shape, "x, y must have the same shape"
+    outliers_x = _outliers(x)
+    outliers_y = _outliers(y)
+    all_outliers = outliers_x | outliers_y
+    not_outliers = ~all_outliers
+    return x[not_outliers], y[not_outliers]
+
+
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
                                                   subtract_self=False,
@@ -792,19 +806,6 @@ _weighted_corrcoef = _weighted_corrcoef_np
 #_weighted_var = _weighted_var_manual
 #_weighted_corrcoef = _weighted_corrcoef_manual
 
-
-def _remove_outliers(x, y):
-    """
-    :param x: 1d array
-    :param y: 1d array
-    :return (new_x, new_y): 1d arrays, x, y after remove outliers in both
-    """
-    assert x.shape == y.shape, "x, y must have the same shape"
-    outliers_x = _outliers(x)
-    outliers_y = _outliers(y)
-    all_outliers = outliers_x | outliers_y
-    not_outliers = ~all_outliers
-    return x[not_outliers], y[not_outliers]
 
 def relative_bfe_with_cv_using_exp_mean_method_2b(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
