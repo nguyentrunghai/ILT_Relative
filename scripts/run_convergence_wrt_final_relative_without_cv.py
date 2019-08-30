@@ -12,6 +12,7 @@ from _process_yank_outputs import load_interaction_energies
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _yank import load_scores
 from _relative_estimators import RelBFEWithoutCV
+from _yank import YANK_LIGANDS
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--algdock_score_dir", type=str,
@@ -99,8 +100,20 @@ def _fe_one_ref_one_target_a_random_sample_of_snapshot(algdock_score_dir, target
 
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
+
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
-print("ref_ligands", ref_ligands)
+print("ref_ligands:", ref_ligands)
+target_ligands = YANK_LIGANDS.keys()
+print("target_ligands:", target_ligands)
+
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir)
 
 final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
+
+for ligand in target_ligands:
+    fe = _fe_one_ref_one_target_a_random_sample_of_snapshot(args.algdock_score_dir, ligand,
+                                                      "1-methylpyrrole.A__AAA", ref_ligands,
+                                                      args.FF, single_snap_weights, yank_interaction_energies,
+                                                      96)
+    print("s30, %10.5f" % (ligand, fe))
+    
