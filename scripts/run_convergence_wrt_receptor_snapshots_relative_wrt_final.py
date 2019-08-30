@@ -5,27 +5,34 @@ import argparse
 
 import numpy as np
 
-from _averaging_relative_estimator import MultiStruScores
+from _relative_estimators import RelBFEWithoutCV
 
 from _algdock import SIX_YANK_SYSTEMS
 from _process_yank_outputs import load_interaction_energies 
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 
 sys.path.append("/home/tnguye46/FFT_T4/scripts")
-from _yank_algdock_fft_scores import load_scores
+from _yank import load_scores
+
 
 def pearson_r_and_rmse(yank_fe, algdock_fe):
+    """
+    :param yank_fe: dict, ligand (str) -> free energy (float)
+    :param algdock_fe: dict, ligand (str) -> free energy (float)
+    :return (r, rmse): (float, float)
+    """
     ligands = set(yank_fe.keys()).intersection(algdock_fe.keys())
-    ligands = [l for l in ligands if str(algdock_fe[l]).lower() not in ["inf", "nan"] ]
+    ligands = [ligand for ligand in ligands if str(algdock_fe[ligand]).lower() not in ["inf", "nan"]]
     
-    xd = np.array([yank_fe[l] for l in ligands], dtype=float)
-    yd = np.array([algdock_fe[l] for l in ligands], dtype=float)
+    xd = np.array([yank_fe[ligand] for ligand in ligands], dtype=float)
+    yd = np.array([algdock_fe[ligand] for ligand in ligands], dtype=float)
 
     r = np.corrcoef( [xd, yd] )[0][-1]
-
     rmse = ((xd - yd)**2).mean()
     rmse = np.sqrt(rmse)
+    
     return r, rmse
+
 
 def get_all_snapshots(six_yank_systems, weights):
     snapshots = []
@@ -66,7 +73,7 @@ def relative_fes_final_results(score_dir, ligands, weights, six_yank_systems, ya
     for ligand in ligands:
         ligand_group   = ligand[:-3]
         ligand_3l_code = ligand[-3:] 
-        fe_cal = MultiStruScores(score_dir, ligand_group, ligand_3l_code, weights, six_yank_systems, yank_interaction_energies)
+        fe_cal = RelBFEWithoutCV(score_dir, ligand_group, ligand_3l_code, weights, six_yank_systems, yank_interaction_energies)
 
         relative_fes[ligand] = fe_cal.cal_exp_mean_separate_for_each_system(FF, all_snapshots)
     return relative_fes
