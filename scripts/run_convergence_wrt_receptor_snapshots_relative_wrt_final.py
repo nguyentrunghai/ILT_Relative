@@ -18,7 +18,7 @@ from _yank import load_scores
 def pearson_r_and_rmse(yank_fe, algdock_fe):
     """
     :param yank_fe: dict, ligand (str) -> free energy (float)
-    :param algdock_fe: dict, ligand (str) -> free energy (float)
+    :param algdock_fe: dict, ligand (str) --> free energy (float)
     :return (r, rmse): (float, float)
     """
     ligands = set(yank_fe.keys()).intersection(algdock_fe.keys())
@@ -30,15 +30,21 @@ def pearson_r_and_rmse(yank_fe, algdock_fe):
     r = np.corrcoef( [xd, yd] )[0][-1]
     rmse = ((xd - yd)**2).mean()
     rmse = np.sqrt(rmse)
-    
+
     return r, rmse
 
 
 def get_all_snapshots(six_yank_systems, weights):
+    """
+    :param six_yank_systems: list of str
+    :param weights: dict, ligand (str) --> {snapshot (str) : weight (float)}
+    :return:
+    """
     snapshots = []
     for system in six_yank_systems:
         snapshots += weights[system].keys()
     return snapshots
+
 
 def relative_fes_using_random_sets_of_receptor_snapshots(score_dir, ligands, weights, six_yank_systems, yank_interaction_energies, 
                                                             FF, sample_size, repeats):
