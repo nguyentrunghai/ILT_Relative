@@ -48,3 +48,40 @@ def load_scores(file, id_col, score_col, std_col, exclude_ligands):
                         scores[id] = np.float(val)
                         standard_devs[id] = np.float(std)
     return scores, standard_devs
+
+
+def matching_scores(score1, score2, err1, err2, allowed_ligands=[]):
+    ligands = set(score1.keys()).intersection(set(score2.keys()))
+
+    if len(allowed_ligands) > 0:
+        ligands = ligands.intersection(allowed_ligands)
+    ligands = list(ligands)
+
+    x, y, xerr, yerr = [], [], [], []
+
+    for ligand in ligands:
+        x.append(score1[ligand])
+        y.append(score2[ligand])
+
+        xerr.append(err1[ligand])
+        yerr.append(err2[ligand])
+
+    return np.array(x), np.array(y), np.array(xerr), np.array(yerr), ligands
+
+
+def write_pairs(score1, score2, err1, err2, out, allowed_ligands):
+    ligands = set(score1.keys()).intersection( set(score2.keys()))
+    if len(allowed_ligands) > 0:
+        ligands = ligands.intersection( set(allowed_ligands))
+    ligands = list(ligands)
+
+    diff = {l:np.abs(score1[l] - score2[l]) for l in ligands}
+    ligands.sort(key=lambda l: diff[l], reverse=True)
+
+    with open(out, "w") as handle:
+        handle.write("# ligand     x     y    xerr    yerr   diff\n")
+        for l in ligands:
+            handle.write("%30s %20.10f %20.10f %20.10f %20.10f %20.10f\n" % (l, score1[l], score2[l],
+                                                                             err1[l], err2[l], diff[l]))
+    return None
+
