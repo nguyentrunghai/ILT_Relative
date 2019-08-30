@@ -155,12 +155,6 @@ yank_interaction_energies = load_interaction_energies(path=args.interaction_ener
 
 final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
 
-r_mean, r_std, rmse_mean, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
-                                                              "1-methylpyrrole.A__AAA", ref_ligands,
-                                                              args.FF, single_snap_weights, yank_interaction_energies,
-                                                              96,
-                                                              final_fes, 500)
-
 for ref_ligand in ref_ligands:
     print("Processing ref ligand:", ref_ligand)
     out_dir = ref_ligand
