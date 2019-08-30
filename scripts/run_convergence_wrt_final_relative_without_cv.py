@@ -148,6 +148,7 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
 
 # sample_sizes = np.array(range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
 sample_sizes = [int(num) for num in args.sample_sizes.split()]
+print("sample_sizes", sample_sizes)
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 
