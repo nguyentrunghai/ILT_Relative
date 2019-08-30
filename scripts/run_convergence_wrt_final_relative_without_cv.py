@@ -103,6 +103,43 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target
     return pearson_r, rmse
 
 
+def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
+                                     ref_ligand, ref_ligands,
+                                     FF, weights, yank_interaction_energies,
+                                     sample_size, final_fes, repeats):
+    """
+    :param algdock_score_dir: str
+    :param target_ligands: list of str
+    :param ref_ligand: str
+    :param ref_ligands: list of str
+    :param FF: str
+    :param weights:  dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param sample_size: int
+    :param final_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :param repeats: int
+    :return (r_mean, r_std, rmse_mean, rmse_std): (float, float, float, float)
+    """
+    rs = []
+    rmses = []
+    for _ in range(repeats):
+        r, rmse = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target_ligands,
+                                                                     ref_ligand, ref_ligands,
+                                                                     FF, weights, yank_interaction_energies,
+                                                                     sample_size, final_fes)
+        rs.append(r)
+        rmses.append(rmse)
+
+    r_mean = np.mean(rs)
+    r_std = np.std(rs)
+    rmse_mean = np.mean(rmses)
+    rmse_std = np.std(rmses)
+
+    return r_mean, r_std, rmse_mean, rmse_std
+
+
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
@@ -114,8 +151,8 @@ yank_interaction_energies = load_interaction_energies(path=args.interaction_ener
 
 final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
 
-pearson_r, rmse = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(args.algdock_score_dir, target_ligands,
+r_mean, r_std, rmse_mean, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
                                                               "1-methylpyrrole.A__AAA", ref_ligands,
                                                               args.FF, single_snap_weights, yank_interaction_energies,
                                                               96,
-                                                              final_fes)
+                                                              final_fes, 500)
