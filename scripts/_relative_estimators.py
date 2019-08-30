@@ -576,7 +576,7 @@ def _make_holo_weights_uniform(weights, ref_ligand):
     return unif_weights
 
 
-def _outliers(x, log_scale=False, how_far_from_iq=1.5):
+def _outliers(x, log_scale=True, how_far_from_iq=1.25):
     """
     :param x: 1d array
     :param log_scale: bool
@@ -687,15 +687,15 @@ def _weighted_corrcoef_manual(x, y, weights):
 
 
 # select which statistic functions to use
-_weighted_mean = _weighted_mean_np
-_weighted_cov = _weighted_cov_np
-_weighted_var = _weighted_var_np
-_weighted_corrcoef = _weighted_corrcoef_np
+#_weighted_mean = _weighted_mean_np
+#_weighted_cov = _weighted_cov_np
+#_weighted_var = _weighted_var_np
+#_weighted_corrcoef = _weighted_corrcoef_np
 
-#_weighted_mean = _weighted_mean_manual
-#_weighted_cov = _weighted_cov_manual
-#_weighted_var = _weighted_var_manual
-#_weighted_corrcoef = _weighted_corrcoef_manual
+_weighted_mean = _weighted_mean_manual
+_weighted_cov = _weighted_cov_manual
+_weighted_var = _weighted_var_manual
+_weighted_corrcoef = _weighted_corrcoef_manual
 
 
 def relative_bfe_with_cv_using_exp_mean_method_2a(snapshots, score_dir, target_ligand, ref_ligand,
