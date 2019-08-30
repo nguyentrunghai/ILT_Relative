@@ -11,6 +11,7 @@ import numpy as np
 from _process_yank_outputs import load_interaction_energies
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _yank import load_scores
+from _relative_estimators import RelBFEWithoutCV
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--algdock_score_dir", type=str,
@@ -66,6 +67,35 @@ def _pearson_r_rmse(reference_vals, target_vals):
     rmse = np.sqrt(rmse)
 
     return r, rmse
+
+
+def _fe_one_ref_one_target_a_random_sample_of_snapshot(algdock_score_dir, target_ligand,
+                                                      ref_ligand, ref_ligands,
+                                                      FF, weights, yank_interaction_energies,
+                                                      sample_size):
+    """
+    :param algdock_score_dir: str
+    :param target_ligand: str
+    :param ref_ligand: str
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param ref_ligands: list of str
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param sample_size: int
+    :return fe: float
+    """
+    assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
+
+    group = target_ligand[:-3]
+    code = target_ligand[-3:]
+    fe_cal = RelBFEWithoutCV(algdock_score_dir, group, code, weights, ref_ligands, yank_interaction_energies)
+
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+    print("rand_snapshots:", rand_snapshots)
+
+    fe = fe_cal.cal_exp_mean_for_one_ref_ligand(FF, rand_snapshots, ref_ligand)
+    return fe
 
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
