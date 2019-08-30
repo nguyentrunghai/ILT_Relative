@@ -232,6 +232,33 @@ class RelBFEWithoutCV:
 
         return sys_means
 
+    def cal_exp_mean_for_one_ref_ligand(self, FF, snapshots, ref_ligand):
+        """
+        exponential mean for each FF, with respect to ref ligand
+        :param FF: str
+        :param snapshots: list of str
+        :param ref_ligand: str
+        :return: exp_mean, float
+        """
+        a = 0.
+        w = 0.
+        for snapshot in snapshots:
+            if snapshot in self._allowed_snapshots[FF][ref_ligand]:
+                try:
+                    a += np.exp(-1.0 * (self._scores[FF][snapshot] -
+                                        self._yank_interaction_energies[ref_ligand][snapshot])
+                                ) * self._weights[ref_ligand][snapshot]
+                except FloatingPointError:
+                    #print("overflow for", self._identification, snapshot, FF)
+                    pass
+                else:
+                    w += self._weights[ref_ligand][snapshot]
+        if w != 0:
+            a = a / w
+        exp_mean = (-1. / BETA) * np.log(a)
+
+        return exp_mean
+
     def cal_exp_mean_min_across_systems(self, snapshots):
         """
         the same as _cal_exp_mean() except that the min value across YANK systems is taken
