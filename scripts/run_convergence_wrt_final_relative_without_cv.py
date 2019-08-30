@@ -115,5 +115,4 @@ for ligand in target_ligands:
                                                       "1-methylpyrrole.A__AAA", ref_ligands,
                                                       args.FF, single_snap_weights, yank_interaction_energies,
                                                       96)
-    print("s30, %10.5f" % (ligand, fe))
-    
+    print("%30s, %10.5f" % (ligand, fe))
