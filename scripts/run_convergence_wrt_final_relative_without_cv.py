@@ -179,7 +179,7 @@ for ref_ligand in ref_ligands:
                                                               args.FF, single_snap_weights, yank_interaction_energies,
                                                               sample_size, final_fes, args.bootstrap_repeats)
 
-        r_out_file.write("%10d %15.10f %15.10f" % (sample_size, r, r_std))
-        rmse_out_file.write("%10d %15.10f %15.10f" % (sample_size, rmse, rmse_std))
+        r_out_file.write("%10d %15.10f %15.10f\n" % (sample_size, r, r_std))
+        rmse_out_file.write("%10d %15.10f %15.10f\n" % (sample_size, rmse, rmse_std))
 
 print("DONE")
