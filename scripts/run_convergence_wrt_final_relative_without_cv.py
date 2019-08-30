@@ -92,11 +92,40 @@ def _fe_one_ref_one_target_a_random_sample_of_snapshot(algdock_score_dir, target
     code = target_ligand[-3:]
     fe_cal = RelBFEWithoutCV(algdock_score_dir, group, code, weights, ref_ligands, yank_interaction_energies)
 
-    # TODO
-    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=False)
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
 
     fe = fe_cal.cal_exp_mean_for_one_ref_ligand(FF, rand_snapshots, ref_ligand)
     return fe
+
+
+def _pearsonR_RMSE_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target_ligands,
+                                                              ref_ligand, ref_ligands,
+                                                              FF, weights, yank_interaction_energies,
+                                                              sample_size,
+                                                              final_fes):
+    """
+    :param algdock_score_dir: str
+    :param target_ligands: list of str
+    :param ref_ligand: str
+    :param ref_ligands: list of str
+    :param FF: str
+    :param weights:  dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param sample_size: int
+    :param final_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :return: pearson_r, rmse
+    """
+    fes = {}
+    for ligand in target_ligands:
+        fes[ligand] = _fe_one_ref_one_target_a_random_sample_of_snapshot(algdock_score_dir, ligand,
+                                                                         ref_ligand, ref_ligands,
+                                                                         FF, weights, yank_interaction_energies,
+                                                                         sample_size)
+
+    pearson_r, rmse = _pearson_r_rmse(final_fes[ref_ligand], fes)
+    return pearson_r, rmse
 
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
@@ -110,9 +139,4 @@ yank_interaction_energies = load_interaction_energies(path=args.interaction_ener
 
 final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
 
-for ligand in target_ligands:
-    fe = _fe_one_ref_one_target_a_random_sample_of_snapshot(args.algdock_score_dir, ligand,
-                                                      "1-methylpyrrole.A__AAA", ref_ligands,
-                                                      args.FF, single_snap_weights, yank_interaction_energies,
-                                                      96)
-    print("%30s, %10.5f" % (ligand, fe))
+
