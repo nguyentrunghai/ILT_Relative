@@ -27,6 +27,8 @@ parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--final_results_dir", type=str,
                     default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96")
 
+parser.add_argument("--bootstrap_repeats", type=int, default=100)
+
 args = parser.parse_args()
 
 
@@ -140,6 +142,8 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     return r_mean, r_std, rmse_mean, rmse_std
 
 
+sample_sizes = np.array( range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
+
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 
 ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
@@ -156,3 +160,25 @@ r_mean, r_std, rmse_mean, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdo
                                                               args.FF, single_snap_weights, yank_interaction_energies,
                                                               96,
                                                               final_fes, 500)
+
+for ref_ligand in ref_ligands:
+    print("Processing ref ligand:", ref_ligand)
+    out_dir = ref_ligand
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir)
+
+    r_out_file = open(os.path.join(out_dir, "pearson_r.dat"), "w")
+    r_out_file.write("# sample size    r     r_std\n")
+    rmse_out_file = open(os.path.join(out_dir, "rmse.dat"), "w")
+    rmse_out_file.write("# sample size    rmse     rmse_std\n")
+
+    for sample_size in sample_sizes:
+        r, r_std, rmse, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
+                                                              ref_ligand, ref_ligands,
+                                                              args.FF, single_snap_weights, yank_interaction_energies,
+                                                              sample_size, final_fes, args.bootstrap_repeats)
+
+        r_out_file.write("%10d %15.10f %15.10f" % (sample_size, r, r_std))
+        rmse_out_file.write("%10d %15.10f %15.10f" % (sample_size, rmse, rmse_std))
+
+print("DONE")
