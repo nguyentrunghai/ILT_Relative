@@ -50,4 +50,4 @@ ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "sys
 print("ref_ligands", ref_ligands)
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir)
 
-final_fes = _load_final_fe(agrs.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
+final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
