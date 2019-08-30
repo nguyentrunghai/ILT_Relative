@@ -28,6 +28,7 @@ parser.add_argument("--final_results_dir", type=str,
                     default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96")
 
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
+parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 
 args = parser.parse_args()
 
@@ -131,8 +132,11 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                                                      ref_ligand, ref_ligands,
                                                                      FF, weights, yank_interaction_energies,
                                                                      sample_size, final_fes)
-        rs.append(r)
-        rmses.append(rmse)
+
+        if str(r).lower() not in ["-inf", "inf", "nan"]:
+            if str(rmse).lower() not in ["-inf", "inf", "nan"]:
+                rs.append(r)
+                rmses.append(rmse)
 
     r_mean = np.mean(rs)
     r_std = np.std(rs)
@@ -142,7 +146,8 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     return r_mean, r_std, rmse_mean, rmse_std
 
 
-sample_sizes = np.array( range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
+# sample_sizes = np.array(range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
+sample_sizes = [int(num) for num in args.sample_sizes.split()]
 
 _, _, single_snap_weights, _, _ = load_mbar_weights()
 
@@ -167,6 +172,7 @@ for ref_ligand in ref_ligands:
     rmse_out_file.write("# sample size    rmse     rmse_std\n")
 
     for sample_size in sample_sizes:
+        print(sample_size)
         r, r_std, rmse, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
                                                               ref_ligand, ref_ligands,
                                                               args.FF, single_snap_weights, yank_interaction_energies,
