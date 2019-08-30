@@ -8,10 +8,8 @@ import numpy as np
 
 from _algdock import SIX_YANK_SYSTEMS
 
-import sys
-sys.path.append("/home/tnguye46/FFT_T4/scripts")
 from _plots import scatter_plot, scatter_plot_info
-from _yank_algdock_fft_scores import load_scores, matching_scores, write_pairs
+from _yank import load_scores, matching_scores, write_pairs
 
 
 parser = argparse.ArgumentParser()
