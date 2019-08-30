@@ -92,7 +92,7 @@ def _fe_one_ref_one_target_a_random_sample_of_snapshot(algdock_score_dir, target
     code = target_ligand[-3:]
     fe_cal = RelBFEWithoutCV(algdock_score_dir, group, code, weights, ref_ligands, yank_interaction_energies)
 
-    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=False)
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
 
     fe = fe_cal.cal_exp_mean_for_one_ref_ligand(FF, rand_snapshots, ref_ligand)
     return fe
