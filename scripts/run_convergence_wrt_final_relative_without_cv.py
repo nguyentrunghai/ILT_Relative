@@ -16,16 +16,16 @@ from _yank import YANK_LIGANDS
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--algdock_score_dir", type=str,
-                    default="/home/tnguye46/T4_Lysozyme/Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
+                    default="Bing_Calculations/Correct_Pro_BornRadii/Concatened_Scores/version2016_May_AlGDock/OBC2")
 parser.add_argument("--interaction_energies_dir",   type=str,
-                    default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
+                    default="Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
 
 parser.add_argument("--FF", type=str, default="OpenMM_OBC2_MBAR")
 parser.add_argument("--weight_scheme", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
 parser.add_argument("--final_results_dir", type=str,
-                    default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96")
+                    default="Relative_Binding_FE/Relative_FE_Est_1/all96")
 
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
 parser.add_argument("--sample_sizes", type=str, default="10 50 96")
@@ -167,10 +167,8 @@ for ref_ligand in ref_ligands:
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
-    r_out_file = open(os.path.join(out_dir, "pearson_r.dat"), "w")
-    r_out_file.write("# sample size    r     r_std\n")
-    rmse_out_file = open(os.path.join(out_dir, "rmse.dat"), "w")
-    rmse_out_file.write("# sample size    rmse     rmse_std\n")
+    out_file = open(os.path.join(out_dir, "r_rmse.dat"), "w")
+    out_file.write("# sample_size     r          r_std          rmse          rmse_std\n")
 
     for sample_size in sample_sizes:
         print(sample_size)
@@ -179,7 +177,6 @@ for ref_ligand in ref_ligands:
                                                               args.FF, single_snap_weights, yank_interaction_energies,
                                                               sample_size, final_fes, args.bootstrap_repeats)
 
-        r_out_file.write("%10d %15.10f %15.10f\n" % (sample_size, r, r_std))
-        rmse_out_file.write("%10d %15.10f %15.10f\n" % (sample_size, rmse, rmse_std))
+        out_file.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r, r_std, rmse, rmse_std))
 
 print("DONE")
