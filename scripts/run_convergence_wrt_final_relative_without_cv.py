@@ -62,6 +62,8 @@ def _pearson_r_rmse(reference_vals, target_vals):
     :param target_vals: dict, {ligand (str): free energy (float)}
     :return r: float
     """
+    if (len(reference_vals) == 0) or (len(target_vals) == 0):
+        return np.nan, np.nan
     ligands = set(reference_vals.keys()).intersection(target_vals.keys())
     ligands = [ligand for ligand in ligands if str(reference_vals[ligand]).lower() not in ["inf", "-inf", "nan"]]
     ligands = [ligand for ligand in ligands if str(target_vals[ligand]).lower() not in ["inf", "-inf", "nan"]]
