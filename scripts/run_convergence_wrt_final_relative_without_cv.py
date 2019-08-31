@@ -178,5 +178,6 @@ for ref_ligand in ref_ligands:
                                                               sample_size, final_fes, args.bootstrap_repeats)
 
         out_file.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r, r_std, rmse, rmse_std))
+    out_file.close()
 
 print("DONE")
