@@ -133,14 +133,18 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
 
     fes = {}
     for ligand in target_ligands:
-        _, _, _, _, fe = relative_bfe_with_cv_using_exp_mean_method_3a(rand_snapshots, algdock_score_dir,
+        try:
+            _, _, _, _, fe = relative_bfe_with_cv_using_exp_mean_method_3a(rand_snapshots, algdock_score_dir,
                                                                        ligand, ref_ligand,
                                                                        weights, yank_interaction_energies, FF,
                                                                        remove_outliers_g_h=False,
                                                                        subtract_self=False,
                                                                        flip_sign_c=True,
                                                                        verbose=False)
-        fes[ligand] = fe
+        except FloatingPointError:
+            pass
+        else:
+            fes[ligand] = fe
 
     pearson_r, rmse = _pearson_r_rmse(final_fes[ref_ligand], fes)
     return pearson_r, rmse
