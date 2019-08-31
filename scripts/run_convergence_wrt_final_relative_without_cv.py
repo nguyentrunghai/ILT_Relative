@@ -30,6 +30,9 @@ parser.add_argument("--final_results_dir", type=str,
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
 parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 
+# "without_cv" or "with_cv_3a"
+parser.add_argument("--method", type=str, default="none")
+
 args = parser.parse_args()
 
 
@@ -106,7 +109,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_
     return pearson_r, rmse
 
 
-def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3b(algdock_score_dir, target_ligands,
+def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_dir, target_ligands,
                                                       ref_ligand, ref_ligands,
                                                       FF, weights, yank_interaction_energies,
                                                       sample_size, final_fes):
@@ -168,7 +171,7 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     if method == "without_cv":
         _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv
     else:
-        _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3b
+        _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a
 
     rs = []
     rmses = []
@@ -218,9 +221,10 @@ for ref_ligand in ref_ligands:
     for sample_size in sample_sizes:
         print(sample_size)
         r, r_std, rmse, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
-                                                              ref_ligand, ref_ligands,
-                                                              args.FF, single_snap_weights, yank_interaction_energies,
-                                                              sample_size, final_fes, args.bootstrap_repeats)
+                                                                    ref_ligand, ref_ligands,
+                                                                    args.FF, single_snap_weights, yank_interaction_energies,
+                                                                    sample_size, final_fes, args.bootstrap_repeats,
+                                                                    args.method)
 
         out_file.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r, r_std, rmse, rmse_std))
     out_file.close()
