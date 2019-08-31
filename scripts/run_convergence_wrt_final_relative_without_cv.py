@@ -11,7 +11,7 @@ import numpy as np
 from _process_yank_outputs import load_interaction_energies
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _yank import load_scores
-from _relative_estimators import RelBFEWithoutCV
+from _relative_estimators import RelBFEWithoutCV, relative_bfe_with_cv_using_exp_mean_method_3a
 from _yank import YANK_LIGANDS
 
 parser = argparse.ArgumentParser()
@@ -73,7 +73,7 @@ def _pearson_r_rmse(reference_vals, target_vals):
     return r, rmse
 
 
-def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target_ligands,
+def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_dir, target_ligands,
                                                       ref_ligand, ref_ligands,
                                                       FF, weights, yank_interaction_energies,
                                                       sample_size, final_fes):
@@ -106,10 +106,48 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target
     return pearson_r, rmse
 
 
+def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3b(algdock_score_dir, target_ligands,
+                                                      ref_ligand, ref_ligands,
+                                                      FF, weights, yank_interaction_energies,
+                                                      sample_size, final_fes):
+    """
+    :param algdock_score_dir: str
+    :param target_ligands: list of str
+    :param ref_ligand: str
+    :param FF: str
+    :param ref_ligands: list of str
+    :param weights: dict,
+                        weights[ref_ligand_name][snapshot] -> float
+                        weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param sample_size: int
+    :param final_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :return (pearson_r, rmse): (float, float)
+    """
+    assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
+
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+
+    fes = {}
+    for ligand in target_ligands:
+        _, _, _, _, fe = relative_bfe_with_cv_using_exp_mean_method_3a(rand_snapshots, algdock_score_dir,
+                                                                       ligand, ref_ligand,
+                                                                       weights, yank_interaction_energies, FF,
+                                                                       remove_outliers_g_h=False,
+                                                                       subtract_self=False,
+                                                                       flip_sign_c=True,
+                                                                       verbose=False)
+        fes[ligand] = fe
+
+    pearson_r, rmse = _pearson_r_rmse(final_fes[ref_ligand], fes)
+    return pearson_r, rmse
+
+
 def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                      ref_ligand, ref_ligands,
                                      FF, weights, yank_interaction_energies,
-                                     sample_size, final_fes, repeats):
+                                     sample_size, final_fes, repeats,
+                                     method):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -123,8 +161,15 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     :param sample_size: int
     :param final_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
     :param repeats: int
+    :param method: str
     :return (r_mean, r_std, rmse_mean, rmse_std): (float, float, float, float)
     """
+    assert method in ["without_cv", "with_cv_3a"], "unrecognized method: " + method
+    if method == "without_cv":
+        _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv
+    else:
+        _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3b
+
     rs = []
     rmses = []
     for _ in range(repeats):
