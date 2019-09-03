@@ -38,3 +38,10 @@ def _load_data(data_file, which_data):
 
 for ref_ligand in ref_ligands:
     data_file_1 = os.path.join(args.data_1_dir, ref_ligand, args.data_file)
+    print("Loading " + args.which_data + " from " + data_file_1)
+    data_1 = _load_data(data_file_1, args.which_data)
+
+    data_file_2 = os.path.join(args.data_2_dir, ref_ligand, args.data_file)
+    print("Loading " + args.which_data + " from " + data_file_2)
+    data_2 = _load_data(data_file_2, args.which_data)
+    
