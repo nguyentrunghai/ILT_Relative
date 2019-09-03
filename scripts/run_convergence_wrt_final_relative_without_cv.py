@@ -30,9 +30,6 @@ parser.add_argument("--final_results_dir", type=str,
 parser.add_argument("--yank_results_file", type=str,
                     default="Yank/yank_results.dat")
 
-# "yank" or "final"
-parser.add_argument("--with_respect_to", type=str, default="none")
-
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
 parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 
@@ -227,8 +224,6 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
 
     return r_final, rmse_final, r_yank, rmse_yank
 
-
-assert args.with_respect_to in ["yank", "final"], "unknown with_respect_to: " + args.with_respect_to
 
 # sample_sizes = np.array(range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
 sample_sizes = [int(num) for num in args.sample_sizes.split()]
