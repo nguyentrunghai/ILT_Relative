@@ -223,7 +223,7 @@ yank_interaction_energies = load_interaction_energies(path=args.interaction_ener
 
 final_rel_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
 
-yank_fes, _ = load_scores(args.yank_results_file, 0, 1, 2, [])
+yank_abs_fes, _ = load_scores(args.yank_results_file, 0, 1, 2, [])
 
 for ref_ligand in ref_ligands:
     print("Processing ref ligand:", ref_ligand)
