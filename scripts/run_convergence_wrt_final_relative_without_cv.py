@@ -253,18 +253,26 @@ for ref_ligand in ref_ligands:
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
-    out_file = open(os.path.join(out_dir, "r_rmse.dat"), "w")
-    out_file.write("# sample_size     r          r_std          rmse          rmse_std\n")
+    out_file_final = open(os.path.join(out_dir, "r_rmse_wrt_final.dat"), "w")
+    out_file_final.write("# sample_size     r          r_std          rmse          rmse_std\n")
+
+    out_file_yank = open(os.path.join(out_dir, "r_rmse_wrt_yank.dat"), "w")
+    out_file_yank.write("# sample_size     r          r_std          rmse          rmse_std\n")
 
     for sample_size in sample_sizes:
         print(sample_size)
-        r, r_std, rmse, rmse_std = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
+        r_final, rmse_final, r_yank, rmse_yank = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
                                                                     ref_ligand, ref_ligands,
                                                                     args.FF, single_snap_weights, yank_interaction_energies,
-                                                                    sample_size, final_rel_fes, args.bootstrap_repeats,
-                                                                    args.method)
+                                                                    sample_size, final_rel_fes, yank_abs_fes,
+                                                                    args.bootstrap_repeats, args.method)
 
-        out_file.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r, r_std, rmse, rmse_std))
-    out_file.close()
+        out_file_final.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_final[0], r_final[1],
+                                                                         rmse_final[0], rmse_final[1]))
+
+        out_file_yank.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_yank[0], r_yank[1],
+                                                                         rmse_yank[0], rmse_yank[1]))
+    out_file_final.close()
+    out_file_yank.close()
 
 print("DONE")
