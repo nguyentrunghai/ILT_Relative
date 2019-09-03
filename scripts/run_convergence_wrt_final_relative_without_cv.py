@@ -171,8 +171,8 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
 def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                      ref_ligand, ref_ligands,
                                      FF, weights, yank_interaction_energies,
-                                     sample_size, final_rel_fes, repeats,
-                                     method):
+                                     sample_size, final_rel_fes, yank_abs_fes,
+                                     repeats, method):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -185,6 +185,7 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param sample_size: int
     :param final_rel_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :param yank_abs_fes: dict, {ligand (str): fe (float)}
     :param repeats: int
     :param method: str
     :return (r_mean, r_std, rmse_mean, rmse_std): (float, float, float, float)
@@ -195,25 +196,36 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     else:
         _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a
 
-    rs = []
-    rmses = []
+    r_final_s = []
+    rmse_final_s = []
+    r_yank_s = []
+    rmse_yank_s = []
+
     for _ in range(repeats):
-        r, rmse = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir, target_ligands,
-                                                                     ref_ligand, ref_ligands,
+        r_f, rmse_f, r_y, rmse_y = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir,
+                                                                    target_ligands, ref_ligand, ref_ligands,
                                                                      FF, weights, yank_interaction_energies,
-                                                                     sample_size,  final_rel_fes)
+                                                                     sample_size,  final_rel_fes, yank_abs_fes)
 
-        if str(r).lower() not in ["-inf", "inf", "nan"]:
-            if str(rmse).lower() not in ["-inf", "inf", "nan"]:
-                rs.append(r)
-                rmses.append(rmse)
+        if str(r_f).lower() not in ["-inf", "inf", "nan"]:
+            r_final_s.append(r_f)
 
-    r_mean = np.mean(rs)
-    r_std = np.std(rs)
-    rmse_mean = np.mean(rmses)
-    rmse_std = np.std(rmses)
+        if str(rmse_f).lower() not in ["-inf", "inf", "nan"]:
+            rmse_final_s.append(rmse_f)
 
-    return r_mean, r_std, rmse_mean, rmse_std
+        if str(r_y).lower() not in ["-inf", "inf", "nan"]:
+            r_yank_s.append(r_y)
+
+        if str(rmse_y).lower() not in ["-inf", "inf", "nan"]:
+            rmse_yank_s.append(rmse_y)
+
+    r_final = (np.mean(r_final_s), np.std(r_final_s))
+    rmse_final = (np.mean(rmse_final_s), np.std(rmse_final_s))
+
+    r_yank = (np.mean(r_yank_s), np.std(r_yank_s))
+    rmse_yank = (np.mean(rmse_yank_s), np.std(rmse_yank_s))
+
+    return r_final, rmse_final, r_yank, rmse_yank
 
 
 assert args.with_respect_to in ["yank", "final"], "unknown with_respect_to: " + args.with_respect_to
