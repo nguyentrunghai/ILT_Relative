@@ -27,6 +27,9 @@ parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--final_results_dir", type=str,
                     default="Relative_Binding_FE/Relative_FE_Est_1/all96")
 
+parser.add_argument("--yank_results_file", type=str,
+                    default="/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
+
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
 parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 
@@ -214,6 +217,8 @@ print("target_ligands:", target_ligands)
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir)
 
 final_fes = _load_final_fe(args.final_results_dir, ref_ligands, args.weight_scheme, args.combining_rule, args.FF)
+
+yank_fes, _ = load_scores(args.yank_results_file, 0, 1, 2, [])
 
 for ref_ligand in ref_ligands:
     print("Processing ref ligand:", ref_ligand)
