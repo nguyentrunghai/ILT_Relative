@@ -125,7 +125,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_
 def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_dir, target_ligands,
                                                       ref_ligand, ref_ligands,
                                                       FF, weights, yank_interaction_energies,
-                                                      sample_size, final_rel_fes):
+                                                      sample_size, final_rel_fes, yank_abs_fes):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -138,6 +138,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param sample_size: int
     :param final_rel_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :param yank_abs_fes: dict, {ligand (str): fe (float)}
     :return (pearson_r, rmse): (float, float)
     """
     assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
@@ -159,8 +160,12 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
         else:
             fes[ligand] = fe
 
-    pearson_r, rmse = _pearson_r_rmse(final_rel_fes[ref_ligand], fes)
-    return pearson_r, rmse
+    r_final, rmse_final = _pearson_r_rmse(final_rel_fes[ref_ligand], fes)
+
+    yank_rel_fes = {ligand: yank_abs_fes[ligand] - yank_abs_fes[ref_ligand] for ligand in yank_abs_fes}
+    r_yank, rmse_yank = _pearson_r_rmse(yank_rel_fes, fes)
+
+    return r_final, rmse_final, r_yank, rmse_yank
 
 
 def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
