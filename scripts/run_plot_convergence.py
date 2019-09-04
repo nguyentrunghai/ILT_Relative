@@ -82,7 +82,7 @@ for ref_ligand in ref_ligands:
     yerr2 = data_2[2] / 2.
     yerrs = [yerr1, yerr2]
 
-    out = ref_ligand + "_" + args.which_data
+    out = ref_ligand + "_" + args.which_data + ".pdf"
     print("Plotting "+out)
     improved_plot_lines(xs, ys, yerrs=yerrs, xlabel=args.xlabel, ylabel=args.ylabel, out=out,
                         colors=colors,
