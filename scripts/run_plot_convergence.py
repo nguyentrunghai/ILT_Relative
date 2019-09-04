@@ -28,6 +28,10 @@ parser.add_argument("--modifying_constants", type=str, default=" ")
 parser.add_argument("--xlabel", type=str, default="# receptor snapshots")
 parser.add_argument("--ylabel", type=str, default="Pearson's R w.r.t. final results")
 
+parser.add_argument("--colors", type=str, default="g b")
+parser.add_argument("--line_styles", type=str, default="- --")
+parser.add_argument("--line_width", type=float, default=2)
+
 args = parser.parse_args()
 
 
@@ -46,6 +50,10 @@ def _load_data(data_file, which_data):
 ref_ligands_2_modify = args.ref_ligands_2_modify.split()
 modifying_constants = [np.float(s) for s in args.modifying_constants.split()]
 assert len(ref_ligands_2_modify) == len(modifying_constants), "len(ref_ligands_2_modify) neq len(modifying_constants)"
+
+colors = args.colors.split()
+line_styles = args.line_styles.split()
+assert len(colors) == len(line_styles) == 2, "len(colors) and len(line_styles) must equal 2"
 
 modifying_constants = {ligand : num for ligand, num in zip(ref_ligands_2_modify, modifying_constants)}
 print("modifying_constants", modifying_constants)
@@ -72,7 +80,8 @@ for ref_ligand in ref_ligands:
     yerrs = [yerr1, yerr2]
 
     out = ref_ligand + "_" + args.which_data
+    print("Plotting "+out)
     improved_plot_lines(xs, ys, yerrs=yerrs, xlabel=args.xlabel, ylabel=args.ylabel, out=out,
                         colors=colors,
                         line_styles=line_styles,
-                        lw=lw)
+                        lw=args.line_width)
