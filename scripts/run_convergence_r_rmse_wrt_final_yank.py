@@ -111,10 +111,13 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_
         fe_cal = RelBFEWithoutCV(algdock_score_dir, group, code, weights, ref_ligands, yank_interaction_energies)
         fes[ligand] = fe_cal.cal_exp_mean_for_one_ref_ligand(FF, rand_snapshots, ref_ligand)
 
-    r_final, rmse_final = _pearson_r_rmse(final_rel_fes[ref_ligand], fes)
+    r_final, rmse_final = _pearson_r_rmse(final_rel_fes, fes)
+
+    # subtract self
+    fes_subtract_self = {ligand: fes[ligand] - fes[ref_ligand] for ligand in fes}
 
     yank_rel_fes = {ligand: yank_abs_fes[ligand] - yank_abs_fes[ref_ligand] for ligand in yank_abs_fes}
-    r_yank, rmse_yank = _pearson_r_rmse(yank_rel_fes, fes)
+    r_yank, rmse_yank = _pearson_r_rmse(yank_rel_fes, fes_subtract_self)
 
     return r_final, rmse_final, r_yank, rmse_yank
 
