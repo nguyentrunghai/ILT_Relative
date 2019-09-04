@@ -7,9 +7,9 @@ from __future__ import print_function
 import argparse
 import os
 
-import nump as np
+import numpy as np
 
-from _yank import YANK_LIGANDS as ref_ligands
+from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _plots import improved_plot_lines
 
 parser = argparse.ArgumentParser()
@@ -58,6 +58,9 @@ assert len(colors) == len(line_styles) == 2, "len(colors) and len(line_styles) m
 modifying_constants = {ligand : num for ligand, num in zip(ref_ligands_2_modify, modifying_constants)}
 print("modifying_constants", modifying_constants)
 
+_, _, single_snap_weights, _, _ = load_mbar_weights()
+
+ref_ligands = [ligand for ligand in single_snap_weights.keys() if ligand != "systems"]
 for ref_ligand in ref_ligands:
     data_file_1 = os.path.join(args.data_1_dir, ref_ligand, args.data_file)
     print("Loading " + args.which_data + " from " + data_file_1)
