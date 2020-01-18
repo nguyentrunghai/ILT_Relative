@@ -22,6 +22,7 @@ parser.add_argument("--glob_matching", type=str, default="*_VERSUS_*")
 parser.add_argument("--xlabel", type=str, default="Self relative binding free energy (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="Relative binding free energy (kcal/mol)")
 
+parser.add_argument("--log_scale", action="store_true", default=False)
 parser.add_argument("--title", action="store_true", default=False)
 
 args = parser.parse_args()
@@ -33,6 +34,10 @@ for data_file in data_files:
     data = np.loadtxt(data_file)
     x = data[:, 0]
     y = data[:, 1]
+
+    if args.log_scale:
+        x = np.log(x)
+        y = np.log(y)
 
     out_file = os.path.basename(data_file) + ".pdf"
 
