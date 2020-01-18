@@ -15,7 +15,7 @@ from _plots import scatter_plot
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--data_dir", type=str,
-                    default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/test/p-xylene.A__AAA__equal_sys__single_weight/ExpMean")
+default="Relative_FE_Est_with_CV_method_3a/flip_sign_c__not_subtract_self/benzene.A__AAA__equal_sys__single_weight/ExpMean")
 
 parser.add_argument("--glob_matching", type=str, default="*_vs_*")
 
