@@ -22,6 +22,8 @@ parser.add_argument("--glob_matching", type=str, default="*_VERSUS_*")
 parser.add_argument("--xlabel", type=str, default="Self relative binding free energy (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="Relative binding free energy (kcal/mol)")
 
+parser.add_argument("--title", action="store_true", default=False)
+
 args = parser.parse_args()
 
 data_files = glob.glob(os.path.join(args.data_dir, args.glob_matching))
@@ -35,7 +37,10 @@ for data_file in data_files:
     out_file = os.path.basename(data_file) + ".pdf"
 
     title = os.path.basename(data_file)
-    title = " vs ".join(title.split("_vs_"))
+    if args.title:
+        title = " vs ".join(title.split("_vs_"))
+    else:
+        title = None
     scatter_plot(x, y, args.xlabel, args.ylabel, out_file,
                  show_xy_axes=True,
                  xerr=None, yerr=None,
