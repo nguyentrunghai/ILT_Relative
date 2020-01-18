@@ -36,8 +36,8 @@ for data_file in data_files:
     y = data[:, 1]
 
     if args.log_scale:
-        x = np.log(x)
-        y = np.log(y)
+        x = np.log(np.abs(x))
+        y = np.log(np.abs(y))
 
     out_file = os.path.basename(data_file) + ".pdf"
 
