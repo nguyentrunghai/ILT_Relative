@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data_dir", type=str,
 default="Relative_FE_Est_with_CV_method_3a/flip_sign_c__not_subtract_self/benzene.A__AAA__equal_sys__single_weight/ExpMean")
 
-parser.add_argument("--glob_matching", type=str, default="*_vs_*")
+parser.add_argument("--glob_matching", type=str, default="*_VERSUS_*")
 
 parser.add_argument("--xlabel", type=str, default="Self relative binding free energy (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="Relative binding free energy (kcal/mol)")
