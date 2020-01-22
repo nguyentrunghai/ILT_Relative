@@ -122,8 +122,9 @@ def scatter_plot(x, y, xlabel, ylabel, out,
                 xlimits=None,
                 ylimits=None,
                 aspect="auto",
-
-                same_xy_scale=True,
+                x_logscale=False,
+                y_logscale=False,
+                same_xy_scale=False,
                 integer_limits=True,
                 show_regression_line=False,
                 show_diagonal_line=False,
@@ -263,6 +264,11 @@ def scatter_plot(x, y, xlabel, ylabel, out,
         y_label = None
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
+
+    if x_logscale:
+        ax.set_xscale("log")
+    if y_logscale:
+        ax.set_yscale("log")
 
     if xlabel is not None:
         plt.xlabel(xlabel, fontsize=fontsize, **font)
