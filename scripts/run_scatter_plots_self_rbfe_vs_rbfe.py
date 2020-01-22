@@ -36,6 +36,7 @@ for data_file in data_files:
     y = data[:, 1]
 
     if args.log_scale:
+        print("Log scale")
         x = np.log(np.abs(x) + 1)
         y = np.log(np.abs(y) + 1)
 
