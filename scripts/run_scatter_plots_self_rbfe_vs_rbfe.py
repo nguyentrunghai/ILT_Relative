@@ -37,9 +37,9 @@ for data_file in data_files:
     print("Before log scaled", x)
 
     if args.log_scale:
-        print("After log scaled", x)
         x = np.log(np.abs(x) + 1)
         y = np.log(np.abs(y) + 1)
+    print("After log scaled", x)
 
     out_file = os.path.basename(data_file) + ".pdf"
 
