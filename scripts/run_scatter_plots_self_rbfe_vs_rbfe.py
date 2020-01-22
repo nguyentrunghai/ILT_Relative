@@ -34,9 +34,10 @@ for data_file in data_files:
     data = np.loadtxt(data_file)
     x = data[:, 0]
     y = data[:, 1]
+    print("Before log scaled", x)
 
     if args.log_scale:
-        print("Log scale")
+        print("After log scaled", x)
         x = np.log(np.abs(x) + 1)
         y = np.log(np.abs(y) + 1)
 
