@@ -18,8 +18,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--yank_results", type=str, default="/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
 
-parser.add_argument("--rel_bfe_dir", type=str,
-default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_with_CV_using_exp_mean_method_3/with_neg_cap/all96")
+parser.add_argument("--rel_bfe_dir", type=str, default="")
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
