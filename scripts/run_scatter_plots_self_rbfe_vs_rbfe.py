@@ -34,12 +34,6 @@ for data_file in data_files:
     data = np.loadtxt(data_file)
     x = data[:, 0]
     y = data[:, 1]
-    print("Before log scaled", x)
-
-    if args.log_scale:
-        x = np.log(np.abs(x) + 1)
-        y = np.log(np.abs(y) + 1)
-    print("After log scaled", x)
 
     out_file = os.path.basename(data_file) + ".pdf"
 
@@ -51,7 +45,9 @@ for data_file in data_files:
     scatter_plot(x, y, args.xlabel, args.ylabel, out_file,
                  show_xy_axes=True,
                  xerr=None, yerr=None,
-                 show_regression_line=True,
+                 x_logscale=args.log_scale,
+                 y_logscale=args.log_scale,
+                 show_regression_line=False,
                  show_diagonal_line=False,
                  show_rmse=True,
                  show_R=True,
