@@ -33,6 +33,26 @@ def _std_from_iqr(x):
     return stats.iqr(x) / 1.35
 
 
+def _outliers(x, how_many_std=3):
+    """
+    :param x: 1d array
+    :param how_many_std: float
+    :return outliers: 1d bool array
+    """
+    x = np.asarray(x)
+    assert x.ndim == 1, "x must be 1d"
+
+    std = _std_from_iqr(x)
+    median = np.median(x)
+
+    lower = median - how_many_std * std
+    upper = median + how_many_std * std
+
+    outliers = (x < lower) | (x > upper)
+    return outliers
+
+
+
 data_files = glob.glob(os.path.join(args.data_dir, args.glob_matching))
 
 for data_file in data_files:
