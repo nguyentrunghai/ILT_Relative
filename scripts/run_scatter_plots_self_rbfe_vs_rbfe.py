@@ -9,6 +9,7 @@ import glob
 import argparse
 
 import numpy as np
+from scipy import stats
 
 from _plots import scatter_plot
 
@@ -26,6 +27,11 @@ parser.add_argument("--log_scale", action="store_true", default=False)
 parser.add_argument("--title", action="store_true", default=False)
 
 args = parser.parse_args()
+
+
+def _std_from_iqr(x):
+    return stats.iqr(x) / 1.35
+
 
 data_files = glob.glob(os.path.join(args.data_dir, args.glob_matching))
 
