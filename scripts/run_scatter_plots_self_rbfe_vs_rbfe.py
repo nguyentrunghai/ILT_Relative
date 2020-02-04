@@ -23,7 +23,9 @@ parser.add_argument("--glob_matching", type=str, default="*_VERSUS_*")
 parser.add_argument("--xlabel", type=str, default="Self relative binding free energy (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="Relative binding free energy (kcal/mol)")
 
-parser.add_argument("--log_scale", action="store_true", default=False)
+parser.add_argument("--remove_outliers", action="store_true", default=False)
+parser.add_argument("--how_many_std", type=float, default=3.)
+
 parser.add_argument("--title", action="store_true", default=False)
 
 args = parser.parse_args()
@@ -79,6 +81,10 @@ for data_file in data_files:
     x = data[:, 0]
     y = data[:, 1]
 
+    if args.remove_outliers:
+        print("Remove outliers beyond %0.2f std" % args.how_many_std)
+        x, y = _remove_outliers(x, y, how_many_std=args.how_many_std)
+        
     out_file = os.path.basename(data_file) + ".pdf"
 
     title = os.path.basename(data_file)
@@ -89,8 +95,8 @@ for data_file in data_files:
     scatter_plot(x, y, args.xlabel, args.ylabel, out_file,
                  show_xy_axes=True,
                  xerr=None, yerr=None,
-                 x_logscale=args.log_scale,
-                 y_logscale=args.log_scale,
+                 x_logscale=False,
+                 y_logscale=False,
                  show_regression_line=False,
                  show_diagonal_line=False,
                  show_rmse=True,
