@@ -52,7 +52,7 @@ def _outliers(x, how_many_std=3):
     return outliers
 
 
-def _remove_outliers(x, y):
+def _remove_outliers(x, y, how_many_std=3):
     """
     :param x: 1d array
     :param y: 1d array
@@ -64,8 +64,8 @@ def _remove_outliers(x, y):
 
     assert x.shape == y.shape, "x, y must have the same shape"
 
-    outliers_x = _outliers(x)
-    outliers_y = _outliers(y)
+    outliers_x = _outliers(x, how_many_std=how_many_std)
+    outliers_y = _outliers(y, how_many_std=how_many_std)
     all_outliers = outliers_x | outliers_y
     not_outliers = ~all_outliers
     return x[not_outliers], y[not_outliers]
