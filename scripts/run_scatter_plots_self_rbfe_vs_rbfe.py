@@ -52,6 +52,24 @@ def _outliers(x, how_many_std=3):
     return outliers
 
 
+def _remove_outliers(x, y):
+    """
+    :param x: 1d array
+    :param y: 1d array
+    :param weights: 1d array
+    :return (new_x, new_y): 1d arrays, x, y after remove outliers in both
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    assert x.shape == y.shape, "x, y must have the same shape"
+
+    outliers_x = _outliers(x)
+    outliers_y = _outliers(y)
+    all_outliers = outliers_x | outliers_y
+    not_outliers = ~all_outliers
+    return x[not_outliers], y[not_outliers]
+
 
 data_files = glob.glob(os.path.join(args.data_dir, args.glob_matching))
 
