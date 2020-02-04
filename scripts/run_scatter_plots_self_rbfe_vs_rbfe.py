@@ -9,7 +9,6 @@ import glob
 import argparse
 
 import numpy as np
-from scipy import stats
 
 from _plots import scatter_plot
 
@@ -31,8 +30,13 @@ parser.add_argument("--title", action="store_true", default=False)
 args = parser.parse_args()
 
 
+def _iqr(x):
+    q75, q25 = np.percentile(x, [75, 25])
+    return q75 - q25
+
+
 def _std_from_iqr(x):
-    return stats.iqr(x) / 1.35
+    return _iqr(x) / 1.35
 
 
 def _outliers(x, how_many_std=3):
@@ -84,7 +88,7 @@ for data_file in data_files:
     if args.remove_outliers:
         print("Remove outliers beyond %0.2f std" % args.how_many_std)
         x, y = _remove_outliers(x, y, how_many_std=args.how_many_std)
-        
+
     out_file = os.path.basename(data_file) + ".pdf"
 
     title = os.path.basename(data_file)
