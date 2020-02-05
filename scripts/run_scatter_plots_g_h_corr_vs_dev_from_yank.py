@@ -18,9 +18,14 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--yank_results", type=str, default="/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
 
-parser.add_argument("--g_h_corr_dir", type=str, default="")
-parser.add_argument("--bfe_without_cv_dir", type=str, default="")
-parser.add_argument("--bfe_with_cv_dir", type=str, default="")
+parser.add_argument("--g_h_corr_dir", type=str,
+default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_with_CV_method_3a/flip_sign_c__not_subtract_self__remove_outliers")
+
+parser.add_argument("--bfe_without_cv_dir", type=str,
+default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96")
+
+parser.add_argument("--bfe_with_cv_dir", type=str,
+default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_with_CV_method_3a/flip_sign_c__not_subtract_self")
 
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
