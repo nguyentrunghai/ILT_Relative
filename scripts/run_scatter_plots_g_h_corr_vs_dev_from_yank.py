@@ -107,7 +107,7 @@ ax.scatter(xs, ys)
 
 #ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
 ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Diff. in Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Diff. in Abs. Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
 fig.savefig("dev_diff_vs_corr.pdf")
