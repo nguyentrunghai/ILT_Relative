@@ -68,8 +68,8 @@ for ref_ligand in ref_ligands:
     self_bfe = bfes[ref_ligand]
 
     # remove reference ligands in the dict
-    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand not in ref_ligands}
-    errors = {ligand: errors[ligand] for ligand in errors if ligand not in ref_ligands}
+    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
+    errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
 
     for target_ligand in bfes:
         bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
