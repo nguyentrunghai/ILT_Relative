@@ -54,20 +54,23 @@ for ref_ligand in ref_ligands:
 
 # deviations from yank of bfe est WITHOUT CV
 devs_without_cv = {}            # devs_without_cv[ref_ligand][target_ligand] -> float
-
+bfe_errors_without_cv = {}
 for ref_ligand in ref_ligands:
     infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
                           args.combining_rule, args.rel_bfe_file)
     print("Loading", infile)
-    bfes, _ = load_scores(infile, 0, 1, 2, exclude_ligands=[])
+    bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
     self_bfe = bfes[ref_ligand]
+
     # remove reference ligands in the dict
     bfes = {ligand: bfes[ligand] for ligand in bfes if ligand not in ref_ligands}
+    errors = {ligand: errors[ligand] for ligand in errors if ligand not in ref_ligands}
 
     for target_ligand in bfes:
         bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
 
     devs_without_cv[ref_ligand] = bfes
+    bfe_errors_without_cv[ref_ligand] = errors
 
 # load g-h correlation coefficients
 corr_coeffs = {}      # corr_coeffs[ref_ligand][target_ligand] -> float
