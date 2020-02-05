@@ -115,7 +115,7 @@ ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[r
       for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
 xs = np.array(xs)
-ys = np.array(ys)
+ys = np.array(ys) - 0.05
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
