@@ -30,23 +30,41 @@ args = parser.parse_args()
 
 # load yank results
 ref_ligands = SIX_YANK_SYSTEMS
-yank_bfes, yank_bfe_errors = load_scores(args.yank_results, 0, 1, 2, [])
+yank_bfes, yank_bfe_errors = load_scores(args.yank_results, 0, 1, 2, exclude_ligands=[])
 
 all_ligands = yank_bfes.keys()
 target_ligands = [ligand for ligand in all_ligands if ligand not in ref_ligands]
 
 
-# deviations from yank of bfe without cv
-devs_without_cv = {}            # devs_without_cv[ref_ligand][target_ligand] -> float
+# deviations from yank of bfe est WITH CV
+devs_with_cv = {}            # devs_with_cv[ref_ligand][target_ligand] -> float
 
 for ref_ligand in ref_ligands:
-    infile_without_cv = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
-                                     args.combining_rule, args.rel_bfe_file)
-    print("Loading", infile_without_cv)
-    bfes, _ = load_scores(infile_without_cv, 0, 1, 2, ref_ligands)
+    infile = os.path.join(args.bfe_with_cv_dir, ref_ligand + args.result_dir_suffix,
+                          args.combining_rule, args.rel_bfe_file)
+    print("Loading", infile)
+    bfes, _ = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
 
     for target_ligand in bfes:
         bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
+
+    devs_with_cv[ref_ligand] = bfes
+
+
+# deviations from yank of bfe est WITHOUT CV
+devs_without_cv = {}            # devs_without_cv[ref_ligand][target_ligand] -> float
+
+for ref_ligand in ref_ligands:
+    infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
+                          args.combining_rule, args.rel_bfe_file)
+    print("Loading", infile)
+    bfes, _ = load_scores(infile, 0, 1, 2, exclude_ligands=[])
+    self_bfe = bfes[ref_ligand]
+    # remove reference ligands in the dict
+    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand not in ref_ligands}
+
+    for target_ligand in bfes:
+        bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
 
     devs_without_cv[ref_ligand] = bfes
 
