@@ -6,6 +6,9 @@ import glob
 import os
 import numpy as np
 
+import seaborn as sns
+sns.set()
+
 from _algdock import SIX_YANK_SYSTEMS
 
 from _plots import scatter_plot, scatter_plot_info
