@@ -87,12 +87,15 @@ for ref_ligand in ref_ligands:
         corr_coeffs[ref_ligand][target_ligand] = corr
 
 
+# Plot
+
 FONTSIZE = 8
 FONT = {"fontname": "Arial"}
 
-# plot bfe_devs vs cs
-xs = [cs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
-ys = [bfe_devs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+# plot difference in absolute deviation vs corr coef
+xs = [corr_coeffs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[ref_ligand][target_ligand])
+      for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
 xs = np.array(xs)
 ys = np.array(ys)
@@ -102,66 +105,10 @@ ax.scatter(xs, ys)
 # scilimits: (m, n), pair of integers; if style is 'sci', scientific notation will be used for
 # numbers outside the range 10**m to 10**n. Use (0,0) to include all numbers.
 
-ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
-ax.set_xlabel("$C$", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("bfe_dev_vs_C.pdf")
-
-# remove big outliers
-idx = xs.argsort()
-xs_1 = xs[idx][1:-15]
-ys_1 = ys[idx][1:-15]
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs_1, ys_1)
-
-ax.set_xlabel("$C$", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("bfe_dev_vs_C_remove_big_values.pdf")
-
-#-----------------------------------------------
-# plot bfe_devs vs c_errors
-xs = [c_errors[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
-xs = np.array(xs)
-xs_1 = xs[idx][1:-15]
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs_1, ys_1)
-
-ax.set_xlabel("Error in $C$", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("bfe_dev_vs_C_errors.pdf")
-
-#--------------------------------------------------
-# plot bfe_devs vs corr
-xs = [corr_coeffs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
-xs = np.array(xs)
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys)
-
+#ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
 ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Diff. in Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
-fig.savefig("bfe_dev_vs_corr.pdf")
+fig.savefig("dev_diff_vs_corr.pdf")
 
-#---------------------------------------------------
-# plot bfe_devs vs corr_error
-xs = [corr_errors[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
-xs = np.array(xs)
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys)
-
-ax.set_xlabel("Error in Corr($g, h$)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("bfe_dev_vs_corr_error.pdf")
