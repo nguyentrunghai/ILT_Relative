@@ -7,6 +7,7 @@ import os
 import argparse
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
@@ -32,6 +33,17 @@ parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
 
 args = parser.parse_args()
+
+BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
+
+
+def bin_corr_coef(corr_coefs, diff_yank_dev, bins=BINS):
+    df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
+    df["diff_yank_dev_neg"] = df["diff_yank_dev"] < 0.
+    cut = pd.cut(df["corr_coefs"], bins)
+    results = df.groupby(cut)["diff_yank_dev_neg"].agg("mean")
+    return results
+
 
 # load yank results
 ref_ligands = SIX_YANK_SYSTEMS
@@ -115,3 +127,7 @@ ax.set_ylabel("Diff. in Abs. Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FO
 fig.tight_layout()
 fig.savefig("dev_diff_vs_corr.pdf")
 
+
+# rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
+rate_neg_diff_dev = bin_corr_coef(xs, ys)
+rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
