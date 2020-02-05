@@ -28,6 +28,10 @@ default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96"
 parser.add_argument("--bfe_with_cv_dir", type=str,
 default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_with_CV_method_3a/flip_sign_c__not_subtract_self")
 
+
+parser.add_argument("--shift", type=float, default=0.)
+parser.add_argument("--error_scale_factor", type=float, default=1.)
+
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
@@ -115,7 +119,7 @@ ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[r
       for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
 xs = np.array(xs)
-ys = np.array(ys) - 0.05
+ys = np.array(ys) - args.shift
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
@@ -143,7 +147,7 @@ ys = [bfe_errors_with_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligand
       for target_ligand in target_ligands]
 
 xs = np.array(xs)
-ys = np.array(ys) * 0.65
+ys = np.array(ys) * args.error_scale_factor
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
