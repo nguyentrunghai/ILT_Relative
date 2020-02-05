@@ -134,3 +134,31 @@ rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
 
 overall_rate_neg_diff_dev = (ys < 0.).mean()
 print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
+
+
+# plot estimation errors with vs without cv
+xs = [bfe_errors_without_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
+      for target_ligand in target_ligands]
+ys = [bfe_errors_with_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
+      for target_ligand in target_ligands]
+
+xs = np.array(xs)
+ys = np.array(ys)
+
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys)
+
+lower = np.min([xs.min(), xs.min()])
+upper = np.max([xs.max(), xs.max()])
+ax.set_xlim([lower, upper])
+ax.set_ylim([lower, upper])
+ax.plot([lower, lower], [upper, upper], c="k")
+
+ax.set_xlabel("Bootstrap std without CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Bootstrap std with CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
+
+fig.tight_layout()
+fig.savefig("error_with_vs_without_CV.pdf")
+
+rate_error_with_less_than_without = (ys < xs).mean()
+print("Rate at which errors of with are less than without CV %0.5f" % rate_error_with_less_than_without)
