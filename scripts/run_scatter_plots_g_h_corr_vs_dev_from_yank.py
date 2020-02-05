@@ -107,10 +107,8 @@ ys = np.array(ys)
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
-# scilimits: (m, n), pair of integers; if style is 'sci', scientific notation will be used for
-# numbers outside the range 10**m to 10**n. Use (0,0) to include all numbers.
+ax.axhline(y=0)
 
-#ax.ticklabel_format(axis="x", style="sci", scilimits=(0, 0))
 ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Diff. in Abs. Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
