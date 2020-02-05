@@ -143,16 +143,17 @@ ys = [bfe_errors_with_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligand
       for target_ligand in target_ligands]
 
 xs = np.array(xs)
-ys = np.array(ys)
+ys = np.array(ys) * 0.65
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 
 lower = np.min([xs.min(), xs.min()])
 upper = np.max([xs.max(), xs.max()])
+
+ax.plot([lower, upper], [lower, upper], c="k")
 ax.set_xlim([lower, upper])
 ax.set_ylim([lower, upper])
-ax.plot([lower, lower], [upper, upper], c="k")
 
 ax.set_xlabel("Bootstrap std without CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Bootstrap std with CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
