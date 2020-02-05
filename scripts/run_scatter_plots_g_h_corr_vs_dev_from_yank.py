@@ -131,3 +131,6 @@ fig.savefig("dev_diff_vs_corr.pdf")
 # rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
 rate_neg_diff_dev = bin_corr_coef(xs, ys)
 rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
+
+overall_rate_neg_diff_dev = (ys < 0.).mean()
+print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
