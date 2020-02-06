@@ -40,7 +40,7 @@ target_ligands = [ligand for ligand in all_ligands if ligand not in ref_ligands]
 
 
 # rbfe WITH CV
-rbfes_with_cv = {}            # devs_with_cv[ref_ligand][target_ligand] -> float
+rbfes_with_cv = {}            # rbfes_with_cv[ref_ligand][target_ligand] -> float
 rbfe_errors_with_cv = {}
 for ref_ligand in ref_ligands:
     infile = os.path.join(args.bfe_with_cv_dir, ref_ligand + args.result_dir_suffix,
@@ -55,9 +55,9 @@ for ref_ligand in ref_ligands:
     rbfe_errors_with_cv[ref_ligand] = errors
 
 
-# deviations from yank of bfe est WITHOUT CV
-devs_without_cv = {}            # devs_without_cv[ref_ligand][target_ligand] -> float
-bfe_errors_without_cv = {}
+# rbfe WITH CV
+rbfes_without_cv = {}            # rbfes_without_cv[ref_ligand][target_ligand] -> float
+rbfe_errors_without_cv = {}
 for ref_ligand in ref_ligands:
     infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
                           args.combining_rule, args.rel_bfe_file)
@@ -70,10 +70,10 @@ for ref_ligand in ref_ligands:
     errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
 
     for target_ligand in bfes:
-        bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
+        bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand]
 
-    devs_without_cv[ref_ligand] = bfes
-    bfe_errors_without_cv[ref_ligand] = errors
+    rbfes_without_cv[ref_ligand] = bfes
+    rbfe_errors_without_cv[ref_ligand] = errors
 
 # load g-h correlation coefficients
 corr_coeffs = {}      # corr_coeffs[ref_ligand][target_ligand] -> float
