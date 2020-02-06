@@ -7,10 +7,6 @@ import os
 import argparse
 
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set()
 
 from _yank import load_scores
 from _algdock import SIX_YANK_SYSTEMS
