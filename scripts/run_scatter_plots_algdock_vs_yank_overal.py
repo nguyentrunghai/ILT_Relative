@@ -30,6 +30,9 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
 
+parser.add_argument("--xlabel", type=str, default="YANK free energy (kcal/mol)")
+parser.add_argument("--ylabel", type=str, default="AlGDock free energy (kcal/mol)")
+
 args = parser.parse_args()
 
 # load yank results
@@ -85,7 +88,7 @@ for ref_ligand in ref_ligands:
         x_errs.append(yank_bfe_errors[target_ligand])
 
 xs = np.array(xs)
-x_errs = np.aray(x_errs) / 2.
+x_errs = np.array(x_errs) / 2.
 
 # without CV
 ys = []
@@ -96,67 +99,19 @@ for ref_ligand in ref_ligands:
         y_errs.append(rbfe_errors_without_cv[ref_ligand][target_ligand])
 
 ys = np.array(ys)
-y_errs = np.aray(y_errs) / 2.
+y_errs = np.array(y_errs) / 2.
 
+dummy_ligands = ["abc" for _ in ys]
+scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_without_CV.dat")
 
-
-FONTSIZE = 8
-FONT = {"fontname": "Arial"}
-
-# plot difference in absolute deviation vs corr coef
-xs = [corr_coeffs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
-ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[ref_ligand][target_ligand])
-      for ref_ligand in ref_ligands for target_ligand in target_ligands]
-
-xs = np.array(xs)
-ys = np.array(ys) - args.shift
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys)
-ax.axhline(y=0, c="k")
-
-ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Diff. in Abs. Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("dev_diff_vs_corr.pdf")
-
-
-# rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
-rate_neg_diff_dev = bin_corr_coef(xs, ys)
-rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
-
-overall_rate_neg_diff_dev = (ys < 0.).mean()
-print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
-
-
-# plot estimation errors with vs without cv
-xs = [bfe_errors_without_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
-      for target_ligand in target_ligands]
-ys = [bfe_errors_with_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
-      for target_ligand in target_ligands]
-
-xs = np.array(xs)
-ys = np.array(ys) * args.error_scale_factor
-
-fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys)
-
-lower = np.min([xs.min(), xs.min()])
-upper = np.max([xs.max(), xs.max()])
-
-ax.plot([lower, upper], [lower, upper], c="k")
-ax.set_xlim([lower, upper])
-ax.set_ylim([lower, upper])
-
-ax.set_xlabel("Bootstrap std without CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Bootstrap std with CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
-
-fig.tight_layout()
-fig.savefig("error_with_vs_without_CV.pdf")
-
-rate_error_with_less_than_without = (ys < xs).mean()
-print("Rate at which errors of with are less than without CV %0.5f" % rate_error_with_less_than_without)
-
-print("Mean bootstrap std without CV %0.5f" % xs.mean())
-print("Mean bootstrap std with CV %0.5f" % ys.mean())
+scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
+             show_xy_axes=True,
+             xerr=x_errs, yerr=y_errs,
+             show_regression_line=True,
+             show_diagonal_line=False,
+             show_rmse=True,
+             show_R=True,
+             show_regression_line_eq=True,
+             markersize=5,
+             same_xy_scale=False,
+             text_pos=[0.1, 0.7])
