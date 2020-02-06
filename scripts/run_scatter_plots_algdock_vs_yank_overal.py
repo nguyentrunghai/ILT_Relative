@@ -113,3 +113,30 @@ scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
              markersize=4,
              same_xy_scale=False,
              text_pos=[0.1, 0.7])
+
+
+# with CV
+ys = []
+y_errs = []
+for ref_ligand in ref_ligands:
+    for target_ligand in target_ligands:
+        ys.append(rbfes_with_cv[ref_ligand][target_ligand])
+        y_errs.append(rbfe_errors_with_cv[ref_ligand][target_ligand])
+
+ys = np.array(ys)
+y_errs = np.array(y_errs) * args.error_scale_factor / 2.
+
+dummy_ligands = ["abc" for _ in ys]
+scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_with_CV.dat")
+
+scatter_plot(xs, ys, args.xlabel, args.ylabel, "with_CV.pdf",
+             show_xy_axes=True,
+             xerr=x_errs, yerr=y_errs,
+             show_regression_line=True,
+             show_diagonal_line=False,
+             show_rmse=True,
+             show_R=True,
+             show_regression_line_eq=True,
+             markersize=4,
+             same_xy_scale=False,
+             text_pos=[0.1, 0.7])
