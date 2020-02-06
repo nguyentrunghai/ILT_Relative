@@ -56,7 +56,7 @@ for ref_ligand in ref_ligands:
     rbfe_errors_with_cv[ref_ligand] = errors
 
 
-# rbfe WITH CV
+# rbfe WITHOUT CV
 rbfes_without_cv = {}            # rbfes_without_cv[ref_ligand][target_ligand] -> float
 rbfe_errors_without_cv = {}
 for ref_ligand in ref_ligands:
@@ -76,7 +76,7 @@ for ref_ligand in ref_ligands:
     rbfes_without_cv[ref_ligand] = bfes
     rbfe_errors_without_cv[ref_ligand] = errors
 
-
+# plot
 xs = []
 x_errs = []
 for ref_ligand in ref_ligands:
@@ -86,6 +86,19 @@ for ref_ligand in ref_ligands:
 
 xs = np.array(xs)
 x_errs = np.aray(x_errs) / 2.
+
+# without CV
+ys = []
+y_errs = []
+for ref_ligand in ref_ligands:
+    for target_ligand in target_ligands:
+        ys.append(rbfes_without_cv[ref_ligand][target_ligand])
+        y_errs.append(rbfe_errors_without_cv[ref_ligand][target_ligand])
+
+ys = np.array(ys)
+y_errs = np.aray(y_errs) / 2.
+
+
 
 FONTSIZE = 8
 FONT = {"fontname": "Arial"}
