@@ -14,6 +14,7 @@ sns.set()
 
 from _yank import load_scores
 from _algdock import SIX_YANK_SYSTEMS
+from _plots import scatter_plot, scatter_plot_info
 
 parser = argparse.ArgumentParser()
 
@@ -75,22 +76,16 @@ for ref_ligand in ref_ligands:
     rbfes_without_cv[ref_ligand] = bfes
     rbfe_errors_without_cv[ref_ligand] = errors
 
-# load g-h correlation coefficients
-corr_coeffs = {}      # corr_coeffs[ref_ligand][target_ligand] -> float
 
+xs = []
+x_errs = []
 for ref_ligand in ref_ligands:
-    corr_coeffs[ref_ligand] = {}
-
     for target_ligand in target_ligands:
-        infile = os.path.join(args.g_h_corr_dir, ref_ligand + args.result_dir_suffix,
-                              args.combining_rule, ref_ligand + "_G_CORR_H_" + target_ligand)
-        print("Loading", infile)
-        c, c_err, corr, corr_err = np.loadtxt(infile)
+        xs.append(yank_bfes[target_ligand])
+        x_errs.append(yank_bfe_errors[target_ligand])
 
-        corr_coeffs[ref_ligand][target_ligand] = corr
-
-
-# Plot
+xs = np.array(xs)
+x_errs = np.aray(x_errs) / 2.
 
 FONTSIZE = 8
 FONT = {"fontname": "Arial"}
