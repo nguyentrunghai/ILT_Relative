@@ -110,6 +110,6 @@ scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
              show_rmse=True,
              show_R=True,
              show_regression_line_eq=True,
-             markersize=5,
+             markersize=4,
              same_xy_scale=False,
              text_pos=[0.1, 0.7])
