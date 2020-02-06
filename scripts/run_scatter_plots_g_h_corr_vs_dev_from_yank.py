@@ -164,3 +164,6 @@ fig.savefig("error_with_vs_without_CV.pdf")
 
 rate_error_with_less_than_without = (ys < xs).mean()
 print("Rate at which errors of with are less than without CV %0.5f" % rate_error_with_less_than_without)
+
+print("Mean bootstrap std without CV %0.5f" % xs.mean())
+print("Mean bootstrap std with CV %0.5f" % ys.mean())
