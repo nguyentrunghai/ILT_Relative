@@ -49,10 +49,10 @@ for ref_ligand in ref_ligands:
     bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
 
     for target_ligand in bfes:
-        bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand] - yank_bfes[target_ligand]
+        bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand]
 
-    devs_with_cv[ref_ligand] = bfes
-    bfe_errors_with_cv[ref_ligand] = errors
+    rbfes_with_cv[ref_ligand] = bfes
+    rbfe_errors_with_cv[ref_ligand] = errors
 
 
 # deviations from yank of bfe est WITHOUT CV
