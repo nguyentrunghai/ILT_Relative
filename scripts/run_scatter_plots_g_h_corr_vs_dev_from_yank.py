@@ -156,8 +156,8 @@ ax.plot([lower, upper], [lower, upper], c="k")
 ax.set_xlim([lower, upper])
 ax.set_ylim([lower, upper])
 
-ax.set_xlabel("Bootstrap std without CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Bootstrap std with CV (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_xlabel("Estimator A SD (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Estimator B SD (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
 fig.savefig("error_with_vs_without_CV.pdf")
