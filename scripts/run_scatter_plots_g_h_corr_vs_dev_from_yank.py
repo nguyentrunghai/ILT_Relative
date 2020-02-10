@@ -166,4 +166,6 @@ rate_error_with_less_than_without = (ys < xs).mean()
 print("Rate at which errors of with are less than without CV %0.5f" % rate_error_with_less_than_without)
 
 print("Mean bootstrap std without CV %0.5f" % xs.mean())
+print("Median bootstrap std without CV %0.5f" % np.median(xs))
 print("Mean bootstrap std with CV %0.5f" % ys.mean())
+print("Median bootstrap std with CV %0.5f" % np.median(ys))
