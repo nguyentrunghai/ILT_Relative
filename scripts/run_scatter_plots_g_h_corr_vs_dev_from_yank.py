@@ -145,10 +145,16 @@ print("rate_neg_diff_dev")
 print(rate_neg_diff_dev)
 print("")
 
-mean_diff_by_corr_sign = mean_by_corr_and_sign(xs, ys)
+mean_diff_by_corr_sign = mean_by_corr_and_sign(xs, ys, "mean")
 print("")
 print("mean_diff_by_corr_sign")
 print(mean_diff_by_corr_sign)
+print("")
+
+median_diff_by_corr_sign = mean_by_corr_and_sign(xs, ys, "median")
+print("")
+print("median_diff_by_corr_sign")
+print(median_diff_by_corr_sign)
 print("")
 
 overall_rate_neg_diff_dev = (ys < 0.).mean()
