@@ -38,7 +38,7 @@ args = parser.parse_args()
 #BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
 BINS = [-np.inf, 0.6, 1.1]
 
-def bin_corr_coef(corr_coefs, diff_yank_dev, bins=BINS):
+def negative_rate_by_corr(corr_coefs, diff_yank_dev, bins=BINS):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
     df["diff_yank_dev_neg"] = df["diff_yank_dev"] < 0.
     cut = pd.cut(df["corr_coefs"], bins)
@@ -130,7 +130,7 @@ fig.savefig("dev_diff_vs_corr.pdf")
 
 
 # rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
-rate_neg_diff_dev = bin_corr_coef(xs, ys)
+rate_neg_diff_dev = negative_rate_by_corr(xs, ys)
 rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
 print("")
 print("rate_neg_diff_dev")
