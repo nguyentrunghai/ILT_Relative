@@ -145,6 +145,12 @@ print("rate_neg_diff_dev")
 print(rate_neg_diff_dev)
 print("")
 
+mean_diff_by_corr_sign = mean_by_corr_and_sign(xs, ys)
+print("")
+print("mean_diff_by_corr_sign")
+print(mean_diff_by_corr_sign)
+print("")
+
 overall_rate_neg_diff_dev = (ys < 0.).mean()
 print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
 
