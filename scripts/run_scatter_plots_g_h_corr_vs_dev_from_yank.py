@@ -35,8 +35,8 @@ parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score"
 
 args = parser.parse_args()
 
-BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
-
+#BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
+BINS = [-np.inf, 0.5, 1.1]
 
 def bin_corr_coef(corr_coefs, diff_yank_dev, bins=BINS):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
