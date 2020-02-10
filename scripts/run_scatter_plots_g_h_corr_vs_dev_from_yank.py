@@ -46,11 +46,11 @@ def negative_rate_by_corr(corr_coefs, diff_yank_dev, bins=BINS):
     return results
 
 
-def mean_by_corr_and_sign(corr_coefs, diff_yank_dev, bins=BINS):
+def mean_by_corr_and_sign(corr_coefs, diff_yank_dev, agg_func, bins=BINS):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
     df["diff_yank_dev_neg"] = df["diff_yank_dev"] < 0.
     df["corr_group"] = pd.cut(df["corr_coefs"], bins)
-    results = df.groupby(["corr_group", "diff_yank_dev_neg"])["diff_yank_dev"].mean()
+    results = df.groupby(["corr_group", "diff_yank_dev_neg"])["diff_yank_dev"].agg(agg_func)
     return results
 
 
