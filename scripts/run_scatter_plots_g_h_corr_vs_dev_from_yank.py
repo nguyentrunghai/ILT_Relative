@@ -131,7 +131,7 @@ ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
 
 ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
-ax.set_ylabel("Diff. in Abs. Dev. from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
 fig.savefig("dev_diff_vs_corr.pdf")
