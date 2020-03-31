@@ -1339,3 +1339,151 @@ def cal_c_const_method4(hs, gs, ws):
 
     c = numerator / denominator
     return c
+
+
+def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_ligand, ref_ligand,
+                                                  weights, yank_interaction_energies, FF,
+                                                  remove_outliers_g_h=False,
+                                                  subtract_self=False,
+                                                  flip_sign_c=False,
+                                                  verbose=False):
+    """
+    :param snapshots: list of str
+    :param score_dir: str
+    :param target_ligand: str
+    :param ref_ligand: str
+    :param weights: dict,
+                    weights[ref_ligand_name][snapshot] -> float
+                    weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param FF: str, phase
+    :param remove_outliers_g_h: bool, if True, remove outliers in both hs and gs
+    :param subtract_self: bool, if true, subtract result from self relative bfe
+    :param flip_sign_c: bool, if m_bar < 0, flip sign of c
+    :param verbose: bool
+
+    :return: (hs, gs, rel_bfe)
+            hs: 1d array, values of random variable whose mean is to be estimated
+            gs: 1d array, values of random variable whose mean is known (= 1) and used as a control variate
+            rel_bfe: float, relative binding free energy
+    """
+    all_ref_ligands = [ligand for ligand in weights.keys() if ligand != "systems"]
+    assert ref_ligand in all_ref_ligands, "Unknown ref ligand: " + ref_ligand
+    assert set(snapshots) <= set(weights[ref_ligand].keys()), "snapshots must be a subset of weights[ref_ligand].keys()"
+
+    ref_ligand_group = ref_ligand[: -3]
+    ref_ligand_3l_code = ref_ligand[-3:]
+
+    target_ligand_group = target_ligand[:-3]
+    target_ligand_3l_code = target_ligand[-3:]
+
+    ref_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, ref_ligand_group, ref_ligand_3l_code, FF + ".score")
+    target_score_path = os.path.join(score_dir, ALGDOCK_SUB_DIR, target_ligand_group, target_ligand_3l_code,
+                                     FF + ".score")
+
+    if verbose:
+        print("--------------------------------")
+        print("ref_ligand:", ref_ligand)
+        print("target_ligand:", target_ligand)
+        print("ref_score_path:", ref_score_path)
+        print("target_score_path:", target_score_path)
+
+    ref_scores = load_bpmfs(ref_score_path, exclude_nan=False)
+    target_scores = load_bpmfs(target_score_path, exclude_nan=False)
+
+    hs = []    # values of random variable whose mean is to be estimated
+    gs = []    # values of random variable whose mean is known and used as a control variate
+    ws = []
+
+    for snapshot in snapshots:
+
+        if snapshot not in ref_scores:
+            raise ValueError(snapshot + " is not in ref_scores")
+
+        if snapshot not in target_scores:
+            raise ValueError(snapshot + " is not in target_scores")
+
+        try:
+            h = np.exp(- (target_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot]))
+
+            g = np.exp(- (ref_scores[snapshot] - yank_interaction_energies[ref_ligand][snapshot])) - 1.
+
+        except FloatingPointError:
+            pass
+        else:
+            if (not np.isnan(h)) and (not np.isinf(h)) and (not np.isnan(g)) and (not np.isinf(g)):
+                hs.append(h)
+                gs.append(g)
+                ws.append(weights[ref_ligand][snapshot])
+
+    ws = np.array(ws)
+    ws /= ws.sum()
+
+    hs = np.array(hs) * ws
+    gs = np.array(gs) * ws
+
+    if remove_outliers_g_h:
+        if verbose:
+            print("Before removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+
+        hs, gs, ws = _remove_outliers(hs, gs, ws)
+
+        if verbose:
+            print("After removing outliers")
+            print("hs (min, max, len):", hs.min(), hs.max(), len(hs))
+            print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
+
+    correlation = np.corrcoef(hs, gs)[0, -1]
+    c = cal_c_const_method4(hs, gs, ws)
+
+    ms = hs - (c * gs)
+    m_bar = np.mean(ms)
+    w_bar = np.mean(ws)
+
+    # flip sign of c if m_bar < 0
+    if flip_sign_c and (m_bar < 0):
+        ms = hs + (c * gs)
+        m_bar = np.mean(ms)
+
+    rel_bfe = (-1. / BETA) * np.log(m_bar / w_bar)
+
+    if verbose:
+        print("C:", c)
+
+        print("h_bar = %0.5e" %(np.mean(hs)))
+        print("g_bar = %0.5e" % (np.mean(gs)))
+        print("w_bar = %0.5e" % (np.mean(ws)))
+
+        print("h_war = %0.5e" % (np.var(hs)))
+        print("g_war = %0.5e" % (np.var(gs)))
+
+        print("Cor[h, g] = %0.5f" % correlation)
+
+        print("Cov[h, g] = %0.5f" % (np.cov(hs, gs)[0, -1]))
+        print("Cov[h, w] = %0.5f" % (np.cov(hs, ws)[0, -1]))
+        print("Cov[g, w] = %0.5f" % (np.cov(gs, ws)[0, -1]))
+
+        print("m_bar = %0.5e" % m_bar)
+        print("Relative BFE = %0.5f" % rel_bfe)
+
+    self_rel_bfe = 0.
+    if subtract_self:
+        ms_self = gs - (c * gs)
+        m_self_bar = np.mean(ms_self)
+        # flip sign of c if m_self_bar < 0
+        if flip_sign_c and (m_self_bar < 0):
+            ms_self = gs + (c * gs)
+            m_self_bar = np.mean(ms_self)
+        self_rel_bfe = (-1. / BETA) * np.log(m_self_bar / w_bar)
+
+    rel_bfe -= self_rel_bfe
+
+    if verbose:
+        print("Self Relative BFE = %10.5f" % self_rel_bfe)
+        print("Relative BFE (after subtracting self rbfe) = %10.5f" % rel_bfe)
+        print("--------------------------------")
+        print("")
+
+    return hs, gs, c, correlation, rel_bfe
