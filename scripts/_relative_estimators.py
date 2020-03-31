@@ -1308,3 +1308,34 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
         print("")
 
     return hs, gs, c, correlation, rel_bfe
+
+
+#-------------
+# Method 4a
+#-------------
+
+
+def cal_c_const_method4(hs, gs, ws):
+    """
+    :param hs: 1d ndarray, values of variable whose mean to be estimated
+    :param gs: 1d ndarray, values of control variable
+    :param ws: 1d ndarray, values of weights
+    :return: C, float
+    """
+    h_bar = np.mean(hs)
+    g_bar = np.mean(gs)
+    w_bar = np.mean(ws)
+
+    h_var = np.var(hs)
+    g_var = np.var(gs)
+
+    h_g_cov = np.cov(hs, gs)[0, -1]
+    h_w_cov = np.cov(hs, ws)[0, -1]
+    g_w_cov = np.cov(gs, ws)[0, -1]
+
+    numerator = (w_bar * h_bar * h_g_cov) - (w_bar * g_bar * h_var) - (h_bar * h_bar * g_w_cov) + (h_bar * g_bar * h_w_cov)
+
+    denominator = (w_bar * h_bar * g_var) - (w_bar * g_bar * h_g_cov) - (h_bar * g_bar * g_w_cov) + (g_bar * g_bar * h_w_cov)
+
+    c = numerator / denominator
+    return c
