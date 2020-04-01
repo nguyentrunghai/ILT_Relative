@@ -35,7 +35,7 @@ parser.add_argument("--yank_results_file", type=str,
 parser.add_argument("--bootstrap_repeats", type=int, default=100)
 parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 
-# "without_cv" or "with_cv_3a"
+# "without_cv", "with_cv_3a" or "with_cv_4a"
 parser.add_argument("--method", type=str, default="none")
 
 args = parser.parse_args()
@@ -238,11 +238,17 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     :param method: str
     :return (r_mean, r_std, rmse_mean, rmse_std): (float, float, float, float)
     """
-    assert method in ["without_cv", "with_cv_3a"], "unrecognized method: " + method
+    assert method in ["without_cv", "with_cv_3a", "with_cv_4a"], "unrecognized method: " + method
     if method == "without_cv":
         _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv
-    else:
+
+    elif method == "with_cv_3a":
         _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a
+
+    elif method == "with_cv_4a":
+        _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_4a
+    else:
+        pass
 
     r_final_s = []
     rmse_final_s = []
@@ -275,6 +281,9 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
 
     return r_final, rmse_final, r_yank, rmse_yank
 
+
+assert args.method in ["without_cv", "with_cv_3a", "with_cv_4a"], "unrecognized method: " + args.method
+print("Method:" + args.method)
 
 # sample_sizes = np.array(range(10, 51, 5) + range(60, 91, 10) + [96], dtype=int)
 sample_sizes = [int(num) for num in args.sample_sizes.split()]
