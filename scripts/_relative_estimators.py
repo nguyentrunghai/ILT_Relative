@@ -1334,11 +1334,12 @@ def cal_c_const_method4(hs, gs, ws, var_robust=False):
     g_bar = np.mean(gs)
     w_bar = np.mean(ws)
 
-    h_var = np.var(hs)
-    g_var = np.var(gs)
     if var_robust:
         h_var = _var_from_iqr(hs)
         g_var = _var_from_iqr(gs)
+    else:
+        h_var = np.var(hs)
+        g_var = np.var(gs)
 
     h_g_cov = np.cov(hs, gs)[0, -1]
     h_w_cov = np.cov(hs, ws)[0, -1]
