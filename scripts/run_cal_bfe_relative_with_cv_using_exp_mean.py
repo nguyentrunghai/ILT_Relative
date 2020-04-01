@@ -140,7 +140,6 @@ for ref_ligand in ref_ligands:
                                                                          target_ligand, ref_ligand,
                                                                          single_snap_weights,
                                                                          yank_interaction_energies, args.FF,
-                                                                         c=c,
                                                                          remove_outliers_g_h=args.remove_outliers_g_h,
                                                                          subtract_self=args.subtract_self,
                                                                          flip_sign_c=args.flip_sign_c,
