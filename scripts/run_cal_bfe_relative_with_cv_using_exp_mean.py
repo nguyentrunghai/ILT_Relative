@@ -16,6 +16,7 @@ from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2a
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2b
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3a
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3b
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_4a
 
 parser = argparse.ArgumentParser()
 
@@ -33,7 +34,7 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 
-# method is either 2a, 2b, 3a, 3b
+# method is either 2a, 2b, 3a, 3b, 4a
 parser.add_argument("--method", type=str, default="None")
 
 parser.add_argument("--remove_outliers_g_h", action="store_true", default=False)
@@ -77,6 +78,10 @@ elif args.method == "3a":
 elif args.method == "3b":
     print("Method 3b")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_3b
+
+elif args.method == "4a":
+    print("Method 4a")
+    relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_4a
 
 else:
     raise ValueError("unrecognized method " + args.method)
