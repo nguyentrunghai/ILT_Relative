@@ -1451,7 +1451,7 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
 
     correlation = np.corrcoef(hs, gs)[0, -1]
     if c is None:
-        c = cal_c_const_method4(hs, gs, ws)
+        c = cal_c_const_method4(hs, gs, ws, var_robust=True)
 
     ms = hs - (c * gs)
     m_bar = np.mean(ms)
