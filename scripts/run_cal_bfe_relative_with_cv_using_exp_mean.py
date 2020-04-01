@@ -130,14 +130,25 @@ for ref_ligand in ref_ligands:
         bootstrap_corrs = []
         for _ in range(args.bootstrap_repeats):
             random_snapshots = np.random.choice(snapshots, size=len(snapshots), replace=True)
-            _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
-                                                                         target_ligand, ref_ligand,
-                                                                         single_snap_weights,
-                                                                         yank_interaction_energies, args.FF,
-                                                                         remove_outliers_g_h=args.remove_outliers_g_h,
-                                                                         subtract_self=args.subtract_self,
-                                                                         flip_sign_c=args.flip_sign_c,
-                                                                         verbose=False)
+            if args.method == "4a":
+                _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
+                                                                             target_ligand, ref_ligand,
+                                                                             single_snap_weights,
+                                                                             yank_interaction_energies, args.FF,
+                                                                             c=c,
+                                                                             remove_outliers_g_h=args.remove_outliers_g_h,
+                                                                             subtract_self=args.subtract_self,
+                                                                             flip_sign_c=args.flip_sign_c,
+                                                                             verbose=False)
+            else:
+                _, _, b_c, b_corr, bfe = relative_bfe_with_cv_using_exp_mean(random_snapshots, args.scores_dir,
+                                                                             target_ligand, ref_ligand,
+                                                                             single_snap_weights,
+                                                                             yank_interaction_energies, args.FF,
+                                                                             remove_outliers_g_h=args.remove_outliers_g_h,
+                                                                             subtract_self=args.subtract_self,
+                                                                             flip_sign_c=args.flip_sign_c,
+                                                                             verbose=False)
 
             if (not np.isnan(bfe)) and (not np.isinf(bfe)):
                 bootstrap_bfes.append(bfe)
