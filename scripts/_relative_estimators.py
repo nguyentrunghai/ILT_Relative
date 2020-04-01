@@ -1315,6 +1315,14 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 #-------------
 
 
+def _var_from_iqr(data):
+    low, high = np.percentile(data, [25., 75.])
+    iqr = high - low
+    std = iqr / 1.35
+    var = std * std
+    return var
+
+
 def cal_c_const_method4(hs, gs, ws):
     """
     :param hs: 1d ndarray, values of variable whose mean to be estimated
