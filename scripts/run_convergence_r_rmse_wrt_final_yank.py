@@ -11,7 +11,9 @@ import numpy as np
 from _process_yank_outputs import load_interaction_energies
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _yank import load_scores
-from _relative_estimators import RelBFEWithoutCV, relative_bfe_with_cv_using_exp_mean_method_3a
+from _relative_estimators import RelBFEWithoutCV
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_3a
+from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_4a
 from _yank import YANK_LIGANDS
 
 parser = argparse.ArgumentParser()
@@ -149,6 +151,52 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
     for ligand in target_ligands:
         try:
             _, _, _, _, fe = relative_bfe_with_cv_using_exp_mean_method_3a(rand_snapshots, algdock_score_dir,
+                                                                       ligand, ref_ligand,
+                                                                       weights, yank_interaction_energies, FF,
+                                                                       remove_outliers_g_h=False,
+                                                                       subtract_self=False,
+                                                                       flip_sign_c=True,
+                                                                       verbose=False)
+        except FloatingPointError:
+            pass
+        else:
+            fes[ligand] = fe
+
+    r_final, rmse_final = _pearson_r_rmse(final_rel_fes[ref_ligand], fes)
+
+    yank_rel_fes = {ligand: yank_abs_fes[ligand] - yank_abs_fes[ref_ligand] for ligand in yank_abs_fes}
+    r_yank, rmse_yank = _pearson_r_rmse(yank_rel_fes, fes)
+
+    return r_final, rmse_final, r_yank, rmse_yank
+
+
+def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_4a(algdock_score_dir, target_ligands,
+                                                      ref_ligand, ref_ligands,
+                                                      FF, weights, yank_interaction_energies,
+                                                      sample_size, final_rel_fes, yank_abs_fes):
+    """
+    :param algdock_score_dir: str
+    :param target_ligands: list of str
+    :param ref_ligand: str
+    :param FF: str
+    :param ref_ligands: list of str
+    :param weights: dict,
+                        weights[ref_ligand_name][snapshot] -> float
+                        weights["systems"][ref_ligand_name] -> float
+    :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
+    :param sample_size: int
+    :param final_rel_fes: dict, {ref_ligand (str): {ligand (str): fe (float)}}
+    :param yank_abs_fes: dict, {ligand (str): fe (float)}
+    :return (pearson_r, rmse): (float, float)
+    """
+    assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
+
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+
+    fes = {}
+    for ligand in target_ligands:
+        try:
+            _, _, _, _, fe = relative_bfe_with_cv_using_exp_mean_method_4a(rand_snapshots, algdock_score_dir,
                                                                        ligand, ref_ligand,
                                                                        weights, yank_interaction_energies, FF,
                                                                        remove_outliers_g_h=False,
