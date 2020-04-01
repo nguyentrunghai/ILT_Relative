@@ -1393,7 +1393,7 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
 
     hs = []    # values of random variable whose mean is to be estimated
     gs = []    # values of random variable whose mean is known and used as a control variate
-    ws = []
+    ws = []    # weights
 
     for snapshot in snapshots:
 
