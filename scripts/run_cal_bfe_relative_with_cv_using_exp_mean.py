@@ -155,7 +155,7 @@ for ref_ligand in ref_ligands:
         bootstrap_cs = _filter_big_values(bootstrap_cs)
         bootstrap_corrs = _filter_big_values(bootstrap_corrs)
 
-        error = np.std(bootstrap_bfes)
+        error = _std_from_iqr(bootstrap_bfes)
         out_file_handle.write("%s   %20.10f %20.10f\n" %(target_ligand, rel_bfe, error))
 
         g_vs_h_out_file = os.path.join(result_dir, args.combining_rule, ref_ligand + "_G_VERSUS_H_" + target_ligand)
@@ -167,8 +167,8 @@ for ref_ligand in ref_ligands:
         g_corr_h_out_file = os.path.join(result_dir, args.combining_rule, ref_ligand + "_G_CORR_H_" + target_ligand)
         with open(g_corr_h_out_file, "w") as handle:
             handle.write("# C        C_error      correlation    corr_error\n")
-            handle.write("%20.10e %20.10e %20.10e %20.10e\n" % (c, np.std(bootstrap_cs),
-                                                                correlation, np.std(bootstrap_corrs)))
+            handle.write("%20.10e %20.10e %20.10e %20.10e\n" % (c, _std_from_iqr(bootstrap_cs),
+                                                                correlation, _std_from_iqr(bootstrap_corrs)))
 
     out_file_handle.close()
 
