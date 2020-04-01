@@ -1315,15 +1315,7 @@ def relative_bfe_with_cv_using_exp_mean_method_3b(snapshots, score_dir, target_l
 #-------------
 
 
-def _var_from_iqr(data):
-    low, high = np.percentile(data, [25., 75.])
-    iqr = high - low
-    std = iqr / 1.35
-    var = std * std
-    return var
-
-
-def cal_c_const_method4(hs, gs, ws, var_robust=False):
+def cal_c_const_method4(hs, gs, ws):
     """
     :param hs: 1d ndarray, values of variable whose mean to be estimated
     :param gs: 1d ndarray, values of control variable
@@ -1334,12 +1326,8 @@ def cal_c_const_method4(hs, gs, ws, var_robust=False):
     g_bar = np.mean(gs)
     w_bar = np.mean(ws)
 
-    if var_robust:
-        h_var = _var_from_iqr(hs)
-        g_var = _var_from_iqr(gs)
-    else:
-        h_var = np.var(hs)
-        g_var = np.var(gs)
+    h_var = np.var(hs)
+    g_var = np.var(gs)
 
     h_g_cov = np.cov(hs, gs)[0, -1]
     h_w_cov = np.cov(hs, ws)[0, -1]
@@ -1355,7 +1343,6 @@ def cal_c_const_method4(hs, gs, ws, var_robust=False):
 
 def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_ligand, ref_ligand,
                                                   weights, yank_interaction_energies, FF,
-                                                  c=None,
                                                   remove_outliers_g_h=False,
                                                   subtract_self=False,
                                                   flip_sign_c=False,
@@ -1370,7 +1357,6 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
                     weights["systems"][ref_ligand_name] -> float
     :param yank_interaction_energies: dict, yank_interaction_energies[system][snapshot] -> float
     :param FF: str, phase
-    :param c: float
     :param remove_outliers_g_h: bool, if True, remove outliers in both hs and gs
     :param subtract_self: bool, if true, subtract result from self relative bfe
     :param flip_sign_c: bool, if m_bar < 0, flip sign of c
@@ -1450,8 +1436,7 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
             print("gs (min, max, len):", gs.min(), gs.max(), len(gs))
 
     correlation = np.corrcoef(hs, gs)[0, -1]
-    if c is None:
-        c = cal_c_const_method4(hs, gs, ws, var_robust=True)
+    c = cal_c_const_method4(hs, gs, ws)
 
     ms = hs - (c * gs)
     m_bar = np.mean(ms)
