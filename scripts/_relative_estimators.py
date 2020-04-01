@@ -1461,9 +1461,9 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
 
         print("Cor[h, g] = %0.5f" % correlation)
 
-        print("Cov[h, g] = %0.5f" % (np.cov(hs, gs)[0, -1]))
-        print("Cov[h, w] = %0.5f" % (np.cov(hs, ws)[0, -1]))
-        print("Cov[g, w] = %0.5f" % (np.cov(gs, ws)[0, -1]))
+        print("Cov[h, g] = %0.5e" % (np.cov(hs, gs)[0, -1]))
+        print("Cov[h, w] = %0.5e" % (np.cov(hs, ws)[0, -1]))
+        print("Cov[g, w] = %0.5e" % (np.cov(gs, ws)[0, -1]))
 
         print("m_bar = %0.5e" % m_bar)
         print("Relative BFE = %0.5f" % rel_bfe)
