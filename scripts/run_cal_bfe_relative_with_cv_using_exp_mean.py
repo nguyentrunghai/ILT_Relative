@@ -63,6 +63,12 @@ def _filter_big_values(arr):
     return np.array(arr_out)
 
 
+def _std_from_iqr(data):
+    low, high = np.percentile(data, [25., 75.])
+    iqr = high - low
+    return iqr / 1.35
+
+
 if args.method == "2a":
     print("Method 2a")
     relative_bfe_with_cv_using_exp_mean = relative_bfe_with_cv_using_exp_mean_method_2a
