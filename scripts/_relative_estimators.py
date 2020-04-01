@@ -1323,7 +1323,7 @@ def _var_from_iqr(data):
     return var
 
 
-def cal_c_const_method4(hs, gs, ws):
+def cal_c_const_method4(hs, gs, ws, var_robust=False):
     """
     :param hs: 1d ndarray, values of variable whose mean to be estimated
     :param gs: 1d ndarray, values of control variable
@@ -1336,6 +1336,9 @@ def cal_c_const_method4(hs, gs, ws):
 
     h_var = np.var(hs)
     g_var = np.var(gs)
+    if var_robust:
+        h_var = _var_from_iqr(hs)
+        g_var = _var_from_iqr(gs)
 
     h_g_cov = np.cov(hs, gs)[0, -1]
     h_w_cov = np.cov(hs, ws)[0, -1]
