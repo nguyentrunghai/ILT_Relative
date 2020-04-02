@@ -297,6 +297,8 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     return r_final, rmse_final, r_yank, rmse_yank
 
 
+print("robust:", args.robust)
+
 assert args.method in ["without_cv", "with_cv_3a", "with_cv_4a"], "unrecognized method: " + args.method
 print("Method:" + args.method)
 
