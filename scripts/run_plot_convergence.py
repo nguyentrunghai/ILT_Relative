@@ -9,8 +9,9 @@ import os
 
 import numpy as np
 
-from load_mbar_weights_holo_OBC2 import load_mbar_weights
-from _plots import improved_plot_lines
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 parser = argparse.ArgumentParser()
 
@@ -31,7 +32,7 @@ parser.add_argument("--y2err_scale_facs", type=str, default="")
 parser.add_argument("--xlabel", type=str, default="# receptor snapshots")
 parser.add_argument("--ylabel", type=str, default="Pearson's R w.r.t. final results")
 
-parser.add_argument("--colors", type=str, default="g b")
+parser.add_argument("--colors", type=str, default="b r")
 parser.add_argument("--line_styles", type=str, default="- --")
 parser.add_argument("--line_width", type=float, default=2)
 
@@ -58,7 +59,7 @@ def scaling(x, fac=1.):
 
 
 def plot_convergence(data_file_1, data_file_2, which_data, ax,
-                     y2_scale=1, y2err_scale=1, y2_shift=0,
+                     y2_scale=1., y2err_scale=1., y2_shift=0.,
                      colors=("b", "r"), line_styles=["-", "--"],
                      lw=1):
     x1, y1, yerr1 = _load_data(data_file_1, which_data)
@@ -79,6 +80,8 @@ def plot_convergence(data_file_1, data_file_2, which_data, ax,
 colors = args.colors.split()
 line_styles = args.line_styles.split()
 assert len(colors) == len(line_styles) == 2, "len(colors) and len(line_styles) must equal 2"
+
+line_width = args.line_width
 
 ref_systems = args.ref_systems.split()
 print("ref_systems:", ref_systems)
@@ -111,31 +114,34 @@ else:
 print("y2err_scale_facs:", y2err_scale_facs)
 
 
+which_data = args.which_data
+print("which_data:", which_data)
 
-for ref_ligand in ref_ligands:
-    data_file_1 = os.path.join(args.data_1_dir, ref_ligand, args.data_file)
-    print("Loading " + args.which_data + " from " + data_file_1)
-    data_1 = _load_data(data_file_1, args.which_data)
+FONTSIZE = 8
+FONT = {"fontname": "Arial"}
 
-    data_file_2 = os.path.join(args.data_2_dir, ref_ligand, args.data_file)
-    print("Loading " + args.which_data + " from " + data_file_2)
-    data_2 = _load_data(data_file_2, args.which_data)
+for i, ref_system in enumerate(ref_systems):
+    data_file_1 = os.path.join(args.data_1_dir, ref_system, args.data_file)
+    print("data_file_1:", data_file_1)
 
-    xs = [data_1[0], data_2[0]]
+    data_file_2 = os.path.join(args.data_2_dir, ref_system, args.data_file)
+    print("data_file_2:", data_file_2)
 
-    y1 = data_1[1]
-    y2 = data_2[1]
-    if ref_ligand in modifying_constants:
-        y2 += modifying_constants[ref_ligand]
-    ys = [y1, y2]
+    y2_scale = y2_scale_facs[i]
+    y2_shift = y2_shifts[i]
+    y2err_scale = y2err_scale_facs[i]
 
-    yerr1 = data_1[2] / 2.
-    yerr2 = data_2[2] / 2.
-    yerrs = [yerr1, yerr2]
+    fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+    plot_convergence(data_file_1, data_file_2, which_data, ax,
+                     y2_scale=y2_scale, y2_shift=y2_shift, y2err_scale=y2err_scale,
+                     colors=colors, line_styles=line_styles, lw=line_width)
 
-    out = ref_ligand + "_" + args.which_data + ".pdf"
-    print("Plotting "+out)
-    improved_plot_lines(xs, ys, yerrs=yerrs, xlabel=args.xlabel, ylabel=args.ylabel, out=out,
-                        colors=colors,
-                        line_styles=line_styles,
-                        lw=args.line_width)
+    ax.set_xlabel(args.xlabel, fontsize=FONTSIZE, **FONT)
+    ax.set_ylabel(args.ylabel, fontsize=FONTSIZE, **FONT)
+
+    fig.tight_layout()
+    out = ref_system + "_" + which_data + ".pdf"
+    print("Writing figure to " + out)
+    fig.savefig(out)
+
+print("DONE")
