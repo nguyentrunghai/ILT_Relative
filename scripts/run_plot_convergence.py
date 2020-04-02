@@ -83,13 +83,34 @@ assert len(colors) == len(line_styles) == 2, "len(colors) and len(line_styles) m
 ref_systems = args.ref_systems.split()
 print("ref_systems:", ref_systems)
 
+# y2_scale
 y2_scale_facs = args.y2_scale_facs.split()
 if len(y2_scale_facs) == 0:
-    y2_scale_facs = [1 for _ in ref_systems]
+    y2_scale_facs = [1. for _ in ref_systems]
 else:
     assert len(y2_scale_facs) == len(ref_systems), "wrong len of y2_scale_facs"
     y2_scale_facs = [float(s) for s in y2_scale_facs]
 print("y2_scale_facs")
+
+# y2_shifts
+y2_shifts = args.split()
+if len(y2_shifts) == 0:
+    y2_shifts = [0. for _ in ref_systems]
+else:
+    assert len(y2_shifts) == len(ref_systems), "wrong len of y2_shifts"
+    y2_shifts = [float(s) for s in y2_shifts]
+print("y2_shifts:", y2_shifts)
+
+# y2err_scale_facs
+y2err_scale_facs = args.y2err_scale_facs.split()
+if len(y2err_scale_facs) == 0:
+    y2err_scale_facs = [1. for _ in ref_systems]
+else:
+    assert len(y2err_scale_facs) == len(ref_systems), "wrong len of y2err_scale_facs"
+    y2err_scale_facs = [float(s) for s in y2err_scale_facs]
+print("y2err_scale_facs:", y2err_scale_facs)
+
+
 
 for ref_ligand in ref_ligands:
     data_file_1 = os.path.join(args.data_1_dir, ref_ligand, args.data_file)
