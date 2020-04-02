@@ -96,7 +96,7 @@ else:
 print("y2_scale_facs")
 
 # y2_shifts
-y2_shifts = args.split()
+y2_shifts = args.y2_shifts.split()
 if len(y2_shifts) == 0:
     y2_shifts = [0. for _ in ref_systems]
 else:
