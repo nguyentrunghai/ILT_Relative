@@ -60,7 +60,7 @@ def scaling(x, fac=1.):
 
 def plot_convergence(data_file_1, data_file_2, which_data, ax,
                      y2_scale=1., y2err_scale=1., y2_shift=0.,
-                     colors=("b", "r"), line_styles=["-", "--"],
+                     colors=("b", "r"), line_styles=("-", "--"),
                      lw=1):
     x1, y1, yerr1 = _load_data(data_file_1, which_data)
     x2, y2, yerr2 = _load_data(data_file_2, which_data)
