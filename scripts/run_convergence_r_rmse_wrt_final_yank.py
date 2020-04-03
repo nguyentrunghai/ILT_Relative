@@ -216,12 +216,6 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_4a(algdock_score_
     return r_final, rmse_final, r_yank, rmse_yank
 
 
-def std_from_iqr(x):
-    q75, q25 = np.percentile(x, [75, 25])
-    iqr = q75 - q25
-    return iqr / 1.35
-
-
 def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                      ref_ligand, ref_ligands,
                                      FF, weights, yank_interaction_energies,
