@@ -253,10 +253,10 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
     else:
         _r_rmse_one_ref_ligand_a_random_sample_of_snapshot = None
 
-    r_final_s = []
-    rmse_final_s = []
-    r_yank_s = []
-    rmse_yank_s = []
+    rs_final = []
+    rmses_final = []
+    rs_yank = []
+    rmses_yank = []
 
     for _ in range(repeats):
         r_f, rmse_f, r_y, rmse_y = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir,
@@ -269,24 +269,23 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                                                                       replace)
 
         if str(r_f).lower() not in ["-inf", "inf", "nan"]:
-            r_final_s.append(r_f)
+            rs_final.append(r_f)
 
         if str(rmse_f).lower() not in ["-inf", "inf", "nan"]:
-            rmse_final_s.append(rmse_f)
+            rmses_final.append(rmse_f)
 
         if str(r_y).lower() not in ["-inf", "inf", "nan"]:
-            r_yank_s.append(r_y)
+            rs_yank.append(r_y)
 
         if str(rmse_y).lower() not in ["-inf", "inf", "nan"]:
-            rmse_yank_s.append(rmse_y)
+            rmses_yank.append(rmse_y)
 
-    r_final = (np.mean(r_final_s), np.std(r_final_s))
-    rmse_final = (np.mean(rmse_final_s), np.std(rmse_final_s))
+    rs_final = np.array(rs_final)
+    rmses_final = np.array(rmses_final)
+    rs_yank = np.array(rs_yank)
+    rmses_yank = np.array(rmses_yank)
 
-    r_yank = (np.mean(r_yank_s), np.std(r_yank_s))
-    rmse_yank = (np.mean(rmse_yank_s), np.std(rmse_yank_s))
-
-    return r_final, rmse_final, r_yank, rmse_yank
+    return rs_final, rmses_final, rs_yank, rmses_yank
 
 
 assert args.method in ["without_cv", "with_cv_3a", "with_cv_4a"], "unrecognized method: " + args.method
@@ -323,18 +322,40 @@ for ref_ligand in ref_ligands:
 
     for sample_size in sample_sizes:
         print(sample_size)
-        r_final, rmse_final, r_yank, rmse_yank = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
+        rs_final, rmses_final, rs_yank, rmses_yank = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir, target_ligands,
                                                                                   ref_ligand, ref_ligands,
                                                                                   args.FF, single_snap_weights,
                                                                                   yank_interaction_energies,
                                                                                   sample_size, final_rel_fes, yank_abs_fes,
-                                                                                  args.bootstrap_repeats, args.method)
+                                                                                  args.bootstrap_repeats, args.method,
+                                                                                  replace=False)
 
-        out_file_final.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_final[0], r_final[1],
-                                                                         rmse_final[0], rmse_final[1]))
+        r_mean_final = np.mean(rs_final)
+        rmse_mean_final = np.mean(rmses_final)
+        r_mean_yank = np.mean(rs_yank)
+        rmse_mean_yank = np.mean(rmses_yank)
 
-        out_file_yank.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_yank[0], r_yank[1],
-                                                                         rmse_yank[0], rmse_yank[1]))
+        rs_final, rmses_final, rs_yank, rmses_yank = _bootstrap_r_rmse_one_ref_ligand(args.algdock_score_dir,
+                                                                                      target_ligands,
+                                                                                      ref_ligand, ref_ligands,
+                                                                                      args.FF, single_snap_weights,
+                                                                                      yank_interaction_energies,
+                                                                                      sample_size, final_rel_fes,
+                                                                                      yank_abs_fes,
+                                                                                      args.bootstrap_repeats,
+                                                                                      args.method,
+                                                                                      replace=True)
+
+        r_err_final = np.std(rs_final)
+        rmse_err_final = np.std(rmses_final)
+        r_err_yank = np.std(rs_yank)
+        rmse_err_yank = np.std(rmses_yank)
+
+        out_file_final.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_mean_final, r_err_final,
+                                                                         rmse_mean_final, rmse_err_final))
+
+        out_file_yank.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_mean_yank, r_err_yank,
+                                                                         rmse_mean_yank, rmse_err_yank))
     out_file_final.close()
     out_file_yank.close()
 
