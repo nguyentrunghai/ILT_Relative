@@ -241,7 +241,7 @@ y_high = np.ceil(y_high)
 
 # without cv
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys_a, c=cs, marker=ms, s=20)
+ax.scatter(xs, ys_a, c=cs, marker="o", s=20)
 ax.set_ylim([y_low, y_high])
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
@@ -250,7 +250,7 @@ fig.savefig("dev_from_yank_vs_abs_corr_without_cv.pdf")
 
 # with cv
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
-ax.scatter(xs, ys_b, c=cs, marker=ms, s=20)
+ax.scatter(xs, ys_b, c=cs, marker="o", s=20)
 ax.set_ylim([y_low, y_high])
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
