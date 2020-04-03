@@ -122,26 +122,31 @@ for ref_ligand in ref_ligands:
 FONTSIZE = 8
 FONT = {"fontname": "Arial"}
 
+#---------------------------------------------------
 # plot difference in absolute deviation vs corr coef
 xs = [corr_coeffs[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
 ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[ref_ligand][target_ligand])
       for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
 xs = np.array(xs)
+xs = np.abs(xs)
 ys = np.array(ys) - args.shift
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
 
-ax.set_xlabel("Corr($g, h$)", fontsize=FONTSIZE, **FONT)
+ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
-fig.savefig("dev_diff_vs_corr.pdf")
+fig.savefig("d_vs_abs_corr.pdf")
 
+with open("d_vs_abs_corr.dat", "w") as handle:
+    handle.write("# abs_corr      d\n")
+    for x, y in zip(xs, ys):
+        handle.write("%15.5f %15.5f\n" % (x, y))
 
-#------------------------------------------------------------------------------
 # rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
 rate_neg_diff_dev = negative_rate_by_corr(xs, ys)
 rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
@@ -200,3 +205,56 @@ print("Median bootstrap std without CV %0.5f" % np.median(xs))
 print("Mean bootstrap std with CV %0.5f" % ys.mean())
 print("Median bootstrap std with CV %0.5f" % np.median(ys))
 #------------------------------------------------------------------------
+
+# plot deviation from YANK vs |corr[h, g]|
+
+colors = ("b", "g", "c", "m", "y", "k")
+markers = ("v", "^", "<", ">", "s", "D")
+print("ref_ligands:", ref_ligands)
+print("colors:", colors)
+print("markers:", markers)
+
+
+xs = []
+ys_a = []
+ys_b = []
+cs = []
+ms = []
+for c, m, ref_ligand in zip(colors, markers, ref_ligands):
+    for target_ligand in target_ligands:
+        xs.append(corr_coeffs[ref_ligand][target_ligand])
+        ys_a.append(devs_without_cv[ref_ligand][target_ligand])
+        ys_b.append(devs_with_cv[ref_ligand][target_ligand])
+
+        cs.append(c)
+        ms.append(m)
+
+xs = np.array(xs)
+xs = np.abs(xs)
+ys_a = np.array(ys_a)
+ys_b = np.array(ys_b)
+
+y_low = np.min([ys_a.min(), ys_b.min()])
+y_low = np.floor(y_low)
+y_high = np.max([ys_a.max(), ys_b.max()])
+y_high = np.ceil(y_high)
+
+# without cv
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys_a, c=cs, marker=ms, s=20)
+ax.set_ylim([y_low, y_high])
+ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+fig.tight_layout()
+fig.savefig("dev_from_yank_vs_abs_corr_without_cv.pdf")
+
+# with cv
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys_b, c=cs, marker=ms, s=20)
+ax.set_ylim([y_low, y_high])
+ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
+fig.tight_layout()
+fig.savefig("dev_from_yank_vs_abs_corr_with_cv.pdf")
+
+print("DONE")
