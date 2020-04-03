@@ -149,7 +149,7 @@ for i, ref_system in enumerate(ref_systems):
                      y1_shift=y1_shift, y2_shift=y2_shift,
                      colors=colors, line_styles=line_styles, lw=line_width)
 
-    ax.set_xrange([8, 100])
+    ax.set_xlim([8, 100])
 
     ax.set_xlabel(args.xlabel, fontsize=FONTSIZE, **FONT)
     ax.set_ylabel(args.ylabel, fontsize=FONTSIZE, **FONT)
