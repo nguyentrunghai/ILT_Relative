@@ -135,18 +135,20 @@ ys = np.array(ys) - args.shift
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
-
+ax.set_xlim([0, 0.8])
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
 fig.savefig("d_vs_abs_corr.pdf")
 
+#--------
 with open("d_vs_abs_corr.dat", "w") as handle:
     handle.write("# abs_corr      d\n")
     for x, y in zip(xs, ys):
         handle.write("%15.5f %15.5f\n" % (x, y))
 
+#--------
 # rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
 rate_neg_diff_dev = negative_rate_by_corr(xs, ys)
 rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
@@ -242,6 +244,7 @@ y_high = np.ceil(y_high)
 # without cv
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys_a, c=cs, marker="o", s=20)
+ax.set_xlim([0, 0.8])
 ax.set_ylim([y_low, y_high])
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
@@ -251,6 +254,7 @@ fig.savefig("dev_from_yank_vs_abs_corr_without_cv.pdf")
 # with cv
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys_b, c=cs, marker="o", s=20)
+ax.set_xlim([0, 0.8])
 ax.set_ylim([y_low, y_high])
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("Deviation from YANK (kcal/mol)", fontsize=FONTSIZE, **FONT)
