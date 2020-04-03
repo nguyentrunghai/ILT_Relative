@@ -179,14 +179,14 @@ ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[r
       for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
 xs = np.array(xs)
-#xs = np.abs(xs)
+xs = np.abs(xs)
+xs = np.log(xs)
 ys = np.array(ys) - args.shift
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
-#ax.set_xscale('log')
-ax.set_xlabel("C", fontsize=FONTSIZE, **FONT)
+ax.set_xlabel("ln(|$C$|)", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
 fig.tight_layout()
