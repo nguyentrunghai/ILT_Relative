@@ -38,6 +38,7 @@ args = parser.parse_args()
 #BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
 BINS = [-np.inf, 0.6, 1.1]
 
+
 def negative_rate_by_corr(corr_coefs, diff_yank_dev, bins=BINS):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
     df["diff_yank_dev_neg"] = df["diff_yank_dev"] < 0.
@@ -100,9 +101,11 @@ for ref_ligand in ref_ligands:
 
 # load g-h correlation coefficients
 corr_coeffs = {}      # corr_coeffs[ref_ligand][target_ligand] -> float
+c_const = {}          # c_const[ref_ligand][target_ligand] -> float
 
 for ref_ligand in ref_ligands:
     corr_coeffs[ref_ligand] = {}
+    c_const[ref_ligand] = {}
 
     for target_ligand in target_ligands:
         infile = os.path.join(args.g_h_corr_dir, ref_ligand + args.result_dir_suffix,
@@ -111,6 +114,7 @@ for ref_ligand in ref_ligands:
         c, c_err, corr, corr_err = np.loadtxt(infile)
 
         corr_coeffs[ref_ligand][target_ligand] = corr
+        c_const[ref_ligand][target_ligand] = c
 
 
 # Plot
@@ -137,6 +141,7 @@ fig.tight_layout()
 fig.savefig("dev_diff_vs_corr.pdf")
 
 
+#------------------------------------------------------------------------------
 # rate of negative Diff. in Abs. Dev. from YANK grouped by correlation bin
 rate_neg_diff_dev = negative_rate_by_corr(xs, ys)
 rate_neg_diff_dev.to_csv("rate_neg_diff_dev.csv")
@@ -159,6 +164,7 @@ print("")
 
 overall_rate_neg_diff_dev = (ys < 0.).mean()
 print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
+#---------------------------------------------------------------------------
 
 
 # plot estimation errors with vs without cv
@@ -193,3 +199,4 @@ print("Mean bootstrap std without CV %0.5f" % xs.mean())
 print("Median bootstrap std without CV %0.5f" % np.median(xs))
 print("Mean bootstrap std with CV %0.5f" % ys.mean())
 print("Median bootstrap std with CV %0.5f" % np.median(ys))
+#------------------------------------------------------------------------
