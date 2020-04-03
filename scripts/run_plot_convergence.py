@@ -102,8 +102,8 @@ y1_shifts = args.y1_shifts.split()
 if len(y1_shifts) == 0:
     y1_shifts = [0. for _ in ref_systems]
 else:
-    assert len(y1_shifts) == len(ref_systems), "wrong len of y2_shifts"
-    y2_shifts = [float(s) for s in y1_shifts]
+    assert len(y1_shifts) == len(ref_systems), "wrong len of y1_shifts"
+    y1_shifts = [float(s) for s in y1_shifts]
 print("y1_shifts:", y1_shifts)
 
 # y2_shifts
