@@ -93,7 +93,7 @@ if len(y2_scale_facs) == 0:
 else:
     assert len(y2_scale_facs) == len(ref_systems), "wrong len of y2_scale_facs"
     y2_scale_facs = [float(s) for s in y2_scale_facs]
-print("y2_scale_facs")
+print("y2_scale_facs:", y2_scale_facs)
 
 # y2_shifts
 y2_shifts = args.y2_shifts.split()
