@@ -38,8 +38,6 @@ parser.add_argument("--sample_sizes", type=str, default="10 50 96")
 # "without_cv", "with_cv_3a" or "with_cv_4a"
 parser.add_argument("--method", type=str, default="none")
 
-parser.add_argument("--robust", action="store_true", default=False)
-
 args = parser.parse_args()
 
 
@@ -228,7 +226,7 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                      ref_ligand, ref_ligands,
                                      FF, weights, yank_interaction_energies,
                                      sample_size, final_rel_fes, yank_abs_fes,
-                                     repeats, method, robust=False):
+                                     repeats, method):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -281,23 +279,14 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
         if str(rmse_y).lower() not in ["-inf", "inf", "nan"]:
             rmse_yank_s.append(rmse_y)
 
-    if robust:
-        r_final = (np.median(r_final_s), std_from_iqr(r_final_s))
-        rmse_final = (np.median(rmse_final_s), std_from_iqr(rmse_final_s))
+    r_final = (np.mean(r_final_s), np.std(r_final_s))
+    rmse_final = (np.mean(rmse_final_s), np.std(rmse_final_s))
 
-        r_yank = (np.median(r_yank_s), std_from_iqr(r_yank_s))
-        rmse_yank = (np.median(rmse_yank_s), std_from_iqr(rmse_yank_s))
-    else:
-        r_final = (np.mean(r_final_s), np.std(r_final_s))
-        rmse_final = (np.mean(rmse_final_s), np.std(rmse_final_s))
-
-        r_yank = (np.mean(r_yank_s), np.std(r_yank_s))
-        rmse_yank = (np.mean(rmse_yank_s), np.std(rmse_yank_s))
+    r_yank = (np.mean(r_yank_s), np.std(r_yank_s))
+    rmse_yank = (np.mean(rmse_yank_s), np.std(rmse_yank_s))
 
     return r_final, rmse_final, r_yank, rmse_yank
 
-
-print("robust:", args.robust)
 
 assert args.method in ["without_cv", "with_cv_3a", "with_cv_4a"], "unrecognized method: " + args.method
 print("Method:" + args.method)
@@ -338,8 +327,7 @@ for ref_ligand in ref_ligands:
                                                                                   args.FF, single_snap_weights,
                                                                                   yank_interaction_energies,
                                                                                   sample_size, final_rel_fes, yank_abs_fes,
-                                                                                  args.bootstrap_repeats, args.method,
-                                                                                  robust=args.robust)
+                                                                                  args.bootstrap_repeats, args.method)
 
         out_file_final.write("%10d %15.10f %15.10f %15.10f %15.10f\n" % (sample_size, r_final[0], r_final[1],
                                                                          rmse_final[0], rmse_final[1]))
