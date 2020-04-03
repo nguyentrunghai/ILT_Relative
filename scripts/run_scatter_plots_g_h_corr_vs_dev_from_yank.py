@@ -185,7 +185,7 @@ ys = np.array(ys) - args.shift
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
-ax.set_xlim([0, 0.8])
+#ax.set_xscale('log')
 ax.set_xlabel("C", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
