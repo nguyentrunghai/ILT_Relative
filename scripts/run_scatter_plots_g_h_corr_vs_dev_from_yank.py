@@ -173,7 +173,25 @@ overall_rate_neg_diff_dev = (ys < 0.).mean()
 print("Overall rate of negative difference in absolute YANK deviation: %0.5f" % overall_rate_neg_diff_dev)
 #---------------------------------------------------------------------------
 
+# plot d vs c
+xs = [c_const[ref_ligand][target_ligand] for ref_ligand in ref_ligands for target_ligand in target_ligands]
+ys = [np.abs(devs_with_cv[ref_ligand][target_ligand]) - np.abs(devs_without_cv[ref_ligand][target_ligand])
+      for ref_ligand in ref_ligands for target_ligand in target_ligands]
 
+xs = np.array(xs)
+#xs = np.abs(xs)
+ys = np.array(ys) - args.shift
+
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys)
+ax.axhline(y=0, c="k")
+ax.set_xlim([0, 0.8])
+ax.set_xlabel("C", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
+
+fig.tight_layout()
+fig.savefig("d_vs_C.pdf")
+#----------------------------------------
 # plot estimation errors with vs without cv
 xs = [bfe_errors_without_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
       for target_ligand in target_ligands]
