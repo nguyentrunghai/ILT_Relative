@@ -26,6 +26,7 @@ type=str, default="1-methylpyrrole.A__AAA benzene.A__AAA lysozyme.active.A__ABJ 
 parser.add_argument("--which_data", type=str, default="none")
 
 parser.add_argument("--y2_scale_facs", type=str, default="")
+parser.add_argument("--y1_shifts", type=str, default="")
 parser.add_argument("--y2_shifts", type=str, default="")
 parser.add_argument("--y2err_scale_facs", type=str, default="")
 
@@ -59,7 +60,7 @@ def scaling(x, fac=1.):
 
 
 def plot_convergence(data_file_1, data_file_2, which_data, ax,
-                     y2_scale=1., y2err_scale=1., y2_shift=0.,
+                     y2_scale=1., y2err_scale=1., y1_shift=0., y2_shift=0.,
                      colors=("b", "r"), line_styles=("-", "--"),
                      lw=1):
     x1, y1, yerr1 = _load_data(data_file_1, which_data)
@@ -69,6 +70,7 @@ def plot_convergence(data_file_1, data_file_2, which_data, ax,
     yerr2 = yerr2 / 2
     yerr2 = yerr2 * y2err_scale
 
+    y1 = y1 + y1_shift
     y2 = scaling(y2, fac=y2_scale) + y2_shift
 
     ax.errorbar(x1, y1, yerr=yerr1, c=colors[0], linestyle=line_styles[0], lw=lw)
@@ -94,6 +96,15 @@ else:
     assert len(y2_scale_facs) == len(ref_systems), "wrong len of y2_scale_facs"
     y2_scale_facs = [float(s) for s in y2_scale_facs]
 print("y2_scale_facs:", y2_scale_facs)
+
+# y1_shifts
+y1_shifts = args.y1_shifts.split()
+if len(y1_shifts) == 0:
+    y1_shifts = [0. for _ in ref_systems]
+else:
+    assert len(y1_shifts) == len(ref_systems), "wrong len of y2_shifts"
+    y2_shifts = [float(s) for s in y1_shifts]
+print("y1_shifts:", y1_shifts)
 
 # y2_shifts
 y2_shifts = args.y2_shifts.split()
@@ -128,13 +139,17 @@ for i, ref_system in enumerate(ref_systems):
     print("data_file_2:", data_file_2)
 
     y2_scale = y2_scale_facs[i]
+    y1_shift = y1_shifts[i]
     y2_shift = y2_shifts[i]
     y2err_scale = y2err_scale_facs[i]
 
     fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
     plot_convergence(data_file_1, data_file_2, which_data, ax,
-                     y2_scale=y2_scale, y2_shift=y2_shift, y2err_scale=y2err_scale,
+                     y2_scale=y2_scale, y2err_scale=y2err_scale,
+                     y1_shift=y1_shift, y2_shift=y2_shift,
                      colors=colors, line_styles=line_styles, lw=line_width)
+
+    ax.set_xrange([8, 100])
 
     ax.set_xlabel(args.xlabel, fontsize=FONTSIZE, **FONT)
     ax.set_ylabel(args.ylabel, fontsize=FONTSIZE, **FONT)
