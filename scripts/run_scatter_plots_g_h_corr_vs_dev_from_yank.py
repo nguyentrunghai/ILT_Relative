@@ -36,7 +36,7 @@ parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score"
 args = parser.parse_args()
 
 #BINS = [-np.inf, 0.2, 0.4, 0.6, 0.8, 1]
-BINS = [-np.inf, 0.6, 1.1]
+BINS = [-0.1, 0.3, 1.1]
 
 
 def negative_rate_by_corr(corr_coefs, diff_yank_dev, bins=BINS):
