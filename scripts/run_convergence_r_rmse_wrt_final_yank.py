@@ -84,9 +84,10 @@ def _pearson_r_rmse(reference_vals, target_vals):
 
 
 def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_dir, target_ligands,
-                                                      ref_ligand, ref_ligands,
-                                                      FF, weights, yank_interaction_energies,
-                                                      sample_size, final_rel_fes, yank_abs_fes):
+                                                                  ref_ligand, ref_ligands,
+                                                                  FF, weights, yank_interaction_energies,
+                                                                  sample_size, final_rel_fes, yank_abs_fes,
+                                                                  replace):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -104,7 +105,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_
     """
     assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
 
-    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=replace)
 
     fes = {}
     for ligand in target_ligands:
@@ -125,9 +126,10 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_without_cv(algdock_score_
 
 
 def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_dir, target_ligands,
-                                                      ref_ligand, ref_ligands,
-                                                      FF, weights, yank_interaction_energies,
-                                                      sample_size, final_rel_fes, yank_abs_fes):
+                                                                  ref_ligand, ref_ligands,
+                                                                  FF, weights, yank_interaction_energies,
+                                                                  sample_size, final_rel_fes, yank_abs_fes,
+                                                                  replace):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -145,7 +147,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
     """
     assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
 
-    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=replace)
 
     fes = {}
     for ligand in target_ligands:
@@ -171,9 +173,10 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_3a(algdock_score_
 
 
 def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_4a(algdock_score_dir, target_ligands,
-                                                      ref_ligand, ref_ligands,
-                                                      FF, weights, yank_interaction_energies,
-                                                      sample_size, final_rel_fes, yank_abs_fes):
+                                                                  ref_ligand, ref_ligands,
+                                                                  FF, weights, yank_interaction_energies,
+                                                                  sample_size, final_rel_fes, yank_abs_fes,
+                                                                  replace):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -191,7 +194,7 @@ def _r_rmse_one_ref_ligand_a_random_sample_of_snapshot_with_cv_4a(algdock_score_
     """
     assert ref_ligand in ref_ligands, ref_ligand + " not in " + ref_ligands
 
-    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=True)
+    rand_snapshots = np.random.choice(weights[ref_ligand].keys(), size=sample_size, replace=replace)
 
     fes = {}
     for ligand in target_ligands:
@@ -220,7 +223,7 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
                                      ref_ligand, ref_ligands,
                                      FF, weights, yank_interaction_energies,
                                      sample_size, final_rel_fes, yank_abs_fes,
-                                     repeats, method):
+                                     repeats, method, replace):
     """
     :param algdock_score_dir: str
     :param target_ligands: list of str
@@ -257,9 +260,13 @@ def _bootstrap_r_rmse_one_ref_ligand(algdock_score_dir, target_ligands,
 
     for _ in range(repeats):
         r_f, rmse_f, r_y, rmse_y = _r_rmse_one_ref_ligand_a_random_sample_of_snapshot(algdock_score_dir,
-                                                                    target_ligands, ref_ligand, ref_ligands,
-                                                                     FF, weights, yank_interaction_energies,
-                                                                     sample_size,  final_rel_fes, yank_abs_fes)
+                                                                                      target_ligands, ref_ligand,
+                                                                                      ref_ligands,
+                                                                                      FF, weights,
+                                                                                      yank_interaction_energies,
+                                                                                      sample_size,
+                                                                                      final_rel_fes, yank_abs_fes,
+                                                                                      replace)
 
         if str(r_f).lower() not in ["-inf", "inf", "nan"]:
             r_final_s.append(r_f)
