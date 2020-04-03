@@ -139,6 +139,12 @@ for i, ref_system in enumerate(ref_systems):
     ax.set_xlabel(args.xlabel, fontsize=FONTSIZE, **FONT)
     ax.set_ylabel(args.ylabel, fontsize=FONTSIZE, **FONT)
 
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(FONTSIZE)
+
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(FONTSIZE)
+
     fig.tight_layout()
     out = ref_system + "_" + which_data + ".pdf"
     print("Writing figure to " + out)
