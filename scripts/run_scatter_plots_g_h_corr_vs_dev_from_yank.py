@@ -229,6 +229,8 @@ ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 fig.tight_layout()
 fig.savefig("d_vs_C.pdf")
 #----------------------------------------
+
+
 # plot estimation errors with vs without cv
 xs = [bfe_errors_without_cv[ref_ligand][target_ligand] for ref_ligand in ref_ligands
       for target_ligand in target_ligands]
@@ -261,8 +263,38 @@ print("Mean bootstrap std without CV %0.5f" % xs.mean())
 print("Median bootstrap std without CV %0.5f" % np.median(xs))
 print("Mean bootstrap std with CV %0.5f" % ys.mean())
 print("Median bootstrap std with CV %0.5f" % np.median(ys))
-#------------------------------------------------------------------------
+#-------------------------------------------------------------
 
+# plot Error(B) - Error(A) vs cor(h, g)
+xs = []
+ys = []
+for ref_ligand in ref_ligands:
+    for target_ligand in target_ligands:
+        xs.append(corr_coeffs[ref_ligand][target_ligand])
+        y = (bfe_errors_with_cv[ref_ligand][target_ligand] * args.error_scale_factor) - bfe_errors_without_cv[ref_ligand][target_ligand]
+        ys.append(y)
+
+xs = np.array(xs)
+xs = np.abs(xs)
+ys = np.array(ys)
+
+y_max = np.max([np.abs(ys.min()), np.abs(ys.max())])
+y_max = np.ceil(y_max)
+y_low = -y_max
+y_high = y_max
+
+fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
+ax.scatter(xs, ys)
+ax.axhline(y=0, c="k")
+ax.set_xlim([0, 0.8])
+ax.set_ylim([y_low, y_high])
+
+ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
+ax.set_ylabel("[Error(B) - Error(A)] (kcal/mol)", fontsize=FONTSIZE, **FONT)
+
+fig.tight_layout()
+fig.savefig("error_diff_vs_abs_corr.pdf")
+#-----------------------------------------------
 # plot deviation from YANK vs |corr[h, g]|
 
 colors = ("b", "g", "c", "m", "y", "k")
