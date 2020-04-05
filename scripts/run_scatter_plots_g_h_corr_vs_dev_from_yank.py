@@ -162,10 +162,17 @@ ys = np.array(ys) - args.shift
 ys = split_under_cond(xs, ys, cutoff=args.flip_cutoff, ratio=args.flip_ratio)
 xs, ys = move_under_cond(xs, ys, cutoff_cor=args.move_cutoff_cor, cutoff_d=args.move_cutoff_d)
 
+y_max = np.max([np.abs(ys.min()), np.abs(ys.max())])
+y_max = np.ceil(y_max)
+y_low = -y_max
+y_high = y_max
+
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
 ax.set_xlim([0, 0.8])
+ax.set_ylim([y_low, y_high])
+
 ax.set_xlabel("|Corr($g, h$)|", fontsize=FONTSIZE, **FONT)
 ax.set_ylabel("$d$ (kcal/mol)", fontsize=FONTSIZE, **FONT)
 
