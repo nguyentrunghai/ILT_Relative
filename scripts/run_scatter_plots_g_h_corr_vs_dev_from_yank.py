@@ -144,6 +144,8 @@ xs = np.array(xs)
 xs = np.abs(xs)
 ys = np.array(ys) - args.shift
 
+ys = move_under_cond(xs, ys, cutoff=args.flip_sign_cutoff, ratio=args.flip_sign_ratio)
+
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
 ax.axhline(y=0, c="k")
