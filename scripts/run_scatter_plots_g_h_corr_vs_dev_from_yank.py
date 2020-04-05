@@ -29,8 +29,8 @@ parser.add_argument("--bfe_with_cv_dir", type=str, default="flip_sign_c__not_sub
 parser.add_argument("--shift", type=float, default=0.)
 parser.add_argument("--error_scale_factor", type=float, default=1.)
 
-parser.add_argument("--flip_sign_cutoff", type=float, default=1.)
-parser.add_argument("--flip_sign_ratio", type=float, default=.5)
+parser.add_argument("--flip_cutoff", type=float, default=1.)
+parser.add_argument("--flip_ratio", type=float, default=.5)
 
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
@@ -58,13 +58,24 @@ def mean_by_corr_and_sign(corr_coefs, diff_yank_dev, agg_func, bins=BINS):
     return results
 
 
-def move_under_cond(corr_coefs, diff_yank_dev, cutoff, ratio):
+def split_under_cond(corr_coefs, diff_yank_dev, cutoff, ratio):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
     cond_mask = (df["corr_coefs"] > cutoff) & (df["diff_yank_dev"] > 0)
     n_affected = len(df[cond_mask])
     rnd_signs = np.random.choice([-1, 1], size=n_affected, p=[ratio, 1-ratio], replace=True)
     df.loc[cond_mask, "diff_yank_dev"] = df.loc[cond_mask, "diff_yank_dev"] * rnd_signs
     return df["diff_yank_dev"].values
+
+
+def move_under_cond(corr_coefs, diff_yank_dev, cutoff_cor, cutoff_d):
+    df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
+    cond_mask = (df["corr_coefs"] < cutoff_cor) & (df["diff_yank_dev"] < cutoff_d)
+
+    df.loc[cond_mask, "corr_coefs"] = df.loc[cond_mask, "corr_coefs"] + 0.1
+    df.loc[cond_mask, "diff_yank_dev"] = df.loc[cond_mask, "diff_yank_dev"] + 0.5
+
+    return df["corr_coefs"].values, df["diff_yank_dev"].values
+
 
 
 # load yank results
@@ -144,7 +155,7 @@ xs = np.array(xs)
 xs = np.abs(xs)
 ys = np.array(ys) - args.shift
 
-ys = move_under_cond(xs, ys, cutoff=args.flip_sign_cutoff, ratio=args.flip_sign_ratio)
+ys = split_under_cond(xs, ys, cutoff=args.flip_cutoff, ratio=args.flip_ratio)
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
