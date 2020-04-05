@@ -61,10 +61,11 @@ def mean_by_corr_and_sign(corr_coefs, diff_yank_dev, agg_func, bins=BINS):
     return results
 
 
-def split_under_cond(corr_coefs, diff_yank_dev, cutoff, ratio):
+def split_under_cond(corr_coefs, diff_yank_dev, cutoff, ratio, random_state=123):
     df = pd.DataFrame({"corr_coefs": corr_coefs, "diff_yank_dev": diff_yank_dev})
     cond_mask = (df["corr_coefs"] > cutoff) & (df["diff_yank_dev"] > 0)
     n_affected = len(df[cond_mask])
+    np.random.seed(random_state)
     rnd_signs = np.random.choice([-1, 1], size=n_affected, p=[ratio, 1-ratio], replace=True)
     df.loc[cond_mask, "diff_yank_dev"] = df.loc[cond_mask, "diff_yank_dev"] * rnd_signs
     return df["diff_yank_dev"].values
