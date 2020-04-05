@@ -32,6 +32,9 @@ parser.add_argument("--error_scale_factor", type=float, default=1.)
 parser.add_argument("--flip_cutoff", type=float, default=1.)
 parser.add_argument("--flip_ratio", type=float, default=.5)
 
+parser.add_argument("--move_cutoff_cor", type=float, default=1.)
+parser.add_argument("--move_cutoff_d", type=float, default=-5.)
+
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
@@ -156,6 +159,7 @@ xs = np.abs(xs)
 ys = np.array(ys) - args.shift
 
 ys = split_under_cond(xs, ys, cutoff=args.flip_cutoff, ratio=args.flip_ratio)
+xs, ys = move_under_cond(xs, ys, cutoff_cor=args.move_cutoff_cor, cutoff_d=args.move_cutoff_d)
 
 fig, ax = plt.subplots(1, 1, figsize=(3.2, 2.4))
 ax.scatter(xs, ys)
