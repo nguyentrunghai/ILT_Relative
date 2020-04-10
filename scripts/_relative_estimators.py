@@ -1487,3 +1487,22 @@ def relative_bfe_with_cv_using_exp_mean_method_4a(snapshots, score_dir, target_l
         print("")
 
     return hs, gs, c, correlation, rel_bfe
+
+
+def cv_mean(ws, gs):
+    """
+    :param ws: 1d array, variable whose mean to be estimated
+    :param gs: 1d array, control variable
+    :return: w_mean, float
+    """
+    g_var = np.var(gs)
+    w_g_cov = np.cov(ws, gs)[0, -1]
+    c = w_g_cov / g_var
+
+    ms = ws - (c * gs)
+    m_bar = np.mean(ms)
+    if m_bar < 0:
+        ms = ws + (c * gs)
+        m_bar = np.mean(ms)
+    return m_bar
+
