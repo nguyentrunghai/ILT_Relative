@@ -1515,7 +1515,7 @@ def relative_bfe_with_cv_using_exp_mean_method_4b(snapshots, score_dir, target_l
                                                   verbose=False):
     """
     Same as 4a but also control for mean of weight
-    
+
     :param snapshots: list of str
     :param score_dir: str
     :param target_ligand: str
