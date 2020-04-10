@@ -1585,7 +1585,7 @@ def relative_bfe_with_cv_using_exp_mean_method_4b(snapshots, score_dir, target_l
                 ws.append(weights[ref_ligand][snapshot])
 
     ws = np.array(ws)
-    #ws /= ws.sum()
+    ws /= ws.sum()
 
     hs = np.array(hs) * ws
     gs = np.array(gs) * ws
