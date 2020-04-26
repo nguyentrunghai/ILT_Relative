@@ -200,10 +200,16 @@ print("mean_diff_by_corr_sign")
 print(mean_diff_by_corr_sign)
 print("")
 
+print("Overall mean of d: %0.5f" % np.mean(ys))
+print("")
+
 median_diff_by_corr_sign = mean_by_corr_and_sign(xs, ys, "median")
 print("")
 print("median_diff_by_corr_sign")
 print(median_diff_by_corr_sign)
+print("")
+
+print("Overall median of d: %0.5f" % np.median(ys))
 print("")
 
 overall_rate_neg_diff_dev = (ys < 0.).mean()
