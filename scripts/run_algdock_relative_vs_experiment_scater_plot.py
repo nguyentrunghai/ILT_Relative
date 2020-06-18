@@ -23,7 +23,7 @@ parser.add_argument("--algdock_dir", type=str, default="AlGDock")
 # "with" or "without"
 parser.add_argument("--control_variate", type=str, default=" ")
 parser.add_argument("--ref_ligands", type=str,
-default="1-methylpyrrole.A__AAA  benzene.A__AAA  lysozyme.active.A__ABJ  lysozyme.inactive.A__AAS  phenol.A__AAA  p-xylene.A__AAA")
+default="1-methylpyrrole.A__AAA  benzene.A__AAA  lysozyme.active.A__ABJ  lysozyme.inactive.A__AAS p-xylene.A__AAA phenol.A__AAA")
 
 parser.add_argument("--error_scales", type=str, default="1 1 1 1 1 1")
 
@@ -141,7 +141,7 @@ for i, ref_ligand in enumerate(ref_ligands):
 
     ylim = ylims[i]
     if ylim is not None:
-        ylim = [float(s) for s in ylim]
+        ylim = [float(s) for s in ylim.split("_")]
 
     scatter_plot(xs, ys, args.xlabel, args.ylabel, out_fig,
                  show_xy_axes=True,
