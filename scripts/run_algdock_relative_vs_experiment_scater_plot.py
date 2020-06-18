@@ -36,6 +36,8 @@ parser.add_argument("--ylabel", type=str, default="AlGDock free energy (kcal/mol
 args = parser.parse_args()
 
 assert args.control_variate in ["with", "without"], "Unknown control_variate"
+print("Control Variate:", args.control_variate)
+print("AlGDock dir:", args.algdock_dir)
 
 # load experiment results
 exper_bfes = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
