@@ -15,6 +15,7 @@ from _plots import scatter_plot, scatter_plot_info
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--exper_results", type=str, default="/home/tnguye46/T4_Lysozyme/Experiments/experiment_dG.dat")
+parser.add_argument("--yank_results", type=str, default="/home/tnguye46/T4_Lysozyme/Yank/yank_results.dat")
 
 parser.add_argument("--bfe_without_cv_dir", type=str,
                     default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/Relative_FE_Est_1/all96")
@@ -28,16 +29,18 @@ parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__singl
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
 parser.add_argument("--rel_bfe_file", type=str, default="OpenMM_OBC2_MBAR.score")
 
-parser.add_argument("--xlabel", type=str, default="YANK free energy (kcal/mol)")
+parser.add_argument("--xlabel", type=str, default="Experimental results (kcal/mol)")
 parser.add_argument("--ylabel", type=str, default="AlGDock free energy (kcal/mol)")
 
 args = parser.parse_args()
 
 # load experiment results
-exper_fes = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
+exper_bfes = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
 
 ref_ligands = SIX_YANK_SYSTEMS
-target_ligands = [lig for lig in exper_fes.keys() if lig not in ref_ligands]
+print("Ref ligands:\n" + "\n".join(ref_ligands))
+target_ligands = [lig for lig in exper_bfes.keys() if lig not in ref_ligands]
+print("Target ligands:\n" + "\n".join(target_ligands))
 
 # load yank results
 yank_bfes, _ = load_scores(args.yank_results, 0, 1, 2, exclude_ligands=[])
@@ -83,14 +86,11 @@ for ref_ligand in ref_ligands:
 
 # plot
 xs = []
-x_errs = []
 for ref_ligand in ref_ligands:
     for target_ligand in target_ligands:
-        xs.append(yank_bfes[target_ligand])
-        x_errs.append(yank_bfe_errors[target_ligand])
+        xs.append(exper_bfes[target_ligand])
 
 xs = np.array(xs)
-x_errs = np.array(x_errs) / 2.
 
 # without CV
 ys = []
@@ -108,7 +108,7 @@ scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_without_CV.dat")
 
 scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
              show_xy_axes=True,
-             xerr=x_errs, yerr=y_errs,
+             yerr=y_errs,
              show_regression_line=True,
              show_diagonal_line=False,
              show_rmse=True,
@@ -135,7 +135,7 @@ scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_with_CV.dat")
 
 scatter_plot(xs, ys, args.xlabel, args.ylabel, "with_CV.pdf",
              show_xy_axes=True,
-             xerr=x_errs, yerr=y_errs,
+             yerr=y_errs,
              show_regression_line=True,
              show_diagonal_line=False,
              show_rmse=True,
@@ -144,3 +144,5 @@ scatter_plot(xs, ys, args.xlabel, args.ylabel, "with_CV.pdf",
              markersize=4,
              same_xy_scale=False,
              text_pos=[0.1, 0.7])
+
+print("DONE")
