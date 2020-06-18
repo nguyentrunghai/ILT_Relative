@@ -10,6 +10,8 @@ import argparse
 import numpy as np
 
 from _yank import YANK_LIGANDS
+from _yank import load_exper_bfes
+
 from load_mbar_weights_holo_OBC2 import load_mbar_weights
 from _process_yank_outputs import load_interaction_energies
 from _relative_estimators import relative_bfe_with_cv_using_exp_mean_method_2a
@@ -26,6 +28,8 @@ parser.add_argument("--scores_dir", type=str,
 
 parser.add_argument("--interaction_energies_dir", type=str,
                     default="/home/tnguye46/T4_Lysozyme/Relative_Binding_FE/OpenMM_OBC2_interaction_energies_for_576_algdock_snapshots")
+
+parser.add_argument("--exper_results", type=str, default="/home/tnguye46/T4_Lysozyme/Experiments/experiment_dG.dat")
 
 parser.add_argument("--FF", type=str, default="OpenMM_OBC2_MBAR")
 
@@ -103,6 +107,10 @@ print("ref_ligands", ref_ligands)
 
 yank_interaction_energies = load_interaction_energies(path=args.interaction_energies_dir)
 
+exper_res = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
+exper_ligands = exper_res.keys()
+target_ligands = list(set(YANK_LIGANDS + exper_ligands))
+
 if args.flip_sign_c:
     print("Flip sign of C if m_bar is negative")
 else:
@@ -126,7 +134,7 @@ for ref_ligand in ref_ligands:
 
     snapshots = single_snap_weights[ref_ligand].keys()
 
-    for target_ligand in YANK_LIGANDS:
+    for target_ligand in target_ligands:
         hs, gs, c, correlation, rel_bfe = relative_bfe_with_cv_using_exp_mean(snapshots, args.scores_dir,
                                                                               target_ligand, ref_ligand,
                                                                               single_snap_weights,
