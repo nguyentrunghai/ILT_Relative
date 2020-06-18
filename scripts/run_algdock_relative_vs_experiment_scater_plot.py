@@ -53,7 +53,7 @@ if args.control_variate == "with":
     algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
     algdock_errors = {}
     for ref_ligand in ref_ligands:
-        infile = os.path.join(args.bfe_with_cv_dir, ref_ligand + args.result_dir_suffix,
+        infile = os.path.join(args.algdock_dir, ref_ligand + args.result_dir_suffix,
                               args.combining_rule, args.rel_bfe_file)
         print("Loading", infile)
         bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
@@ -77,8 +77,8 @@ if args.control_variate == "without":
     algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
     algdock_errors = {}
     for ref_ligand in ref_ligands:
-        infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
-                          args.combining_rule, args.rel_bfe_file)
+        infile = os.path.join(args.algdock_dir, ref_ligand + args.result_dir_suffix,
+                              args.combining_rule, args.rel_bfe_file)
         print("Loading", infile)
         bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
 
@@ -101,67 +101,39 @@ if args.control_variate == "without":
 
 # plot
 xs = []
-for ref_ligand in ref_ligands:
-    for target_ligand in target_ligands:
-        xs.append(exper_bfes[target_ligand])
-
+for target_ligand in target_ligands:
+    xs.append(exper_bfes[target_ligand])
 xs = np.array(xs)
 
-# without CV
-ys = []
-y_errs = []
 for ref_ligand in ref_ligands:
+    out_dir = ref_ligand
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    out_fig = os.path.join(out_dir, "algdock_vs_experiment.pdf")
+    out_log = os.path.join(out_dir, "rmse_pearsonR.dat")
+
+    ys = []
+    y_errs = []
     for target_ligand in target_ligands:
-        ys.append(rbfes_without_cv[ref_ligand][target_ligand])
-        y_errs.append(rbfe_errors_without_cv[ref_ligand][target_ligand])
+        ys.append(algdock_bfes[ref_ligand][target_ligand])
+        y_errs.append(algdock_errors[ref_ligand][target_ligand])
 
-ys = np.array(ys)
-y_errs = np.array(y_errs) / 2.
+    ys = np.array(ys)
+    y_errs = np.array(y_errs) / 2.
 
-dummy_ligands = ["abc" for _ in ys]
-scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_without_CV.dat")
+    dummy_ligands = ["abc" for _ in ys]
+    scatter_plot_info(xs, ys, dummy_ligands, out_log)
+    scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
+                 show_xy_axes=True,
+                 yerr=y_errs,
+                 show_regression_line=True,
+                 show_diagonal_line=False,
+                 show_rmse=True,
+                 show_R=True,
+                 show_regression_line_eq=True,
+                 markersize=4,
+                 same_xy_scale=False,
+                 text_pos=[0.1, 0.7])
 
-ylimits = [-10, 10]
-scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
-             show_xy_axes=True,
-             yerr=y_errs,
-             ylimits=ylimits,
-             show_regression_line=True,
-             show_diagonal_line=False,
-             show_rmse=True,
-             show_R=True,
-             show_regression_line_eq=True,
-             markersize=4,
-             same_xy_scale=False,
-             text_pos=[0.1, 0.7])
-
-
-# with CV
-ys = []
-y_errs = []
-for ref_ligand in ref_ligands:
-    for target_ligand in target_ligands:
-        ys.append(rbfes_with_cv[ref_ligand][target_ligand])
-        y_errs.append(rbfe_errors_with_cv[ref_ligand][target_ligand])
-
-ys = np.array(ys)
-y_errs = np.array(y_errs) * args.error_scale_factor / 2.
-
-dummy_ligands = ["abc" for _ in ys]
-scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_with_CV.dat")
-
-ylimits = [-12, 8]
-scatter_plot(xs, ys, args.xlabel, args.ylabel, "with_CV.pdf",
-             show_xy_axes=True,
-             yerr=y_errs,
-             ylimits=ylimits,
-             show_regression_line=True,
-             show_diagonal_line=False,
-             show_rmse=True,
-             show_R=True,
-             show_regression_line_eq=True,
-             markersize=4,
-             same_xy_scale=False,
-             text_pos=[0.1, 0.7])
 
 print("DONE")
