@@ -37,8 +37,10 @@ args = parser.parse_args()
 exper_fes = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
 
 ref_ligands = SIX_YANK_SYSTEMS
-exper_ligands = [lig for lig in exper_fes.keys() if lig not in ref_ligands]
+target_ligands = [lig for lig in exper_fes.keys() if lig not in ref_ligands]
 
+# load yank results
+yank_bfes, _ = load_scores(args.yank_results, 0, 1, 2, exclude_ligands=[])
 
 # rbfe WITH CV
 rbfes_with_cv = {}            # rbfes_with_cv[ref_ligand][target_ligand] -> float
@@ -49,6 +51,9 @@ for ref_ligand in ref_ligands:
     print("Loading", infile)
     bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
 
+    # keep only target ligands
+    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
+    errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
     for target_ligand in bfes:
         bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand]
 
@@ -66,7 +71,7 @@ for ref_ligand in ref_ligands:
     bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
     self_bfe = bfes[ref_ligand]
 
-    # remove reference ligands in the dict
+    # keep only target ligands
     bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
     errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
 
