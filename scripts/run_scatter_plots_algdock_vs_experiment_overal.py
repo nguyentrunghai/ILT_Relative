@@ -64,6 +64,8 @@ for ref_ligand in ref_ligands:
     rbfe_errors_with_cv[ref_ligand] = errors
 
 
+short_names = ["active.D__DAA", "active.C__CAA", "active.C__CAB"]
+full_names = ["lysozyme." + lig for lig in short_names]
 # rbfe WITHOUT CV
 rbfes_without_cv = {}            # rbfes_without_cv[ref_ligand][target_ligand] -> float
 rbfe_errors_without_cv = {}
@@ -72,6 +74,12 @@ for ref_ligand in ref_ligands:
                           args.combining_rule, args.rel_bfe_file)
     print("Loading", infile)
     bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
+
+    # change name for some ligands
+    for s_name, f_name in zip(short_names, full_names):
+        bfes[f_name] = bfes[s_name]
+        errors[f_name] = errors[s_name]
+
     self_bfe = bfes[ref_ligand]
 
     # keep only target ligands
