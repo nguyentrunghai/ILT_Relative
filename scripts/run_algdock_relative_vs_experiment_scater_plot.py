@@ -121,7 +121,7 @@ for ref_ligand in ref_ligands:
         y_errs.append(algdock_errors[ref_ligand][target_ligand])
 
     ys = np.array(ys)
-    y_errs = np.array(y_errs) / 2.
+    y_errs = np.array(y_errs) * args.error_scale_factor / 2.
 
     dummy_ligands = ["abc" for _ in ys]
     scatter_plot_info(xs, ys, dummy_ligands, out_log)
