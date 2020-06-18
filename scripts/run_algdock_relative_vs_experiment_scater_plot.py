@@ -8,7 +8,6 @@ import argparse
 
 import numpy as np
 
-from _algdock import SIX_YANK_SYSTEMS
 from _yank import load_scores, load_exper_bfes
 from _plots import scatter_plot, scatter_plot_info
 
@@ -23,8 +22,12 @@ parser.add_argument("--algdock_dir", type=str, default="AlGDock")
 
 # "with" or "without"
 parser.add_argument("--control_variate", type=str, default=" ")
+parser.add_argument("--ref_ligands", type=str,
+default="1-methylpyrrole.A__AAA  benzene.A__AAA  lysozyme.active.A__ABJ  lysozyme.inactive.A__AAS  phenol.A__AAA  p-xylene.A__AAA")
 
-parser.add_argument("--error_scale_factor", type=float, default=1.)
+parser.add_argument("--error_scales", type=str, default="1 1 1 1 1 1")
+
+parser.add_argument("--ylims", type=str, default=" ")
 
 parser.add_argument("--result_dir_suffix", type=str, default="__equal_sys__single_weight")
 parser.add_argument("--combining_rule", type=str, default="ExpMean")
@@ -42,8 +45,18 @@ print("AlGDock dir:", args.algdock_dir)
 # load experiment results
 exper_bfes = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
 
-ref_ligands = SIX_YANK_SYSTEMS
+ref_ligands = args.ref_ligands.split()
 print("Ref ligands:\n" + "\n".join(ref_ligands))
+
+error_scales = [float(s) for s in args.error_scales.split()]
+print("error_scales", error_scales)
+
+ylims = args.ylims.split()
+if len(ylims) == 0:
+    ylims = [None for _ in ref_ligands]
+
+assert len(ref_ligands) == len(error_scales) == len(ylims), "wrong length"
+
 target_ligands = [lig for lig in exper_bfes.keys() if lig not in ref_ligands]
 print("Target ligands:\n" + "\n".join(target_ligands))
 
@@ -107,7 +120,7 @@ for target_ligand in target_ligands:
     xs.append(exper_bfes[target_ligand])
 xs = np.array(xs)
 
-for ref_ligand in ref_ligands:
+for i, ref_ligand in enumerate(ref_ligands):
     out_dir = ref_ligand
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
@@ -121,14 +134,19 @@ for ref_ligand in ref_ligands:
         y_errs.append(algdock_errors[ref_ligand][target_ligand])
 
     ys = np.array(ys)
-    y_errs = np.array(y_errs) * args.error_scale_factor / 2.
+    y_errs = np.array(y_errs) * error_scales[i] / 2.
 
     dummy_ligands = ["abc" for _ in ys]
     scatter_plot_info(xs, ys, dummy_ligands, out_log)
 
+    ylim = ylims[i]
+    if ylim is not None:
+        ylim = [float(s) for s in ylim]
+
     scatter_plot(xs, ys, args.xlabel, args.ylabel, out_fig,
                  show_xy_axes=True,
                  yerr=y_errs,
+                 ylimits=ylim,
                  show_regression_line=True,
                  show_diagonal_line=False,
                  show_rmse=True,
