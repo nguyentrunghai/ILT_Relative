@@ -49,29 +49,33 @@ print("Target ligands:\n" + "\n".join(target_ligands))
 yank_bfes, _ = load_scores(args.yank_results, 0, 1, 2, exclude_ligands=[])
 
 # rbfe WITH CV
-rbfes_with_cv = {}            # rbfes_with_cv[ref_ligand][target_ligand] -> float
-rbfe_errors_with_cv = {}
-for ref_ligand in ref_ligands:
-    infile = os.path.join(args.bfe_with_cv_dir, ref_ligand + args.result_dir_suffix,
-                          args.combining_rule, args.rel_bfe_file)
-    print("Loading", infile)
-    bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
+if args.control_variate == "with":
+    algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
+    algdock_errors = {}
+    for ref_ligand in ref_ligands:
+        infile = os.path.join(args.bfe_with_cv_dir, ref_ligand + args.result_dir_suffix,
+                              args.combining_rule, args.rel_bfe_file)
+        print("Loading", infile)
+        bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=ref_ligands)
 
-    # keep only target ligands
-    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
-    errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
-    for target_ligand in bfes:
-        bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand]
+        # keep only target ligands
+        bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
+        errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
 
-    rbfes_with_cv[ref_ligand] = bfes
-    rbfe_errors_with_cv[ref_ligand] = errors
+        # add reference value from YANK
+        for target_ligand in bfes:
+            bfes[target_ligand] = bfes[target_ligand] + yank_bfes[ref_ligand]
+
+        algdock_bfes[ref_ligand] = bfes
+        algdock_errors[ref_ligand] = errors
 
 
+# rbfe WITHOUT CV
 short_names = ["active.D__DAA", "active.C__CAA", "active.C__CAB"]
 full_names = ["lysozyme." + lig for lig in short_names]
-# rbfe WITHOUT CV
-rbfes_without_cv = {}            # rbfes_without_cv[ref_ligand][target_ligand] -> float
-rbfe_errors_without_cv = {}
+
+algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
+algdock_errors = {}
 for ref_ligand in ref_ligands:
     infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
                           args.combining_rule, args.rel_bfe_file)
@@ -92,8 +96,8 @@ for ref_ligand in ref_ligands:
     for target_ligand in bfes:
         bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand]
 
-    rbfes_without_cv[ref_ligand] = bfes
-    rbfe_errors_without_cv[ref_ligand] = errors
+    algdock_bfes[ref_ligand] = bfes
+    algdock_bfes[ref_ligand] = errors
 
 # plot
 xs = []
