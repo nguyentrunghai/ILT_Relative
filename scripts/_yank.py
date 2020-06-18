@@ -31,11 +31,11 @@ YANK_LIGANDS["phenol.A__AAA"]               = "phenol"
 YANK_LIGANDS["p-xylene.A__AAA"]             = "p-xylene"
 
 
-def load_scores(file, id_col, score_col, std_col, exclude_ligands):
+def load_scores(file_name, id_col, score_col, std_col, exclude_ligands):
     scores = {}
     standard_devs = {}
 
-    with open(file, "r") as handle:
+    with open(file_name, "r") as handle:
         for line in handle:
             if not line.strip().startswith("#"):
                 entries = line.split()
@@ -50,9 +50,9 @@ def load_scores(file, id_col, score_col, std_col, exclude_ligands):
     return scores, standard_devs
 
 
-def load_exper_bfes(file, id_col, score_col, exclude_ligands):
+def load_exper_bfes(file_name, id_col, score_col, exclude_ligands):
     scores = {}
-    with open(file, "r") as handle:
+    with open(file_name, "r") as handle:
         for line in handle:
             if not line.strip().startswith("#"):
                 entries = line.split()
