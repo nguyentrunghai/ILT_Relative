@@ -109,7 +109,10 @@ yank_interaction_energies = load_interaction_energies(path=args.interaction_ener
 
 exper_res = load_exper_bfes(args.exper_results, id_col=1, score_col=2, exclude_ligands=[])
 exper_ligands = exper_res.keys()
-target_ligands = list(set(YANK_LIGANDS + exper_ligands))
+yank_ligands = YANK_LIGANDS.keys()
+target_ligands = list(set(yank_ligands + exper_ligands))
+print("Target ligands:")
+print("\n".join(target_ligands))
 
 if args.flip_sign_c:
     print("Flip sign of C if m_bar is negative")
