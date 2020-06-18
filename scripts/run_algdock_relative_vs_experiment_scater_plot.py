@@ -69,35 +69,35 @@ if args.control_variate == "with":
         algdock_bfes[ref_ligand] = bfes
         algdock_errors[ref_ligand] = errors
 
-
 # rbfe WITHOUT CV
-short_names = ["active.D__DAA", "active.C__CAA", "active.C__CAB"]
-full_names = ["lysozyme." + lig for lig in short_names]
+if args.control_variate == "without":
+    short_names = ["active.D__DAA", "active.C__CAA", "active.C__CAB"]
+    full_names = ["lysozyme." + lig for lig in short_names]
 
-algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
-algdock_errors = {}
-for ref_ligand in ref_ligands:
-    infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
+    algdock_bfes = {}            # algdock_bfes[ref_ligand][target_ligand] -> float
+    algdock_errors = {}
+    for ref_ligand in ref_ligands:
+        infile = os.path.join(args.bfe_without_cv_dir, ref_ligand + args.result_dir_suffix,
                           args.combining_rule, args.rel_bfe_file)
-    print("Loading", infile)
-    bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
+        print("Loading", infile)
+        bfes, errors = load_scores(infile, 0, 1, 2, exclude_ligands=[])
 
-    # change name for some ligands
-    for s_name, f_name in zip(short_names, full_names):
-        bfes[f_name] = bfes[s_name]
-        errors[f_name] = errors[s_name]
+        # change name for some ligands
+        for s_name, f_name in zip(short_names, full_names):
+            bfes[f_name] = bfes[s_name]
+            errors[f_name] = errors[s_name]
 
-    self_bfe = bfes[ref_ligand]
+        self_bfe = bfes[ref_ligand]
 
-    # keep only target ligands
-    bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
-    errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
+        # keep only target ligands
+        bfes = {ligand: bfes[ligand] for ligand in bfes if ligand in target_ligands}
+        errors = {ligand: errors[ligand] for ligand in errors if ligand in target_ligands}
 
-    for target_ligand in bfes:
-        bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand]
+        for target_ligand in bfes:
+            bfes[target_ligand] = bfes[target_ligand] - self_bfe + yank_bfes[ref_ligand]
 
-    algdock_bfes[ref_ligand] = bfes
-    algdock_bfes[ref_ligand] = errors
+        algdock_bfes[ref_ligand] = bfes
+        algdock_errors[ref_ligand] = errors
 
 # plot
 xs = []
