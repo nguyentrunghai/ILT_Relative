@@ -123,7 +123,8 @@ for ref_ligand in ref_ligands:
 
     dummy_ligands = ["abc" for _ in ys]
     scatter_plot_info(xs, ys, dummy_ligands, out_log)
-    scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
+    
+    scatter_plot(xs, ys, args.xlabel, args.ylabel, out_fig,
                  show_xy_axes=True,
                  yerr=y_errs,
                  show_regression_line=True,
