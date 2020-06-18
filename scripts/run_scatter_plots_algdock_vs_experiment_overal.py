@@ -114,7 +114,7 @@ y_errs = np.array(y_errs) / 2.
 dummy_ligands = ["abc" for _ in ys]
 scatter_plot_info(xs, ys, dummy_ligands, "rmse_pearsonR_without_CV.dat")
 
-ylimits = [-10, 8]
+ylimits = [-10, 10]
 scatter_plot(xs, ys, args.xlabel, args.ylabel, "without_CV.pdf",
              show_xy_axes=True,
              yerr=y_errs,
