@@ -50,6 +50,21 @@ def load_scores(file, id_col, score_col, std_col, exclude_ligands):
     return scores, standard_devs
 
 
+def load_exper_bfes(file, id_col, score_col, exclude_ligands):
+    scores = {}
+    with open(file, "r") as handle:
+        for line in handle:
+            if not line.strip().startswith("#"):
+                entries = line.split()
+                id = entries[id_col]
+                val = entries[score_col]
+
+                if id not in exclude_ligands:
+                    if val.lower() not in ["inf", "nan"]:
+                        scores[id] = np.float(val)
+    return scores
+
+
 def matching_scores(score1, score2, err1, err2, allowed_ligands=[]):
     ligands = set(score1.keys()).intersection(set(score2.keys()))
 
